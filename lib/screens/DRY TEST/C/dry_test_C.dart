@@ -281,7 +281,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
                 const SizedBox(height: 4),
                 const Text('🔥 Hot : Black',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.brown)),
+                        fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0))),
               ]),
             ),
             const SizedBox(width: 16),
