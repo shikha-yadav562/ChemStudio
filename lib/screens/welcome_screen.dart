@@ -2,9 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 // Preliminary test screens
-import 'DRY TEST/A/preliminary_test_A.dart';
-import 'DRY TEST/C/preliminary_test_C.dart';
-import 'DRY TEST/B/preliminary_test_B.dart';
+import 'DRY_TEST/A/preliminary_test_A.dart';
+import 'DRY_TEST/C/preliminary_test_C.dart';
+import 'DRY_TEST/B/preliminary_test_B.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);

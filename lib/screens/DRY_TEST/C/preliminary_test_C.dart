@@ -1,17 +1,17 @@
-import 'package:ChemStudio/screens/DRY TEST/B/dry_test_B.dart';
 import 'package:flutter/material.dart';
+import 'package:ChemStudio/screens/DRY_TEST/C/dry_test_C.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class PreliminaryTestBScreen extends StatefulWidget {
-  const PreliminaryTestBScreen({super.key});
+class PreliminaryTestCScreen extends StatefulWidget {
+  const PreliminaryTestCScreen({super.key});
 
   @override
-  State<PreliminaryTestBScreen> createState() => _PreliminaryTestBScreenState();
+  State<PreliminaryTestCScreen> createState() => _PreliminaryTestCScreenState();
 }
 
-class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
+class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
   int _index = 0;
   final Map<int, String> _answers = {};
 
@@ -19,9 +19,9 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
     TestItem(
       id: 1,
       title: "1. Preliminary Test – Colour",
-      observation: "White",
-      options: ["Fe3+", "Cu2+", "Mn2+", "Pb2+"],
-      correct: "Pb2+",
+      observation: "Dark Brown",
+      options: ["Fe3+", "Cu2+", "Mn2+", "Co2+"],
+      correct: "Fe3+",
     ),
     TestItem(
       id: 2,
@@ -38,7 +38,7 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestBScreen()),
+        MaterialPageRoute(builder: (_) => const DryTestCScreen()),
       );
     }
   }
@@ -63,7 +63,7 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
             colors: [accentTeal, primaryBlue],
           ).createShader(bounds),
           child: const Text(
-            "Salt B: Preliminary Test",
+            "Salt C: Preliminary Test",
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -80,9 +80,9 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
             Text(
               test.title,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: primaryBlue,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
             const SizedBox(height: 12),
             Expanded(
@@ -132,8 +132,7 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color:
-                                  selectedHere ? accentTeal : Colors.black87,
+                              color: selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),
@@ -159,13 +158,17 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
                         : Icons.arrow_forward,
                   ),
                   label: Text(
-                    _index == _tests.length - 1 ? "Proceed to Dry Test" : "Next",
+                    _index == _tests.length - 1
+                        ? "Proceed to Dry Test"
+                        : "Next",
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                   ),
                 ),
               ],
@@ -228,23 +231,23 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(
-          colors: [Color.fromARGB(255, 254, 255, 255), Color.fromARGB(255, 254, 255, 255)],
+          colors: [Color(0xFF5D4037), Color(0xFF3E2723)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromARGB(255, 183, 183, 183).withOpacity(0.4),
+            color: Colors.brown.withOpacity(0.4),
             blurRadius: 8,
             spreadRadius: 2,
-          )
+          ),
         ],
       ),
       child: const Center(
         child: Text(
-          "White",
+          "Dark Brown",
           style: TextStyle(
-            color: Color.fromARGB(255, 48, 47, 47),
+            color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,

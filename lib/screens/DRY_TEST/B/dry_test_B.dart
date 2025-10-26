@@ -4,14 +4,14 @@ import '../../welcome_screen.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class DryTestCScreen extends StatefulWidget {
-  const DryTestCScreen({super.key});
+class DryTestBScreen extends StatefulWidget {
+  const DryTestBScreen({super.key});
 
   @override
-  State<DryTestCScreen> createState() => _DryTestCScreenState();
+  State<DryTestBScreen> createState() => _DryTestBScreenState();
 }
 
-class _DryTestCScreenState extends State<DryTestCScreen>
+class _DryTestBScreenState extends State<DryTestBScreen>
     with SingleTickerProviderStateMixin {
   int _index = 0;
   final Map<int, String> _answers = {};
@@ -38,7 +38,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
         title: '1. Heating in a Dry Test Tube',
         procedure:
             'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
-        observation: 'Coloured residue observed.\nCold: Brown Hot: Black',
+        observation: 'Coloured residue observed.\nCold: Yellow Hot: Brown',
         options: ['Co2+', 'Cu2+', 'Fe3+', 'Pb2+'],
       ),
       TestItem(
@@ -46,7 +46,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
         title: '2. NaOH Test',
         procedure:
             'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
-        observation: 'Moist turmeric paper remains unchanged.',
+        observation: 'Moist turmeric paper turn brown/red.',
         options: ['NH4+ Present', 'NH4+ Absent'],
       ),
       TestItem(
@@ -54,7 +54,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
         title: '3. Flame Test',
         procedure:
             'Prepare a paste of the salt with conc. HCl. Dip a platinum wire or glass rod in it and place it in an oxidising flame. Observe the colour.',
-        observation: 'Apple-green flame observed.',
+        observation: 'Bluish white flame observed.',
         options: [
           'Ca2+ may be present',
           'Ba2+ may be present',
@@ -113,7 +113,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
             colors: [accentTeal, primaryBlue],
           ).createShader(bounds),
           child: const Text(
-            'Salt C : Dry Tests',
+            'Salt B : Dry Tests',
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -279,9 +279,9 @@ class _DryTestCScreenState extends State<DryTestCScreen>
                     errorBuilder: (_, __, ___) =>
                         const PlaceholderImage(label: 'Pic A (Hot : Black)')),
                 const SizedBox(height: 4),
-                const Text('🔥 Hot : Black',
+                const Text('🔥 Hot : Brown',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0))),
+                        fontWeight: FontWeight.bold, color: Colors.brown)),
               ]),
             ),
             const SizedBox(width: 16),
@@ -290,11 +290,11 @@ class _DryTestCScreenState extends State<DryTestCScreen>
                 Image.asset('assets/images/pic_b.png',
                     height: 160,
                     errorBuilder: (_, __, ___) =>
-                        const PlaceholderImage(label: 'Pic B (Cold : Brown)')),
+                        const PlaceholderImage(label: 'Pic B (Cold : Yellow)')),
                 const SizedBox(height: 4),
-                const Text('❄️ Cold : Brown',
+                const Text('❄️ Cold : Yellow',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.brown)),
+                        fontWeight: FontWeight.bold, color: Color.fromARGB(255, 255, 183, 0))),
               ]),
             ),
           ],
@@ -324,7 +324,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
               border: Border.all(color: Colors.amber.shade700, width: 2),
             ),
             child: const Center(
-                child: Text('NO\nCHANGE',
+                child: Text('Turns in red/brown',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -348,14 +348,14 @@ class _DryTestCScreenState extends State<DryTestCScreen>
               height: 100,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                    colors: [Colors.greenAccent.shade200, Colors.green.shade600],
+                    colors: [const Color.fromARGB(255, 255, 255, 255), const Color.fromARGB(255, 255, 255, 255)],
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.elliptical(60, 100)),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.green.shade400.withOpacity(0.8),
+                      color: const Color.fromARGB(255, 134, 132, 132).withOpacity(0.8),
                       blurRadius: 10,
                       spreadRadius: 2)
                 ],
@@ -374,11 +374,11 @@ class _DryTestCScreenState extends State<DryTestCScreen>
           const SizedBox(width: 20),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(height: 60),
-            Text('Apple Green',
+            Text('Bluish White',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: accentTeal)),
+                    color: const Color.fromARGB(255, 84, 79, 137))),
             const Text('Characteristic Flame Colour'),
           ])
         ]),
@@ -434,7 +434,7 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt C : Test Summary',
+            'Salt B : Test Summary',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -533,6 +533,7 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: Colors.white,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
