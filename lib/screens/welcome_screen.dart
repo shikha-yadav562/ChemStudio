@@ -28,9 +28,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         centerTitle: true,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min, // keeps items tight
           children: [
             Image.asset('assets/images/chemstudio_logo.png', height: 55),
-            const SizedBox(width: 3),
             ShaderMask(
               shaderCallback: (bounds) => const LinearGradient(
                 colors: [accentTeal, primaryBlue],
@@ -60,27 +60,45 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildCardWrapper("A", "Salt A"),
-                      const SizedBox(width: 16),
-                      _buildCardWrapper("B", "Salt B"),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildCardWrapper("C", "Salt C"),
-                      const SizedBox(width: 16),
-                      _buildCardWrapper("D", "Salt D"),
-                    ],
-                  ),
-                ],
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  double width = constraints.maxWidth;
+
+              
+                  double cardWidth;
+                  double cardHeight;
+
+                  if (width >= 1000) {
+                    // Desktop
+                   
+                    cardWidth = 280;
+                    cardHeight = 260;
+                  } else if (width >= 600) {
+                    // Tablet
+                  
+                    cardWidth = 220;
+                    cardHeight = 220;
+                  } else {
+                    // Mobile
+               
+                    cardWidth = 150;
+                    cardHeight = 150;
+                  }
+
+                  return Center(
+                    child: Wrap(
+                      alignment: WrapAlignment.center,
+                      spacing: 16,
+                      runSpacing: 16,
+                      children: [
+                        _buildSaltCard("A", "Salt A", cardWidth, cardHeight),
+                        _buildSaltCard("B", "Salt B", cardWidth, cardHeight),
+                        _buildSaltCard("C", "Salt C", cardWidth, cardHeight),
+                        _buildSaltCard("D", "Salt D", cardWidth, cardHeight),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -89,18 +107,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 
-  Widget _buildCardWrapper(String letter, String title) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(
-        maxWidth:  300,  // slightly bigger
-        minWidth:  240,  // slightly bigger
-        maxHeight: 260, // slightly bigger
-      ),
-      child: _buildSaltCard(letter, title),
-    );
-  }
-
-  Widget _buildSaltCard(String letter, String title) {
+  Widget _buildSaltCard(String letter, String title, double width, double height) {
     bool isSelected = selectedSalt == letter;
 
     return GestureDetector(
@@ -143,6 +150,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         });
       },
       child: AnimatedContainer(
+        width: width,
+        height: height,
         duration: const Duration(milliseconds: 300),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -197,4 +206,3 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 }
-
