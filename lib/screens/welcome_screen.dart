@@ -1,7 +1,9 @@
-import '/screens/DRY TEST/C/preliminary_test_C.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
+// Preliminary test screens
+import 'DRY TEST/A/preliminary_test_A.dart';
+import 'DRY TEST/C/preliminary_test_C.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -20,8 +22,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // ✅ AppBar with logo + name
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -29,10 +29,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(
-              'assets/images/chemstudio_logo.png',
-              height: 55,
-            ),
+            Image.asset('assets/images/chemstudio_logo.png', height: 55),
             const SizedBox(width: 3),
             ShaderMask(
               shaderCallback: (bounds) => const LinearGradient(
@@ -45,50 +42,61 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white, // hidden by shader
+                  color: Colors.white,
                 ),
               ),
             ),
           ],
         ),
       ),
-
-      // ✅ Body
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // ✅ Background image (less blur for clarity)
-          Image.asset(
-            'assets/images/bg.png',
-            fit: BoxFit.cover,
-          ),
+          Image.asset('assets/images/bg.png', fit: BoxFit.cover),
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
-            child: Container(
-              color: Colors.white.withOpacity(0.2),
-            ),
+            child: Container(color: Colors.white.withOpacity(0.2)),
           ),
-
-          // ✅ Grid of Salt cards
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
-              child: GridView.count(
-                crossAxisCount: 2,
-                mainAxisSpacing: 25,
-                crossAxisSpacing: 25,
-                shrinkWrap: true,
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _buildSaltCard("A", "Salt A"),
-                  _buildSaltCard("B", "Salt B"),
-                  _buildSaltCard("C", "Salt C"),
-                  _buildSaltCard("D", "Salt D"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildCardWrapper("A", "Salt A"),
+                      const SizedBox(width: 16),
+                      _buildCardWrapper("B", "Salt B"),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      _buildCardWrapper("C", "Salt C"),
+                      const SizedBox(width: 16),
+                      _buildCardWrapper("D", "Salt D"),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildCardWrapper(String letter, String title) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        maxWidth:  300,  // slightly bigger
+        minWidth:  240,  // slightly bigger
+        maxHeight: 260, // slightly bigger
+      ),
+      child: _buildSaltCard(letter, title),
     );
   }
 
@@ -99,17 +107,39 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       onTap: () {
         setState(() => selectedSalt = letter);
 
-        // simple fade transition
-        Future.delayed(const Duration(milliseconds: 300), () {
-          Navigator.push(
-            context,
-            PageRouteBuilder(
-              transitionDuration: const Duration(milliseconds: 400),
-              pageBuilder: (_, __, ___) => const PreliminaryTestCScreen(),
-              transitionsBuilder: (_, animation, __, child) =>
-                  FadeTransition(opacity: animation, child: child),
-            ),
-          );
+        Future.delayed(const Duration(milliseconds: 200), () {
+          Widget? targetPage;
+
+          switch (letter) {
+            case "A":
+              targetPage = const PreliminaryTestAScreen();
+              break;
+            case "B":
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Salt B screen not added yet")),
+              );
+              return;
+            case "C":
+              targetPage = const PreliminaryTestCScreen();
+              break;
+            case "D":
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Salt D screen not added yet")),
+              );
+              return;
+          }
+
+          if (targetPage != null) {
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                transitionDuration: const Duration(milliseconds: 400),
+                pageBuilder: (_, __, ___) => targetPage!,
+                transitionsBuilder: (_, animation, __, child) =>
+                    FadeTransition(opacity: animation, child: child),
+              ),
+            );
+          }
         });
       },
       child: AnimatedContainer(
@@ -128,7 +158,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // ✅ Circle gradient highlight
             if (isSelected)
               Container(
                 decoration: const BoxDecoration(
@@ -140,8 +169,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                 ),
               ),
-
-            // ✅ Salt Letter + Title
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -170,3 +197,4 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     );
   }
 }
+
