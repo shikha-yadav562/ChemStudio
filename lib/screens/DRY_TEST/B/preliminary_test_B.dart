@@ -1,17 +1,17 @@
+import 'package:ChemStudio/screens/DRY_TEST/B/dry_test_b.dart';
 import 'package:flutter/material.dart';
-import 'package:ChemStudio/screens/DRY_TEST/D/dry_test_d.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class PreliminaryTestDScreen extends StatefulWidget {
-  const PreliminaryTestDScreen({super.key});
+class PreliminaryTestBScreen extends StatefulWidget {
+  const PreliminaryTestBScreen({super.key});
 
   @override
-  State<PreliminaryTestDScreen> createState() => _PreliminaryTestDScreenState();
+  State<PreliminaryTestBScreen> createState() => _PreliminaryTestBScreenState();
 }
 
-class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
+class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
   int _index = 0;
   final Map<int, String> _answers = {};
 
@@ -19,9 +19,9 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     TestItem(
       id: 1,
       title: "1. Preliminary Test – Colour",
-      observation: "Bluish Green",
-      options: ["Ni2+", "Cu2+", "Mn2+", "Co2+"],
-      correct: "Ni2+",
+      observation: "White",
+      options: ["Fe3+", "Cu2+", "Mn2+", "Pb2+"],
+      correct: "Pb2+",
     ),
     TestItem(
       id: 2,
@@ -38,7 +38,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestDScreen()),
+        MaterialPageRoute(builder: (_) => const DryTestBScreen()),
       );
     }
   }
@@ -63,7 +63,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
             colors: [accentTeal, primaryBlue],
           ).createShader(bounds),
           child: const Text(
-            "Salt D: Preliminary Test",
+            "Salt B: Preliminary Test",
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -200,7 +200,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
             ),
             const SizedBox(height: 10),
             if (test.id == 1)
-              _buildBluishGreenRectangle()
+              _buildDarkBrownRectangle()
             else
               Row(
                 children: [
@@ -222,19 +222,19 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     );
   }
 
-  Widget _buildBluishGreenRectangle() {
+  Widget _buildDarkBrownRectangle() {
     return Container(
       height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        gradient:  LinearGradient(
-          colors: [Colors.blue.shade200, Colors.green.shade600],
+        gradient: const LinearGradient(
+          colors: [Color.fromARGB(255, 254, 255, 255), Color.fromARGB(255, 254, 255, 255)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.shade400.withOpacity(0.4),
+            color: const Color.fromARGB(255, 183, 183, 183).withOpacity(0.4),
             blurRadius: 8,
             spreadRadius: 2,
           )
@@ -242,9 +242,9 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
       ),
       child: const Center(
         child: Text(
-          "Bluish Green",
+          "White",
           style: TextStyle(
-            color: Colors.white,
+            color: Color.fromARGB(255, 48, 47, 47),
             fontSize: 18,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,

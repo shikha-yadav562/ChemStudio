@@ -533,6 +533,7 @@ class _SaltDResultScreenState extends State<SaltDResultScreen>
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: Colors.white,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(

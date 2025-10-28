@@ -2,9 +2,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 // Preliminary test screens
-import 'DRY_TEST/A/preliminary_test_A.dart';
-import 'DRY_TEST/C/preliminary_test_C.dart';
-import 'DRY_TEST/D/preliminary_test_D.dart';
+import 'DRY_TEST/A/preliminary_test_a.dart';
+import 'DRY_TEST/B/preliminary_test_b.dart';
+import 'DRY_TEST/C/preliminary_test_c.dart';
+import 'DRY_TEST/D/preliminary_test_d.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -123,10 +124,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               targetPage = const PreliminaryTestAScreen();
               break;
             case "B":
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Salt B screen not added yet")),
-              );
-              return;
+             targetPage = const PreliminaryTestBScreen();
+              break;
             case "C":
               targetPage = const PreliminaryTestCScreen();
               break;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dry_test_C.dart';
+import 'package:ChemStudio/screens/DRY_TEST/C/dry_test_c.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -80,9 +80,9 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
             Text(
               test.title,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: primaryBlue,
-                  ),
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
             const SizedBox(height: 12),
             Expanded(
@@ -132,8 +132,7 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color:
-                                  selectedHere ? accentTeal : Colors.black87,
+                              color: selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),
@@ -159,13 +158,17 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                         : Icons.arrow_forward,
                   ),
                   label: Text(
-                    _index == _tests.length - 1 ? "Proceed to Dry Test" : "Next",
+                    _index == _tests.length - 1
+                        ? "Proceed to Dry Test"
+                        : "Next",
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                   ),
                 ),
               ],
@@ -237,7 +240,7 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
             color: Colors.brown.withOpacity(0.4),
             blurRadius: 8,
             spreadRadius: 2,
-          )
+          ),
         ],
       ),
       child: const Center(

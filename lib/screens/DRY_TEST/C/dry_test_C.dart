@@ -281,7 +281,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
                 const SizedBox(height: 4),
                 const Text('🔥 Hot : Black',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.brown)),
+                        fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0))),
               ]),
             ),
             const SizedBox(width: 16),
@@ -533,6 +533,7 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: Colors.white,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
