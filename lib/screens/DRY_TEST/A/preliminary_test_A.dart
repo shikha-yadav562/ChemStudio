@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ChemStudio/screens/DRY_TEST/A/dry_test_A.dart';
+import 'package:ChemStudio/screens/DRY_TEST/A/dry_test_a.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);

@@ -1,4 +1,4 @@
-import 'package:ChemStudio/screens/DRY_TEST/B/dry_test_B.dart';
+import 'package:ChemStudio/screens/DRY_TEST/B/dry_test_b.dart';
 import 'package:flutter/material.dart';
 
 const Color primaryBlue = Color(0xFF004C91);

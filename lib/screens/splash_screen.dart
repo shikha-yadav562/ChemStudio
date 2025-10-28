@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'welcome_screen.dart';
 
@@ -11,28 +12,21 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _fadeLogo;
-  late Animation<double> _fadeText;
-
-  final Color primaryBlue = const Color(0xFF004C91);
-  final Color accentTeal = const Color(0xFF00A6A6);
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    // Fade-in animation for 3 seconds
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
     );
 
-    _fadeLogo = CurvedAnimation(
+    _fadeAnimation = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.0, 0.6, curve: Curves.easeInOut),
-    );
-
-    _fadeText = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.4, 1.0, curve: Curves.easeInOut),
+      curve: Curves.easeInOut,
     );
 
     _controller.forward();
@@ -47,60 +41,67 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final double logoSize = size.width * 0.4;
 
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
           // ✅ Background image
-          Image.asset('assets/images/chem_bg.png', fit: BoxFit.cover),
+          Image.asset(
+            'assets/images/chem_bg.png',
+            fit: BoxFit.cover,
+          ),
 
-          // ✅ Slight dark overlay
-          Container(color: Colors.black.withOpacity(0.25)),
+          // ✅ Soft blur overlay
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+            child: Container(color: Colors.black.withOpacity(0.25)),
+          ),
 
           // ✅ Center content
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // Logo fade animation
-              FadeTransition(
-                opacity: _fadeLogo,
-                child: Image.asset(
-                  'assets/images/chemstudio_logo.png',
-                  width: size.width * 0.7, // Bigger logo
-                  fit: BoxFit.contain,
-                ),
-              ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Fade-in animation for logo and text
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Column(
+                    children: [
+                      // Logo
+                      Image.asset(
+                        'assets/images/chemstudio_logo.png',
+                        width: logoSize.clamp(150, 400),
+                      ),
 
-              const SizedBox(height: 10), // 👈 10px space between logo and name
+                      const SizedBox(height: 20),
 
-              // Gradient "ChemStudio" text inside logo zone
-              FadeTransition(
-                opacity: _fadeText,
-                child: ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [primaryBlue, accentTeal],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ).createShader(bounds),
-                  child: const Text(
-                    "ChemStudio",
-                    style: TextStyle(
-                      fontSize: 38,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white, // Needed for gradient mask
-                      letterSpacing: 1.2,
-                    ),
+                      // App name with gradient text
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [ Color(0xFF00A6A6),Color(0xFF004C91)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ).createShader(bounds),
+                        child: Text(
+                          "ChemStudio",
+                          style: TextStyle(
+                            fontSize: size.width < 500 ? 32 : 48,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 40),
+                const SizedBox(height: 50),
 
-              // "Get Started" button
-              FadeTransition(
-                opacity: _fadeText,
-                child: ElevatedButton(
+                // Static “Get Started” button
+                ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
@@ -110,29 +111,28 @@ class _SplashScreenState extends State<SplashScreen>
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: accentTeal,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.white,
+                    foregroundColor: const Color(0xFF00A6A6),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 60,
+                      horizontal: 50,
                       vertical: 16,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                     elevation: 10,
-                    shadowColor: accentTeal.withOpacity(0.6),
                   ),
                   child: const Text(
                     "Get Started",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.1,
+                      letterSpacing: 1.2,
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
