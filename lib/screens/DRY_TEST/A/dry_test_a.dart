@@ -1,3 +1,4 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../../welcome_screen.dart';
 
@@ -19,6 +20,9 @@ class _DryTestAScreenState extends State<DryTestAScreen>
   late final Animation<double> _fadeSlide;
   late final List<TestItem> _tests = _generateTests();
 
+  final dbHelper = DatabaseHelper.instance;
+  final String tableName = 'SaltA_DryTest';
+
   @override
   void initState() {
     super.initState();
@@ -26,58 +30,79 @@ class _DryTestAScreenState extends State<DryTestAScreen>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide =
-        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _animController.forward();
+
+    _loadSavedAnswers(); // ✅ only load, don’t clear
+  }
+
+  Future<void> _loadSavedAnswers() async {
+    final data = await dbHelper.getAnswers(tableName);
+    if (data.isNotEmpty) {
+      setState(() {
+        for (var row in data) {
+          _answers[row['question_id']] = row['answer'];
+        }
+      });
+    }
   }
 
   static List<TestItem> _generateTests() {
-    return [
-      TestItem(
-        id: 1,
-        title: '1. Heating in a Dry Test Tube',
-        procedure:
-            'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
-        observation: 'Coloured residue observed.\nCold: Blue Hot: White',
-        options: ['Co2+','Fe3+', 'Cu2+','Pb2+'],                                                         
+  return [
+    TestItem(
+      id: 1,
+      title: '1. Heating in a Dry Test Tube',
+      procedure:
+          'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
+      observation: 'Coloured residue observed.\nCold: Blue Hot: White',
+      options: ['Co2+', 'Fe3+', 'Cu2+', 'Pb2+'],
+      correct: 'Cu2+', // ✅ Added
+    ),
+    TestItem(
+      id: 2,
+      title: '2. NaOH Test',
+      procedure:
+          'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
+      observation: 'Moist turmeric paper turns brown/red',
+      options: ['NH4+ Present', 'NH4+ Absent'],
+      correct: 'NH4+ Present', // ✅ Added
+    ),
+    TestItem(
+      id: 3,
+      title: '3. Flame Test',
+      procedure:
+          'Prepare a paste of the salt with conc. HCl. Dip a platinum wire or glass rod in it and place it in an oxidising flame. Observe the colour.',
+      observation: 'Bluish Green flame observed.',
+      options: [
+        'Ca2+ may be present',
+        'Ba2+ may be present',
+        'Sr2+ may be present',
+        'Pb2+ may be present',
+        'Cu2+ may be present'
+      ],
+      correct: 'Cu2+ may be present', // ✅ Added
+    ),
+  ];
+}
 
-      ),
-      TestItem(
-        id: 2,
-        title: '2. NaOH Test',
-        procedure:
-            'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
-        observation: 'Moist turmeric paper turn brown/red',
-        options: ['NH4+ Present', 'NH4+ Absent'],
-      ),
-      TestItem(
-        id: 3,
-        title: '3. Flame Test',
-        procedure:
-            'Prepare a paste of the salt with conc. HCl. Dip a platinum wire or glass rod in it and place it in an oxidising flame. Observe the colour.',
-        observation: 'Bluish Green flame observed.',
-        options: [
-          'Ca2+ may be present',
-          'Ba2+ may be present',
-          'Sr2+ may be present',
-          'Pb2+ may be present',
-          'Cu2+ may be present'
-        ],
-      ),
-    ];
+  Future<void> _saveAnswer(int questionId, String answer) async {
+    await dbHelper.saveAnswer(tableName, questionId, answer);
   }
 
-  void _next() {
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() {
         _index++;
         _animController.forward(from: 0);
       });
     } else {
+      // ✅ Make sure DB writes are done
+      await Future.delayed(const Duration(milliseconds: 200));
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => SaltCResultScreen(userAnswers: _answers, tests: _tests),
+          builder: (_) => SaltAResultScreen(userAnswers: _answers, tests: _tests),
         ),
       );
     }
@@ -110,34 +135,38 @@ class _DryTestAScreenState extends State<DryTestAScreen>
         elevation: 2,
         centerTitle: true,
         title: ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [accentTeal, primaryBlue],
-          ).createShader(bounds),
+          shaderCallback: (bounds) =>
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
           child: const Text(
             'Salt A : Dry Tests',
             style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-                  .animate(_fadeSlide),
+          position: Tween<Offset>(
+            begin: const Offset(0.1, 0.03),
+            end: Offset.zero,
+          ).animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(test.title,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: primaryBlue,
-                          fontWeight: FontWeight.bold,
-                        )),
+                Text(
+                  test.title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
                 const SizedBox(height: 12),
                 Expanded(
                   child: ListView(
@@ -145,9 +174,9 @@ class _DryTestAScreenState extends State<DryTestAScreen>
                       _buildTestCard(test),
                       const SizedBox(height: 24),
                       ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [accentTeal, primaryBlue],
-                        ).createShader(bounds),
+                        shaderCallback: (bounds) =>
+                            const LinearGradient(colors: [accentTeal, primaryBlue])
+                                .createShader(bounds),
                         child: const Text(
                           'Based on the observation, select the correct inference:',
                           style: TextStyle(
@@ -163,7 +192,12 @@ class _DryTestAScreenState extends State<DryTestAScreen>
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
-                            onTap: () => setState(() => _answers[test.id] = opt),
+                            onTap: () {
+                              setState(() {
+                                _answers[test.id] = opt;
+                              });
+                              _saveAnswer(test.id, opt);
+                            },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -295,7 +329,8 @@ class _DryTestAScreenState extends State<DryTestAScreen>
                 const SizedBox(height: 4),
                 const Text('❄️ Cold : Blue',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Color.fromARGB(255, 3, 66, 255))),
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 3, 66, 255))),
               ]),
             ),
           ],
@@ -304,40 +339,57 @@ class _DryTestAScreenState extends State<DryTestAScreen>
     );
   }
 
-  Widget _naohObservation() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Column(children: [
+Widget _naohObservation() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Column(
+        children: [
           const Icon(Icons.science_rounded, size: 60, color: accentTeal),
           const SizedBox(height: 8),
-          Text('Test Tube + NaOH',
-              style: TextStyle(color: primaryBlue, fontWeight: FontWeight.w500))
-        ]),
-        const SizedBox(width: 40),
-        Column(children: [
+          Text(
+            'Test Tube + NaOH',
+            style: TextStyle(
+              color: primaryBlue,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(width: 40),
+      Column(
+        children: [
           Container(
             width: 70,
             height: 70,
             decoration: BoxDecoration(
               color: Colors.amber.shade200,
               borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: const Color.fromARGB(255, 100, 66, 8), width: 2),
+              border: Border.all(
+                color: const Color.fromARGB(255, 100, 66, 8),
+                width: 2,
+              ),
             ),
             child: const Center(
-                child: Text('CHANGED BROWN/RED',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                        color: Colors.black87))),
+              child: Text(
+                'CHANGED BROWN/RED',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 4),
           const Text('Moist Turmeric Paper'),
-        ]),
-      ],
-    );
-  }
+        ],
+      ),
+    ],
+  );
+}
+
 
   Widget _flameObservation() {
     return Column(
@@ -348,15 +400,19 @@ class _DryTestAScreenState extends State<DryTestAScreen>
               width: 60,
               height: 100,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [const Color.fromARGB(255, 0, 184, 55),const Color.fromARGB(255, 2, 214, 97)],
+                gradient: const LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 0, 184, 55),
+                      Color.fromARGB(255, 2, 214, 97)
+                    ],
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter),
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.elliptical(60, 100)),
                 boxShadow: [
                   BoxShadow(
-                      color: const Color.fromARGB(255, 63, 198, 70).withOpacity(0.8),
+                      color: const Color.fromARGB(255, 63, 198, 70)
+                          .withOpacity(0.8),
                       blurRadius: 10,
                       spreadRadius: 2)
                 ],
@@ -379,7 +435,7 @@ class _DryTestAScreenState extends State<DryTestAScreen>
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: const Color.fromARGB(255, 2, 86, 95))),
+                    color: Color.fromARGB(255, 2, 86, 95))),
             const Text('Characteristic Flame Colour'),
           ])
         ]),
@@ -387,21 +443,24 @@ class _DryTestAScreenState extends State<DryTestAScreen>
     );
   }
 }
-class SaltCResultScreen extends StatefulWidget {
+
+// ------------------------------------------------------------
+// ✅ Corrected Result Screen name (SaltAResultScreen)
+class SaltAResultScreen extends StatefulWidget {
   final Map<int, String> userAnswers;
   final List<TestItem> tests;
 
-  const SaltCResultScreen({
+  const SaltAResultScreen({
     super.key,
     required this.userAnswers,
     required this.tests,
   });
 
   @override
-  State<SaltCResultScreen> createState() => _SaltCResultScreenState();
+  State<SaltAResultScreen> createState() => _SaltAResultScreenState();
 }
 
-class _SaltCResultScreenState extends State<SaltCResultScreen>
+class _SaltAResultScreenState extends State<SaltAResultScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _fadeCtrl;
 
@@ -425,7 +484,6 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
@@ -444,7 +502,6 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
           ),
         ),
       ),
-
       body: FadeTransition(
         opacity: _fadeCtrl,
         child: Padding(
@@ -457,13 +514,11 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-
-              // ✅ Gradient Border Cards
               Expanded(
                 child: ListView(
                   children: widget.tests.map((test) {
-                    final ans = widget.userAnswers[test.id] ?? 'No answer selected';
-
+                    final ans =
+                        widget.userAnswers[test.id] ?? 'No answer selected';
                     return Container(
                       margin: const EdgeInsets.symmetric(vertical: 10),
                       decoration: BoxDecoration(
@@ -475,7 +530,7 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Container(
-                        margin: const EdgeInsets.all(2.5), // border thickness
+                        margin: const EdgeInsets.all(2.5),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(14),
@@ -517,10 +572,7 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
                   }).toList(),
                 ),
               ),
-
               const SizedBox(height: 16),
-
-              // ✅ Back Button with subtle gradient
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.pushReplacement(
@@ -554,14 +606,15 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
     );
   }
 }
-/* ---------- MODEL + PLACEHOLDER ---------- */
 
+// ---------- Model ----------
 class TestItem {
   final int id;
   final String title;
   final String procedure;
   final String observation;
   final List<String> options;
+  final String correct;
 
   TestItem({
     required this.id,
@@ -569,6 +622,7 @@ class TestItem {
     required this.procedure,
     required this.observation,
     required this.options,
+    required this.correct,
   });
 }
 
@@ -586,9 +640,10 @@ class PlaceholderImage extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade400),
       ),
       child: Center(
-          child: Text(label,
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600))),
+        child: Text(label,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey.shade600)),
+      ),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../../welcome_screen.dart';
 
@@ -18,6 +19,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
   late final List<TestItem> _tests = _generateTests();
+  final dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
@@ -28,7 +30,17 @@ class _DryTestCScreenState extends State<DryTestCScreen>
     );
     _fadeSlide =
         CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _loadSavedAnswers(); // ✅ load saved answers
     _animController.forward();
+  }
+
+  Future<void> _loadSavedAnswers() async {
+    final savedData = await dbHelper.getAnswers('SaltC_DryTest');
+    final Map<int, String> restored = {};
+    for (var row in savedData) {
+      restored[row['question_id']] = row['answer'];
+    }
+    setState(() => _answers.addAll(restored));
   }
 
   static List<TestItem> _generateTests() {
@@ -40,6 +52,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
             'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
         observation: 'Coloured residue observed.\nCold: Brown Hot: Black',
         options: ['Co2+', 'Cu2+', 'Fe3+', 'Pb2+'],
+        correct: 'Fe3+',
       ),
       TestItem(
         id: 2,
@@ -48,6 +61,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
             'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
         observation: 'Moist turmeric paper remains unchanged.',
         options: ['NH4+ Present', 'NH4+ Absent'],
+        correct: 'NH4+ Absent',
       ),
       TestItem(
         id: 3,
@@ -62,11 +76,23 @@ class _DryTestCScreenState extends State<DryTestCScreen>
           'Pb2+ may be present',
           'Cu2+ may be present'
         ],
+        correct: 'Ba2+ may be present',
       ),
     ];
   }
 
-  void _next() {
+  Future<void> _saveAnswer(int questionId, String answer) async {
+    await dbHelper.saveAnswer('SaltC_DryTest', questionId, answer);
+  }
+
+  void _next() async {
+    final currentTest = _tests[_index];
+    final selected = _answers[currentTest.id];
+
+    if (selected != null) {
+      await _saveAnswer(currentTest.id, selected);
+    }
+
     if (_index < _tests.length - 1) {
       setState(() {
         _index++;
@@ -109,15 +135,13 @@ class _DryTestCScreenState extends State<DryTestCScreen>
         elevation: 2,
         centerTitle: true,
         title: ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [accentTeal, primaryBlue],
-          ).createShader(bounds),
+          shaderCallback: (bounds) =>
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
           child: const Text(
             'Salt C : Dry Tests',
             style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22),
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
@@ -162,7 +186,10 @@ class _DryTestCScreenState extends State<DryTestCScreen>
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
-                            onTap: () => setState(() => _answers[test.id] = opt),
+                            onTap: () async {
+                              setState(() => _answers[test.id] = opt);
+                              await _saveAnswer(test.id, opt);
+                            },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -280,8 +307,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
                         const PlaceholderImage(label: 'Pic A (Hot : Black)')),
                 const SizedBox(height: 4),
                 const Text('🔥 Hot : Black',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Color.fromARGB(255, 0, 0, 0))),
+                    style: TextStyle(fontWeight: FontWeight.bold)),
               ]),
             ),
             const SizedBox(width: 16),
@@ -303,18 +329,30 @@ class _DryTestCScreenState extends State<DryTestCScreen>
     );
   }
 
-  Widget _naohObservation() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Column(children: [
+ Widget _naohObservation() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      // 🔹 Left column – Test Tube + NaOH
+      Column(
+        children: [
           const Icon(Icons.science_rounded, size: 60, color: accentTeal),
           const SizedBox(height: 8),
-          Text('Test Tube + NaOH',
-              style: TextStyle(color: primaryBlue, fontWeight: FontWeight.w500))
-        ]),
-        const SizedBox(width: 40),
-        Column(children: [
+          Text(
+            'Test Tube + NaOH',
+            style: TextStyle(
+              color: primaryBlue,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+
+      const SizedBox(width: 40),
+
+      // 🔹 Right column – Moist Turmeric Paper
+      Column(
+        children: [
           Container(
             width: 70,
             height: 70,
@@ -324,19 +362,25 @@ class _DryTestCScreenState extends State<DryTestCScreen>
               border: Border.all(color: Colors.amber.shade700, width: 2),
             ),
             child: const Center(
-                child: Text('NO\nCHANGE',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10,
-                        color: Colors.black87))),
+              child: Text(
+                'NO\nCHANGE',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  color: Colors.black87,
+                ),
+              ),
+            ),
           ),
           const SizedBox(height: 4),
           const Text('Moist Turmeric Paper'),
-        ]),
-      ],
-    );
-  }
+        ],
+      ),
+    ],
+  );
+}
+
 
   Widget _flameObservation() {
     return Column(
@@ -386,7 +430,8 @@ class _DryTestCScreenState extends State<DryTestCScreen>
     );
   }
 }
-class SaltCResultScreen extends StatefulWidget {
+
+class SaltCResultScreen extends StatelessWidget {
   final Map<int, String> userAnswers;
   final List<TestItem> tests;
 
@@ -397,34 +442,9 @@ class SaltCResultScreen extends StatefulWidget {
   });
 
   @override
-  State<SaltCResultScreen> createState() => _SaltCResultScreenState();
-}
-
-class _SaltCResultScreenState extends State<SaltCResultScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _fadeCtrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _fadeCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _fadeCtrl.forward();
-  }
-
-  @override
-  void dispose() {
-    _fadeCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
@@ -443,117 +463,81 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
           ),
         ),
       ),
-
-      body: FadeTransition(
-        opacity: _fadeCtrl,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Your Selected Answers:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-
-              // ✅ Gradient Border Cards
-              Expanded(
-                child: ListView(
-                  children: widget.tests.map((test) {
-                    final ans = widget.userAnswers[test.id] ?? 'No answer selected';
-
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Your Selected Answers:',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView(
+                children: tests.map((test) {
+                  final ans = userAnswers[test.id] ?? 'No answer selected';
+                  return Container(
+                    margin: const EdgeInsets.symmetric(vertical: 10),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [accentTeal, primaryBlue],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Container(
+                      margin: const EdgeInsets.all(2.5),
                       decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [accentTeal, primaryBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      child: Container(
-                        margin: const EdgeInsets.all(2.5), // border thickness
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          leading: const Icon(
-                            Icons.assignment_turned_in_rounded,
-                            color: accentTeal,
-                            size: 28,
-                          ),
-                          title: Text(
-                            test.title,
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 10),
+                        leading: const Icon(Icons.assignment_turned_in_rounded,
+                            color: accentTeal, size: 28),
+                        title: Text(test.title,
                             style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 16),
-                          ),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(
-                              ans,
+                                fontWeight: FontWeight.w600, fontSize: 16)),
+                        subtitle: Padding(
+                          padding: const EdgeInsets.only(top: 6),
+                          child: Text(ans,
                               style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15,
-                                color: primaryBlue,
-                              ),
-                            ),
-                          ),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: primaryBlue)),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // ✅ Back Button with subtle gradient
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                    ),
                   );
-                },
-                icon: const Icon(Icons.home_rounded, color: Colors.white),
-                label: const Text(
-                  'Back to Home',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  backgroundColor: primaryBlue,
-                  shadowColor: accentTeal.withOpacity(0.4),
-                  elevation: 8,
-                ),
+                }).toList(),
               ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: () => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+              ),
+              icon: const Icon(Icons.home_rounded, color: Colors.white),
+              label: const Text('Back to Home',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30)),
+                backgroundColor: primaryBlue,
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-/* ---------- MODEL + PLACEHOLDER ---------- */
 
 class TestItem {
   final int id;
@@ -561,6 +545,7 @@ class TestItem {
   final String procedure;
   final String observation;
   final List<String> options;
+  final String correct;
 
   TestItem({
     required this.id,
@@ -568,6 +553,7 @@ class TestItem {
     required this.procedure,
     required this.observation,
     required this.options,
+    required this.correct,
   });
 }
 
