@@ -1,3 +1,4 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/screens/DRY_TEST/B/dry_test_b.dart';
 import 'package:flutter/material.dart';
 
@@ -14,6 +15,17 @@ class PreliminaryTestBScreen extends StatefulWidget {
 class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
   int _index = 0;
   final Map<int, String> _answers = {};
+  final _dbHelper = DatabaseHelper.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    //_clearPreviousAnswers();
+  }
+
+  /*Future<void> _clearPreviousAnswers() async {
+    await _dbHelper.clearTest('SaltB_PreliminaryTest');
+  }*/
 
   final List<TestItem> _tests = [
     TestItem(
@@ -109,7 +121,14 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
-                        onTap: () => setState(() => _answers[test.id] = opt),
+                        onTap: () async {
+                          setState(() => _answers[test.id] = opt);
+                          await _dbHelper.saveAnswer(
+                            'SaltB_PreliminaryTest',
+                            test.id,
+                            opt,
+                          );
+                        },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
@@ -132,8 +151,7 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color:
-                                  selectedHere ? accentTeal : Colors.black87,
+                              color: selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),
@@ -159,7 +177,9 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
                         : Icons.arrow_forward,
                   ),
                   label: Text(
-                    _index == _tests.length - 1 ? "Proceed to Dry Test" : "Next",
+                    _index == _tests.length - 1
+                        ? "Proceed to Dry Test"
+                        : "Next",
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
@@ -200,7 +220,7 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
             ),
             const SizedBox(height: 10),
             if (test.id == 1)
-              _buildDarkBrownRectangle()
+              _buildWhiteRectangle()
             else
               Row(
                 children: [
@@ -222,20 +242,20 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
     );
   }
 
-  Widget _buildDarkBrownRectangle() {
+  Widget _buildWhiteRectangle() {
     return Container(
       height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(
-          colors: [Color.fromARGB(255, 254, 255, 255), Color.fromARGB(255, 254, 255, 255)],
+          colors: [Color(0xFFFDFDFD), Color(0xFFF3F3F3)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromARGB(255, 183, 183, 183).withOpacity(0.4),
-            blurRadius: 8,
+            color: Colors.grey.withOpacity(0.3),
+            blurRadius: 6,
             spreadRadius: 2,
           )
         ],
@@ -244,7 +264,7 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
         child: Text(
           "White",
           style: TextStyle(
-            color: Color.fromARGB(255, 48, 47, 47),
+            color: Colors.black87,
             fontSize: 18,
             fontWeight: FontWeight.bold,
             letterSpacing: 1.2,

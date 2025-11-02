@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/screens/DRY_TEST/C/dry_test_c.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
@@ -14,6 +15,17 @@ class PreliminaryTestCScreen extends StatefulWidget {
 class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
   int _index = 0;
   final Map<int, String> _answers = {};
+  final _dbHelper = DatabaseHelper.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    //_clearPreviousAnswers(); // optional
+  }
+
+  /*Future<void> _clearPreviousAnswers() async {
+    await _dbHelper.clearTest('SaltC_PreliminaryTest');
+  }*/
 
   final List<TestItem> _tests = [
     TestItem(
@@ -80,9 +92,9 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
             Text(
               test.title,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: primaryBlue,
-              ),
+                    fontWeight: FontWeight.bold,
+                    color: primaryBlue,
+                  ),
             ),
             const SizedBox(height: 12),
             Expanded(
@@ -109,7 +121,14 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
-                        onTap: () => setState(() => _answers[test.id] = opt),
+                        onTap: () async {
+                          setState(() => _answers[test.id] = opt);
+                          await _dbHelper.saveAnswer(
+                            'SaltC_PreliminaryTest',
+                            test.id,
+                            opt,
+                          );
+                        },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
@@ -132,7 +151,8 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color: selectedHere ? accentTeal : Colors.black87,
+                              color:
+                                  selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),
@@ -166,9 +186,7 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
+                        horizontal: 20, vertical: 12),
                   ),
                 ),
               ],
