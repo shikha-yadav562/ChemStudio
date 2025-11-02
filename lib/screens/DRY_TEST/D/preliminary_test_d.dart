@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/screens/DRY_TEST/D/dry_test_d.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
@@ -14,7 +15,7 @@ class PreliminaryTestDScreen extends StatefulWidget {
 class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
   int _index = 0;
   final Map<int, String> _answers = {};
-
+  final _dbHelper = DatabaseHelper.instance;
 
   final List<TestItem> _tests = [
     TestItem(
@@ -32,6 +33,28 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
       correct: "Crystalline",
     ),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeTest();
+  }
+
+  Future<void> _initializeTest() async {
+    // ✅ Clear previous answers when entering
+    await _dbHelper.clearTest('SaltD_PreliminaryTest');
+    // ✅ Load any saved answers (if any)
+    await _loadSavedAnswers();
+  }
+
+  Future<void> _loadSavedAnswers() async {
+    final saved = await _dbHelper.getAnswers('SaltD_PreliminaryTest');
+    setState(() {
+      for (var row in saved) {
+        _answers[row['question_id']] = row['answer'];
+      }
+    });
+  }
 
   void _next() {
     if (_index < _tests.length - 1) {
@@ -110,7 +133,15 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
-                        onTap: () => setState(() => _answers[test.id] = opt),
+                        onTap: () async {
+                          setState(() => _answers[test.id] = opt);
+                          // ✅ Save selected answer to database
+                          await _dbHelper.saveAnswer(
+                            'SaltD_PreliminaryTest',
+                            test.id,
+                            opt,
+                          );
+                        },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
@@ -160,13 +191,17 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                         : Icons.arrow_forward,
                   ),
                   label: Text(
-                    _index == _tests.length - 1 ? "Proceed to Dry Test" : "Next",
+                    _index == _tests.length - 1
+                        ? "Proceed to Dry Test"
+                        : "Next",
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
                   ),
                 ),
               ],
@@ -228,17 +263,17 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
       height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        gradient:  LinearGradient(
-          colors: [Colors.blue.shade200, Colors.green.shade600],
+        gradient: LinearGradient(
+          colors: [Colors.teal.shade300, Colors.blue.shade600],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.shade400.withOpacity(0.4),
+            color: Colors.teal.shade400.withOpacity(0.4),
             blurRadius: 8,
             spreadRadius: 2,
-          )
+          ),
         ],
       ),
       child: const Center(

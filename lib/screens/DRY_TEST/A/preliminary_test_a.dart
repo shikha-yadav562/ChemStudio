@@ -1,3 +1,4 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/DRY_TEST/A/dry_test_a.dart';
 
@@ -14,6 +15,17 @@ class PreliminaryTestAScreen extends StatefulWidget {
 class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
   int _index = 0;
   final Map<int, String> _answers = {};
+  final _dbHelper = DatabaseHelper.instance; // ✅ define once
+
+  @override
+void initState() {
+  super.initState();
+ // _clearPreviousAnswers();
+}
+
+/*Future<void> _clearPreviousAnswers() async {
+  await _dbHelper.clearTest('SaltA_PreliminaryTest');
+}*/
 
   final List<TestItem> _tests = [
     TestItem(
@@ -109,7 +121,15 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
-                        onTap: () => setState(() => _answers[test.id] = opt),
+                        onTap: () async {
+                          setState(() => _answers[test.id] = opt);
+                          // ✅ save to correct table
+                          await _dbHelper.saveAnswer(
+                            'SaltA_PreliminaryTest',
+                            test.id,
+                            opt,
+                          );
+                        },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
@@ -159,7 +179,9 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
                         : Icons.arrow_forward,
                   ),
                   label: Text(
-                    _index == _tests.length - 1 ? "Proceed to Dry Test" : "Next",
+                    _index == _tests.length - 1
+                        ? "Proceed to Dry Test"
+                        : "Next",
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
@@ -228,13 +250,16 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
         gradient: const LinearGradient(
-          colors: [Color.fromARGB(255, 37, 45, 100), Color.fromARGB(255, 24, 30, 101)],
+          colors: [
+            Color.fromARGB(255, 37, 45, 100),
+            Color.fromARGB(255, 24, 30, 101)
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromARGB(255, 45, 38, 124).withOpacity(0.4),
+            color: Color.fromARGB(255, 45, 38, 124).withOpacity(0.4),
             blurRadius: 8,
             spreadRadius: 2,
           )
