@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
 class DatabaseHelper {
   static const _dbName = 'chemstudio.db';
   static const _dbVersion = 1;
