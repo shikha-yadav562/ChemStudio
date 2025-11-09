@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 
 class DatabaseHelper {
   static const _dbName = 'chemstudio.db';
@@ -23,11 +24,7 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _dbName);
 
-    return await openDatabase(
-      path,
-      version: _dbVersion,
-      onCreate: _onCreate,
-    );
+    return await openDatabase(path, version: _dbVersion, onCreate: _onCreate);
   }
 
   // -------------------- CREATE TABLES --------------------
@@ -98,16 +95,16 @@ class DatabaseHelper {
   }
 
   // -------------------- SAVE ANSWER --------------------
-  Future<void> saveAnswer(String tableName, int questionId, String answer) async {
+  Future<void> saveAnswer(
+    String tableName,
+    int questionId,
+    String answer,
+  ) async {
     final db = await database;
-    await db.insert(
-      tableName,
-      {
-        'question_id': questionId,
-        'answer': answer,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert(tableName, {
+      'question_id': questionId,
+      'answer': answer,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   // -------------------- GET ALL ANSWERS --------------------
@@ -151,14 +148,54 @@ class DatabaseHelper {
   }
 
   // -------------------- EXPORT DATABASE TO DOWNLOADS --------------------
+  // -------------------- EXPORT DATABASE TO DOWNLOADS --------------------
   Future<void> exportDatabase() async {
     try {
       final dbPath = await getDatabasesPath();
       final sourcePath = join(dbPath, _dbName);
-      final targetPath = '/storage/emulated/0/Download/$_dbName';
+      final sourceFile = File(sourcePath);
 
-      await File(sourcePath).copy(targetPath);
-      print('✅ Database copied to: $targetPath');
+      if (!await sourceFile.exists()) {
+        print('❌ Database file not found at: $sourcePath');
+        return;
+      }
+
+      // Detect platform and select export folder
+      Directory? exportDir;
+
+      if (Platform.isAndroid) {
+        // Android physical download folder
+        exportDir = Directory('/storage/emulated/0/Download');
+      } else if (Platform.isWindows || Platform.isMacOS) {
+        // Use the system downloads folder on desktop
+        try {
+          final downloads = await getDownloadsDirectory();
+          if (downloads != null) {
+            exportDir = downloads;
+          } else {
+            // Fallback to Documents if unavailable
+            exportDir = await getApplicationDocumentsDirectory();
+          }
+        } catch (_) {
+          exportDir = await getApplicationDocumentsDirectory();
+        }
+      } else {
+        // Default for other OS
+        exportDir = await getApplicationDocumentsDirectory();
+      }
+
+      // Make sure export directory exists
+      if (!await exportDir.exists()) {
+        await exportDir.create(recursive: true);
+      }
+
+      // Target destination path
+      final targetPath = join(exportDir.path, _dbName);
+
+      // Copy database
+      await sourceFile.copy(targetPath);
+
+      print('✅ Database exported successfully to: $targetPath');
     } catch (e) {
       print('❌ Error exporting database: $e');
     }
