@@ -17,16 +17,6 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
 
-  @override
-  void initState() {
-    super.initState();
-    //_clearPreviousAnswers();
-  }
-
-  /*Future<void> _clearPreviousAnswers() async {
-    await _dbHelper.clearTest('SaltB_PreliminaryTest');
-  }*/
-
   final List<TestItem> _tests = [
     TestItem(
       id: 1,
@@ -44,13 +34,26 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
     ),
   ];
 
-  void _next() {
+  // 👇 Added same as A (for console verification)
+  Future<void> _printPreliminaryAnswers() async {
+    final answers = await _dbHelper.getAnswers('SaltB_PreliminaryTest');
+    print('📘 --- Preliminary Test B Answers from Database ---');
+    for (var row in answers) {
+      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+    }
+    print('----------------------------------------------');
+  }
+
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
+      await _printPreliminaryAnswers();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestBScreen()),
+        MaterialPageRoute(
+          builder: (_) => DryTestBScreen(preliminaryAnswers: _answers),
+        ),
       );
     }
   }
@@ -151,7 +154,8 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color: selectedHere ? accentTeal : Colors.black87,
+                              color:
+                                  selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),

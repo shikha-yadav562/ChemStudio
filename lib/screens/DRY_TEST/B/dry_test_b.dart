@@ -6,7 +6,11 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class DryTestBScreen extends StatefulWidget {
-  const DryTestBScreen({super.key});
+  final Map<int, String> preliminaryAnswers;
+  const DryTestBScreen({
+    super.key,
+    required this.preliminaryAnswers,
+  });
 
   @override
   State<DryTestBScreen> createState() => _DryTestBScreenState();
@@ -20,24 +24,34 @@ class _DryTestBScreenState extends State<DryTestBScreen>
   late final Animation<double> _fadeSlide;
   late final List<TestItem> _tests = _generateTests();
 
+  final dbHelper = DatabaseHelper.instance;
+  final String tableName = 'SaltB_DryTest';
+
   @override
   void initState() {
     super.initState();
-    _animController =
-        AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
-    _fadeSlide =
-        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-    _loadSavedAnswers();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _animController.forward();
+
+    _loadSavedAnswers(); // ✅ only load, don’t clear
+
+    // ✅ Print preliminary data when screen opens
+    print("🧪 Preliminary Answers Received: ${widget.preliminaryAnswers}");
   }
 
-  // ✅ Load saved answers from DB on startup
   Future<void> _loadSavedAnswers() async {
-    final rows = await DatabaseHelper.instance.getAnswers('SaltB_DryTest');
-    for (var row in rows) {
-      _answers[row['question_id']] = row['answer'];
+    final data = await dbHelper.getAnswers(tableName);
+    if (data.isNotEmpty) {
+      setState(() {
+        for (var row in data) {
+          _answers[row['question_id']] = row['answer'];
+        }
+      });
     }
-    setState(() {});
   }
 
   static List<TestItem> _generateTests() {
@@ -49,7 +63,7 @@ class _DryTestBScreenState extends State<DryTestBScreen>
             'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
         observation: 'Coloured residue observed.\nCold: Yellow Hot: Brown',
         options: ['Co2+', 'Cu2+', 'Fe3+', 'Pb2+'],
-        correct: 'Fe3+',
+        correct: 'Fe3+', // ✅ Added
       ),
       TestItem(
         id: 2,
@@ -58,7 +72,7 @@ class _DryTestBScreenState extends State<DryTestBScreen>
             'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
         observation: 'Moist turmeric paper turns brown/red.',
         options: ['NH4+ Present', 'NH4+ Absent'],
-        correct: 'NH4+ Present',
+        correct: 'NH4+ Present', // ✅ Added
       ),
       TestItem(
         id: 3,
@@ -73,24 +87,32 @@ class _DryTestBScreenState extends State<DryTestBScreen>
           'Pb2+ may be present',
           'Cu2+ may be present'
         ],
-        correct: 'Cu2+ may be present',
+        correct: 'Cu2+ may be present', // ✅ Added
       ),
     ];
   }
 
-  void _next() {
+  Future<void> _saveAnswer(int questionId, String answer) async {
+    await dbHelper.saveAnswer(tableName, questionId, answer);
+  }
+
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() {
         _index++;
         _animController.forward(from: 0);
       });
     } else {
+      // ✅ Make sure DB writes are done
+      await Future.delayed(const Duration(milliseconds: 200));
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => SaltBResultScreen(
             userAnswers: _answers,
             tests: _tests,
+            preliminaryAnswers: widget.preliminaryAnswers,
           ),
         ),
       );
@@ -130,26 +152,32 @@ class _DryTestBScreenState extends State<DryTestBScreen>
           child: const Text(
             'Salt B : Dry Tests',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-                  .animate(_fadeSlide),
+          position: Tween<Offset>(
+            begin: const Offset(0.1, 0.03),
+            end: Offset.zero,
+          ).animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(test.title,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: primaryBlue,
-                          fontWeight: FontWeight.bold,
-                        )),
+                Text(
+                  test.title,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        color: primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
                 const SizedBox(height: 12),
                 Expanded(
                   child: ListView(
@@ -157,15 +185,16 @@ class _DryTestBScreenState extends State<DryTestBScreen>
                       _buildTestCard(test),
                       const SizedBox(height: 24),
                       ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [accentTeal, primaryBlue],
-                        ).createShader(bounds),
+                        shaderCallback: (bounds) =>
+                            const LinearGradient(colors: [accentTeal, primaryBlue])
+                                .createShader(bounds),
                         child: const Text(
                           'Based on the observation, select the correct inference:',
                           style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold),
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -174,10 +203,11 @@ class _DryTestBScreenState extends State<DryTestBScreen>
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
-                            onTap: () async {
-                              setState(() => _answers[test.id] = opt);
-                              await DatabaseHelper.instance
-                                  .saveAnswer('SaltB_DryTest', test.id, opt);
+                            onTap: () {
+                              setState(() {
+                                _answers[test.id] = opt;
+                              });
+                              _saveAnswer(test.id, opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
@@ -274,9 +304,14 @@ class _DryTestBScreenState extends State<DryTestBScreen>
       shaderCallback: (bounds) =>
           const LinearGradient(colors: [accentTeal, primaryBlue])
               .createShader(bounds),
-      child: Text(text,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
     );
   }
 
@@ -290,28 +325,28 @@ class _DryTestBScreenState extends State<DryTestBScreen>
           children: [
             Expanded(
               child: Column(children: [
-                Image.asset('assets/images/pic_a.png',
+                Image.asset('assets/images/pic_c.png',
                     height: 160,
                     errorBuilder: (_, __, ___) =>
-                        const PlaceholderImage(label: 'Pic A (Hot : Brown)')),
+                        const PlaceholderImage(label: 'Pic C (Hot : Brown)')),
                 const SizedBox(height: 4),
                 const Text('🔥 Hot : Brown',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.brown)),
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, color: Colors.brown)),
               ]),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(children: [
-                Image.asset('assets/images/pic_b.png',
+                Image.asset('assets/images/pic_d.png',
                     height: 160,
                     errorBuilder: (_, __, ___) =>
-                        const PlaceholderImage(label: 'Pic B (Cold : Yellow)')),
+                        const PlaceholderImage(label: 'Pic D (Cold : Yellow)')),
                 const SizedBox(height: 4),
                 const Text('❄️ Cold : Yellow',
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 255, 183, 0))),
+                        color: Color.fromARGB(255, 230, 180, 0))),
               ]),
             ),
           ],
@@ -346,11 +381,14 @@ class _DryTestBScreenState extends State<DryTestBScreen>
               decoration: BoxDecoration(
                 color: Colors.amber.shade200,
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.amber.shade700, width: 2),
+                border: Border.all(
+                  color: const Color.fromARGB(255, 100, 66, 8),
+                  width: 2,
+                ),
               ),
               child: const Center(
                 child: Text(
-                  'Turns red/brown',
+                  'CHANGED BROWN/RED',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
@@ -376,56 +414,82 @@ class _DryTestBScreenState extends State<DryTestBScreen>
             Container(
               width: 60,
               height: 100,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                    colors: [Colors.white, Colors.white],
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(255, 150, 200, 255),
+                      Color.fromARGB(255, 200, 230, 255)
+                    ],
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter),
                 borderRadius:
-                    const BorderRadius.vertical(top: Radius.elliptical(60, 100)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey.withOpacity(0.8),
-                      blurRadius: 10,
-                      spreadRadius: 2)
-                ],
+                    BorderRadius.vertical(top: Radius.elliptical(60, 100)),
               ),
             ),
             Container(
               width: 80,
               height: 40,
               decoration: BoxDecoration(
-                  color: Colors.grey.shade700,
-                  borderRadius: BorderRadius.circular(8)),
+                color: Colors.grey.shade700,
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: const Center(
                   child: Icon(Icons.fireplace, size: 20, color: Colors.white)),
-            )
+            ),
           ]),
           const SizedBox(width: 20),
           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(height: 60),
-            Text('Bluish White',
+            Text('Bluish White Flame',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Color.fromARGB(255, 84, 79, 137))),
+                    color: primaryBlue)),
             const Text('Characteristic Flame Colour'),
-          ])
+          ]),
         ]),
       ],
     );
   }
 }
 
-class SaltBResultScreen extends StatelessWidget {
+// --------------------------- RESULT SCREEN ---------------------------
+
+class SaltBResultScreen extends StatefulWidget {
   final Map<int, String> userAnswers;
   final List<TestItem> tests;
+  final Map<int, String> preliminaryAnswers;
 
   const SaltBResultScreen({
     super.key,
     required this.userAnswers,
     required this.tests,
+    required this.preliminaryAnswers,
   });
+
+  @override
+  State<SaltBResultScreen> createState() => _SaltBResultScreenState();
+}
+
+class _SaltBResultScreenState extends State<SaltBResultScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _fadeCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _fadeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _fadeCtrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _fadeCtrl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -440,101 +504,129 @@ class SaltBResultScreen extends StatelessWidget {
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt B : Test Summary',
+            'Salt B: Test Summary',
             style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'Your Selected Answers:',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView(
-                children: tests.map((test) {
-                  final ans = userAnswers[test.id] ?? 'No answer selected';
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [accentTeal, primaryBlue],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Container(
-                      margin: const EdgeInsets.all(2.5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        boxShadow: [
-                          BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 5,
-                              offset: const Offset(0, 3)),
-                        ],
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
-                        leading: const Icon(Icons.assignment_turned_in_rounded,
-                            color: accentTeal, size: 28),
-                        title: Text(test.title,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 16)),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(ans,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: primaryBlue)),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+      body: FadeTransition(
+        opacity: _fadeCtrl,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text('Dry Test Answers:',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  children: [
+                    ...widget.tests.map((test) {
+                      final ans = widget.userAnswers[test.id] ?? 'No answer selected';
+                      return _buildAnswerTile(test.title, ans, Icons.assignment);
+                    }),
+                    const SizedBox(height: 30),
+                    const Text('Preliminary Test Answers:',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    if (widget.preliminaryAnswers.isEmpty)
+                      const Text(
+                        'No preliminary test data found.',
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      )
+                    else
+                      ...widget.preliminaryAnswers.entries.map((entry) =>
+                          _buildAnswerTile(
+                              'Preliminary Test Q${entry.key}',
+                              entry.value,
+                              Icons.science_rounded)),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (_) => const WelcomeScreen()));
-              },
-              icon: const Icon(Icons.home_rounded, color: Colors.white),
-              label: const Text('Back to Home',
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                  );
+                },
+                icon: const Icon(Icons.home_rounded, color: Colors.white),
+                label: const Text(
+                  'Back to Home',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
-                      color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30)),
-                backgroundColor: primaryBlue,
-                shadowColor: accentTeal.withOpacity(0.4),
-                elevation: 8,
+                      color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30)),
+                  backgroundColor: primaryBlue,
+                  shadowColor: accentTeal.withOpacity(0.4),
+                  elevation: 8,
+                ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnswerTile(String title, String answer, IconData icon) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [accentTeal, primaryBlue],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(2.5),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 5,
+              offset: const Offset(0, 3),
             ),
           ],
+        ),
+        child: ListTile(
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          leading: Icon(icon, color: accentTeal, size: 28),
+          title: Text(title,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(answer,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: primaryBlue)),
+          ),
         ),
       ),
     );
   }
 }
 
-/* ---------- MODEL + PLACEHOLDER ---------- */
+// ---------- Model ----------
 class TestItem {
   final int id;
   final String title;

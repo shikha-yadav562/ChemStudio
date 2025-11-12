@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/DRY_TEST/D/dry_test_d.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
@@ -34,35 +34,25 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     ),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeTest();
+  Future<void> _printPreliminaryAnswers() async {
+    final answers = await _dbHelper.getAnswers('SaltD_PreliminaryTest');
+    print('📘 --- Preliminary Test Answers from Database ---');
+    for (var row in answers) {
+      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+    }
+    print('----------------------------------------------');
   }
 
-  Future<void> _initializeTest() async {
-    // ✅ Clear previous answers when entering
-    await _dbHelper.clearTest('SaltD_PreliminaryTest');
-    // ✅ Load any saved answers (if any)
-    await _loadSavedAnswers();
-  }
-
-  Future<void> _loadSavedAnswers() async {
-    final saved = await _dbHelper.getAnswers('SaltD_PreliminaryTest');
-    setState(() {
-      for (var row in saved) {
-        _answers[row['question_id']] = row['answer'];
-      }
-    });
-  }
-
-  void _next() {
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
+      await _printPreliminaryAnswers();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestDScreen()),
+        MaterialPageRoute(
+          builder: (_) => DryTestDScreen(preliminaryAnswers: _answers),
+        ),
       );
     }
   }
@@ -135,7 +125,6 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                       child: InkWell(
                         onTap: () async {
                           setState(() => _answers[test.id] = opt);
-                          // ✅ Save selected answer to database
                           await _dbHelper.saveAnswer(
                             'SaltD_PreliminaryTest',
                             test.id,
@@ -199,9 +188,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
+                        horizontal: 20, vertical: 12),
                   ),
                 ),
               ],
