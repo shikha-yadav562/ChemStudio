@@ -1,6 +1,7 @@
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../../welcome_screen.dart';
+import 'package:ChemStudio/screens/DRY_TEST/A/preliminary_test_a.dart'; // ✅ Import Preliminary Test screen
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -30,7 +31,8 @@ class _DryTestAScreenState extends State<DryTestAScreen>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide =
+        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _animController.forward();
 
     _loadSavedAnswers(); // ✅ only load, don’t clear
@@ -48,42 +50,42 @@ class _DryTestAScreenState extends State<DryTestAScreen>
   }
 
   static List<TestItem> _generateTests() {
-  return [
-    TestItem(
-      id: 1,
-      title: '1. Heating in a Dry Test Tube',
-      procedure:
-          'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
-      observation: 'Coloured residue observed.\nCold: Blue Hot: White',
-      options: ['Co2+', 'Fe3+', 'Cu2+', 'Pb2+'],
-      correct: 'Cu2+', // ✅ Added
-    ),
-    TestItem(
-      id: 2,
-      title: '2. NaOH Test',
-      procedure:
-          'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
-      observation: 'Moist turmeric paper turns brown/red',
-      options: ['NH4+ Present', 'NH4+ Absent'],
-      correct: 'NH4+ Present', // ✅ Added
-    ),
-    TestItem(
-      id: 3,
-      title: '3. Flame Test',
-      procedure:
-          'Prepare a paste of the salt with conc. HCl. Dip a platinum wire or glass rod in it and place it in an oxidising flame. Observe the colour.',
-      observation: 'Bluish Green flame observed.',
-      options: [
-        'Ca2+ may be present',
-        'Ba2+ may be present',
-        'Sr2+ may be present',
-        'Pb2+ may be present',
-        'Cu2+ may be present'
-      ],
-      correct: 'Cu2+ may be present', // ✅ Added
-    ),
-  ];
-}
+    return [
+      TestItem(
+        id: 1,
+        title: '1. Heating in a Dry Test Tube',
+        procedure:
+            'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
+        observation: 'Coloured residue observed.\nCold: Blue Hot: White',
+        options: ['Co2+', 'Fe3+', 'Cu2+', 'Pb2+'],
+        correct: 'Cu2+', // ✅ Added
+      ),
+      TestItem(
+        id: 2,
+        title: '2. NaOH Test',
+        procedure:
+            'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
+        observation: 'Moist turmeric paper turns brown/red',
+        options: ['NH4+ Present', 'NH4+ Absent'],
+        correct: 'NH4+ Present', // ✅ Added
+      ),
+      TestItem(
+        id: 3,
+        title: '3. Flame Test',
+        procedure:
+            'Prepare a paste of the salt with conc. HCl. Dip a platinum wire or glass rod in it and place it in an oxidising flame. Observe the colour.',
+        observation: 'Bluish Green flame observed.',
+        options: [
+          'Ca2+ may be present',
+          'Ba2+ may be present',
+          'Sr2+ may be present',
+          'Pb2+ may be present',
+          'Cu2+ may be present'
+        ],
+        correct: 'Cu2+ may be present', // ✅ Added
+      ),
+    ];
+  }
 
   Future<void> _saveAnswer(int questionId, String answer) async {
     await dbHelper.saveAnswer(tableName, questionId, answer);
@@ -114,6 +116,15 @@ class _DryTestAScreenState extends State<DryTestAScreen>
         _index--;
         _animController.forward(from: 0);
       });
+    } else {
+      // ✅ FIX: Navigate back to the PreliminaryTestAScreen at index 1 (Nature Test)
+       Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          // Pass initialIndex: 1 to load the second page (Nature Test)
+          builder: (_) => const PreliminaryTestAScreen(initialIndex: 1), 
+        ),
+      );
     }
   }
 
@@ -339,106 +350,62 @@ class _DryTestAScreenState extends State<DryTestAScreen>
     );
   }
 
-Widget _naohObservation() {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      Column(
-        children: [
-          const Icon(Icons.science_rounded, size: 60, color: accentTeal),
-          const SizedBox(height: 8),
-          Text(
-            'Test Tube + NaOH',
-            style: TextStyle(
-              color: primaryBlue,
-              fontWeight: FontWeight.w500,
-            ),
+// MODIFIED WIDGET: _naohObservation()
+  Widget _naohObservation() {
+    return Column(
+      // Ensure both are centered
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // 1. The Image (Replacing the old icon/container)
+        Image.asset(
+          'assets/images/turmeric_red.png', // The required image
+          height: 160, // Set a suitable height for the image
+          errorBuilder: (_, __, ___) => const PlaceholderImage(
+            label: 'Image: turmeric_red.png',
           ),
-        ],
-      ),
-      const SizedBox(width: 40),
-      Column(
-        children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.amber.shade200,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(
-                color: const Color.fromARGB(255, 100, 66, 8),
-                width: 2,
-              ),
-            ),
-            child: const Center(
-              child: Text(
-                'CHANGED BROWN/RED',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
+        ),
+        const SizedBox(height: 8),
+        // 2. The required text
+        const Text(
+          'Moist turmeric paper turns brown on exposure to gas', // The required text
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: primaryBlue,
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
           ),
-          const SizedBox(height: 4),
-          const Text('Moist Turmeric Paper'),
-        ],
-      ),
-    ],
-  );
-}
+        ),
+      ],
+    );
+  }
 
 
+// MODIFIED WIDGET: _flameObservation()
   Widget _flameObservation() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center, // Center the content
+      crossAxisAlignment: CrossAxisAlignment.center, // Center the content
       children: [
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Column(children: [
-            Container(
-              width: 60,
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                    colors: [
-                      Color.fromARGB(255, 0, 184, 55),
-                      Color.fromARGB(255, 2, 214, 97)
-                    ],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.elliptical(60, 100)),
-                boxShadow: [
-                  BoxShadow(
-                      color: const Color.fromARGB(255, 63, 198, 70)
-                          .withOpacity(0.8),
-                      blurRadius: 10,
-                      spreadRadius: 2)
-                ],
-              ),
-            ),
-            Container(
-              width: 80,
-              height: 40,
-              decoration: BoxDecoration(
-                  color: Colors.grey.shade700,
-                  borderRadius: BorderRadius.circular(8)),
-              child: const Center(
-                  child: Icon(Icons.fireplace, size: 20, color: Colors.white)),
-            )
-          ]),
-          const SizedBox(width: 20),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(height: 60),
-            Text('Bluish green',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 2, 86, 95))),
-            const Text('Characteristic Flame Colour'),
-          ])
-        ]),
+        // 1. The required Image
+        Image.asset(
+          'assets/images/flame_bluishgreen.png',
+          height: 180, // Adjusted height for better visibility
+          errorBuilder: (_, __, ___) => const PlaceholderImage(
+            label: 'Image: flame_bluishgreen.png',
+          ),
+        ),
+        const SizedBox(height: 8),
+        // 2. The required Text
+        const Text(
+          'Bluish Green Flame',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: primaryBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ],
     );
   }

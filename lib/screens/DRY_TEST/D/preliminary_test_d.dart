@@ -6,16 +6,28 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestDScreen extends StatefulWidget {
-  const PreliminaryTestDScreen({super.key});
+  // 1. Add final startIndex
+  final int startIndex; 
+  // 2. Update constructor
+  const PreliminaryTestDScreen({super.key, this.startIndex = 0}); 
 
   @override
   State<PreliminaryTestDScreen> createState() => _PreliminaryTestDScreenState();
 }
 
 class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
-  int _index = 0;
+  // 3. Update initialization of _index
+  late int _index; 
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    // 4. Initialize _index from widget property
+    _index = widget.startIndex;
+    //_clearPreviousAnswers(); // optional
+  }
 
   final List<TestItem> _tests = [
     TestItem(
@@ -33,28 +45,6 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
       correct: "Crystalline",
     ),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeTest();
-  }
-
-  Future<void> _initializeTest() async {
-    // ✅ Clear previous answers when entering
-    await _dbHelper.clearTest('SaltD_PreliminaryTest');
-    // ✅ Load any saved answers (if any)
-    await _loadSavedAnswers();
-  }
-
-  Future<void> _loadSavedAnswers() async {
-    final saved = await _dbHelper.getAnswers('SaltD_PreliminaryTest');
-    setState(() {
-      for (var row in saved) {
-        _answers[row['question_id']] = row['answer'];
-      }
-    });
-  }
 
   void _next() {
     if (_index < _tests.length - 1) {
@@ -164,8 +154,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color:
-                                  selectedHere ? accentTeal : Colors.black87,
+                              color: selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),
@@ -176,13 +165,18 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
               ),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Change mainAxisAlignment to align 'Next' to the end on the first page
+              mainAxisAlignment:
+                  (_index == 0) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
               children: [
-                TextButton.icon(
-                  onPressed: _prev,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text("Previous"),
-                ),
+                // Conditionally show the "Previous" button only if not on the first page
+                if (_index > 0)
+                  TextButton.icon(
+                    onPressed: _prev,
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text("Previous"),
+                  ),
+                
                 ElevatedButton.icon(
                   onPressed: selected != null ? _next : null,
                   icon: Icon(

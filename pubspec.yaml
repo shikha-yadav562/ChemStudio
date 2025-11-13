@@ -34,11 +34,17 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/pic_b.png
     - assets/images/pic_a.png
+    - assets/images/pic_b.png
     - assets/images/chem_bg.png
     - assets/images/chemstudio_logo.png
     - assets/images/bg.png
+    - assets/images/flame_applegreen.png
+    - assets/images/flame_bluishgreen.png
+    - assets/images/flame_bluishwhite.png
+    - assets/images/turmeric_red.png
+    - assets/images/turmeric_yellow.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

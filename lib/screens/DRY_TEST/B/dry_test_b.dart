@@ -1,6 +1,7 @@
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../../welcome_screen.dart';
+import 'package:ChemStudio/screens/DRY_TEST/B/preliminary_test_b.dart'; // ✅ Import Preliminary Test screen
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -97,12 +98,21 @@ class _DryTestBScreenState extends State<DryTestBScreen>
     }
   }
 
-  void _prev() {
+void _prev() {
     if (_index > 0) {
       setState(() {
         _index--;
         _animController.forward(from: 0);
       });
+    } else {
+      // ✅ FIX: Navigate back to the PreliminaryTestBScreen at index 1 (Nature Test)
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          // Pass initialIndex: 1 to load the second page (Nature Test)
+          builder: (_) => const PreliminaryTestBScreen(initialIndex: 1),
+        ),
+      );
     }
   }
 
@@ -320,101 +330,63 @@ class _DryTestBScreenState extends State<DryTestBScreen>
     );
   }
 
+  // MODIFIED WIDGET: _naohObservation()
   Widget _naohObservation() {
-    return Row(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Column(
-          children: [
-            const Icon(Icons.science_rounded, size: 60, color: accentTeal),
-            const SizedBox(height: 8),
-            Text(
-              'Test Tube + NaOH',
-              style: TextStyle(
-                color: primaryBlue,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+        Image.asset(
+          'assets/images/turmeric_red.png', // The new image
+          height: 160, // Adjusted height for image placement
+          errorBuilder: (_, __, ___) => const PlaceholderImage(
+            label: 'Image: turmeric_red.png',
+          ),
         ),
-        const SizedBox(width: 40),
-        Column(
-          children: [
-            Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                color: Colors.amber.shade200,
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Colors.amber.shade700, width: 2),
-              ),
-              child: const Center(
-                child: Text(
-                  'Turns red/brown',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 10,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            const Text('Moist Turmeric Paper'),
-          ],
+        const SizedBox(height: 8),
+        const Text(
+          'Moist turmeric paper turns brown on exposure to gas', // The required text
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: primaryBlue,
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+          ),
         ),
       ],
     );
   }
 
+  // MODIFIED WIDGET: _flameObservation()
   Widget _flameObservation() {
-    return Column(
+  // Wrap the entire Column in a Center widget
+  return Center( 
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Column(children: [
-            Container(
-              width: 60,
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                    colors: [Colors.white, Colors.white],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.elliptical(60, 100)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.grey.withOpacity(0.8),
-                      blurRadius: 10,
-                      spreadRadius: 2)
-                ],
-              ),
-            ),
-            Container(
-              width: 80,
-              height: 40,
-              decoration: BoxDecoration(
-                  color: Colors.grey.shade700,
-                  borderRadius: BorderRadius.circular(8)),
-              child: const Center(
-                  child: Icon(Icons.fireplace, size: 20, color: Colors.white)),
-            )
-          ]),
-          const SizedBox(width: 20),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(height: 60),
-            Text('Bluish White',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Color.fromARGB(255, 84, 79, 137))),
-            const Text('Characteristic Flame Colour'),
-          ])
-        ]),
+        // Replace current icon/symbol and text with the image
+        Image.asset(
+          'assets/images/flame_bluishwhite.png', // The required image
+          height: 180, // Set a suitable height for the image
+          errorBuilder: (_, __, ___) => const PlaceholderImage(
+            label: 'Image: flame_bluishwhite.png',
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Add the required text below the image
+        const Text(
+          'Bluish White Flame',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: primaryBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ],
-    );
-  }
+    ),
+  );
+}
 }
 
 class SaltBResultScreen extends StatelessWidget {

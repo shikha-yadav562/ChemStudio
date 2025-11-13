@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../../welcome_screen.dart';
+import 'package:ChemStudio/screens/DRY_TEST/D/preliminary_test_d.dart'; // ✅ Import Preliminary Test screen
+
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -67,7 +69,7 @@ class _DryTestDScreenState extends State<DryTestDScreen>
         title: '2. NaOH Test',
         procedure:
             'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
-        observation: 'Moist turmeric paper remains unchanged.',
+        observation: 'Moist turmeric paper remains as it is on exposure to gas.',
         options: ['NH4+ Present', 'NH4+ Absent'],
         correct: 'NH4+ Absent',
       ),
@@ -105,8 +107,20 @@ class _DryTestDScreenState extends State<DryTestDScreen>
     }
   }
 
-  void _prev() {
-    if (_index > 0) {
+void _prev() {
+    // If on the first page of Dry Test (index 0)
+    if (_index == 0) {
+      // Navigate back to the Preliminary Test, specifically the second page (index 1)
+      // The second page is the Nature Test. Use pushReplacement as we are moving back a step in the flow.
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          // Navigate to PreliminaryTestCScreen and pass startIndex 1
+          builder: (_) => const PreliminaryTestDScreen(startIndex: 1), 
+        ),
+      );
+    } else {
+      // Otherwise, navigate to the previous page within Dry Test
       setState(() {
         _index--;
         _animController.forward(from: 0);
@@ -272,7 +286,7 @@ class _DryTestDScreenState extends State<DryTestDScreen>
             _gradientHeader('Observation'),
             const SizedBox(height: 8),
             if (test.id == 1) _heatingObservation(),
-            if (test.id == 2) _naohObservation(),
+            if (test.id == 2) _naohObservation(test.observation),
             if (test.id == 3) _flameObservation(),
           ],
         ),
@@ -336,90 +350,56 @@ class _DryTestDScreenState extends State<DryTestDScreen>
     );
   }
 
-  Widget _naohObservation() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+  // 🔥 NaOH Test (Test ID 2) Update: Removed the 'Observation: ' prefix.
+  Widget _naohObservation(String observationText) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(children: [
-          const Icon(Icons.science_rounded, size: 60, color: accentTeal),
-          const SizedBox(height: 8),
-          Text('Test Tube + NaOH',
-              style:
-                  TextStyle(color: primaryBlue, fontWeight: FontWeight.w500))
-        ]),
-        const SizedBox(width: 40),
-        Column(children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.amber.shade200,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.amber.shade700, width: 2),
-            ),
-            child: const Center(
-              child: Text(
-                'NO\nCHANGE',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
+        // New image asset
+        Image.asset(
+          'assets/images/turmeric_yellow.png',
+          height: 160,
+          errorBuilder: (_, __, ___) =>
+              const PlaceholderImage(label: 'Moist Turmeric Paper'),
+        ),
+        const SizedBox(height: 12),
+        // Observation text placed directly below the image, without "Observation: " prefix
+        Text(
+          observationText, // <--- CHANGE IS HERE: Removed "Observation: "
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: primaryBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
           ),
-          const SizedBox(height: 4),
-          const Text('Moist Turmeric Paper'),
-        ]),
+        ),
       ],
     );
   }
 
+  // 🔥 Flame Test (Test ID 3) Update: Replaced custom UI with image and specific text.
   Widget _flameObservation() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Column(children: [
-            Container(
-              width: 60,
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.lightGreen.shade300, Colors.blue.shade500],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.elliptical(60, 100)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.blue.shade400.withOpacity(0.8),
-                      blurRadius: 10,
-                      spreadRadius: 2)
-                ],
-              ),
-            ),
-            Container(
-              width: 80,
-              height: 40,
-              decoration: BoxDecoration(
-                  color: Colors.grey.shade700,
-                  borderRadius: BorderRadius.circular(8)),
-              child: const Center(
-                  child: Icon(Icons.fireplace, size: 20, color: Colors.white)),
-            )
-          ]),
-          const SizedBox(width: 20),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(height: 60),
-            Text('Bluish Green',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: accentTeal)),
-            const Text('Characteristic Flame Colour'),
-          ])
-        ]),
+        // Display the new image asset
+        Image.asset(
+          'assets/images/flame_bluishgreen.png', // <--- NEW IMAGE PATH
+          height: 160,
+          errorBuilder: (_, __, ___) =>
+              const PlaceholderImage(label: 'Bluish Green Flame'),
+        ),
+        const SizedBox(height: 12),
+        // Display the required text below the image
+        Text(
+          'Bluish Green Flame', // <--- NEW REQUIRED TEXT
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: primaryBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
       ],
     );
   }

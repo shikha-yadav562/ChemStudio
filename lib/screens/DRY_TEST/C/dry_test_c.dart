@@ -1,6 +1,8 @@
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../../welcome_screen.dart';
+import 'package:ChemStudio/screens/DRY_TEST/C/preliminary_test_c.dart'; // ✅ Import Preliminary Test screen
+
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -38,7 +40,10 @@ class _DryTestCScreenState extends State<DryTestCScreen>
     final savedData = await dbHelper.getAnswers('SaltC_DryTest');
     final Map<int, String> restored = {};
     for (var row in savedData) {
-      restored[row['question_id']] = row['answer'];
+      // Safely access data, assuming it's structured correctly from DB
+      if (row.containsKey('question_id') && row.containsKey('answer')) {
+        restored[row['question_id'] as int] = row['answer'] as String;
+      }
     }
     setState(() => _answers.addAll(restored));
   }
@@ -50,7 +55,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
         title: '1. Heating in a Dry Test Tube',
         procedure:
             'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
-        observation: 'Coloured residue observed.\nCold: Brown Hot: Black',
+        observation: 'Coloured residue observed.\nCold: Brown\tHot: Black',
         options: ['Co2+', 'Cu2+', 'Fe3+', 'Pb2+'],
         correct: 'Fe3+',
       ),
@@ -108,15 +113,26 @@ class _DryTestCScreenState extends State<DryTestCScreen>
     }
   }
 
-  void _prev() {
-    if (_index > 0) {
+void _prev() {
+    // If on the first page of Dry Test (index 0)
+    if (_index == 0) {
+      // Navigate back to the Preliminary Test, specifically the second page (index 1)
+      // The second page is the Nature Test. Use pushReplacement as we are moving back a step in the flow.
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          // Navigate to PreliminaryTestCScreen and pass startIndex 1
+          builder: (_) => const PreliminaryTestCScreen(startIndex: 1), 
+        ),
+      );
+    } else {
+      // Otherwise, navigate to the previous page within Dry Test
       setState(() {
         _index--;
         _animController.forward(from: 0);
       });
     }
   }
-
   @override
   void dispose() {
     _animController.dispose();
@@ -273,7 +289,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
             const SizedBox(height: 8),
             if (test.id == 1) _heatingObservation(),
             if (test.id == 2) _naohObservation(),
-            if (test.id == 3) _flameObservation(),
+            if (test.id == 3) _flameObservation(), // This is the target for change
           ],
         ),
       ),
@@ -329,104 +345,62 @@ class _DryTestCScreenState extends State<DryTestCScreen>
     );
   }
 
- Widget _naohObservation() {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [
-      // 🔹 Left column – Test Tube + NaOH
-      Column(
+  // UPDATED _naohObservation() METHOD (Kept unchanged as per instructions)
+  Widget _naohObservation() {
+    return Center(
+      child: Column(
         children: [
-          const Icon(Icons.science_rounded, size: 60, color: accentTeal),
-          const SizedBox(height: 8),
+          // Image from assets
+          Image.asset(
+            'assets/images/turmeric_yellow.png',
+            height: 160, 
+            errorBuilder: (_, __, ___) =>
+                const PlaceholderImage(label: 'turmeric_yellow.png'),
+          ),
+          const SizedBox(height: 12),
+          // Observation Text - styled to match existing text color for emphasis (primaryBlue)
           Text(
-            'Test Tube + NaOH',
+            'Moist turmeric paper remains as it is on exposure to gas.',
+            textAlign: TextAlign.center,
             style: TextStyle(
-              color: primaryBlue,
-              fontWeight: FontWeight.w500,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: primaryBlue, // Using primaryBlue as seen in _heatingObservation()
             ),
           ),
         ],
       ),
-
-      const SizedBox(width: 40),
-
-      // 🔹 Right column – Moist Turmeric Paper
-      Column(
-        children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.amber.shade200,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: Colors.amber.shade700, width: 2),
-            ),
-            child: const Center(
-              child: Text(
-                'NO\nCHANGE',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 10,
-                  color: Colors.black87,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          const Text('Moist Turmeric Paper'),
-        ],
-      ),
-    ],
-  );
-}
+    );
+  }
 
 
+  // 🔥 Flame Test Observation - UPDATED as per exact instructions
   Widget _flameObservation() {
-    return Column(
-      children: [
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Column(children: [
-            Container(
-              width: 60,
-              height: 100,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [Colors.greenAccent.shade200, Colors.green.shade600],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.elliptical(60, 100)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.green.shade400.withOpacity(0.8),
-                      blurRadius: 10,
-                      spreadRadius: 2)
-                ],
-              ),
+    return Center( 
+      child: Column(
+        children: [
+          Image.asset(
+            'assets/images/flame_applegreen.png',
+            height: 160, // Match sizing convention of other observations
+            errorBuilder: (_, __, ___) =>
+                const PlaceholderImage(label: 'flame_applegreen.png'),
+          ),
+          
+          // 2. Remove all old flame-related text/widgets.
+          const SizedBox(height: 12), // Match padding convention of other observations
+          
+          // 3. Display this exact text below the image
+          Text(
+            'Apple Green flame', // EXACT text requested
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: primaryBlue, // Match text style convention
             ),
-            Container(
-              width: 80,
-              height: 40,
-              decoration: BoxDecoration(
-                  color: Colors.grey.shade700,
-                  borderRadius: BorderRadius.circular(8)),
-              child: const Center(
-                  child: Icon(Icons.fireplace, size: 20, color: Colors.white)),
-            )
-          ]),
-          const SizedBox(width: 20),
-          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(height: 60),
-            Text('Apple Green',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: accentTeal)),
-            const Text('Characteristic Flame Colour'),
-          ])
-        ]),
-      ],
+          ),
+        ],
+      ),
     );
   }
 }

@@ -6,22 +6,28 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestAScreen extends StatefulWidget {
-  const PreliminaryTestAScreen({super.key});
+  // ✅ 1. Add required field for initial index
+  final int initialIndex; 
+
+  // ✅ 2. Update constructor to accept initialIndex, defaulting to 0
+  const PreliminaryTestAScreen({super.key, this.initialIndex = 0}); 
 
   @override
   State<PreliminaryTestAScreen> createState() => _PreliminaryTestAScreenState();
 }
 
 class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
-  int _index = 0;
+  // ✅ 3. Change initialization to use widget.initialIndex
+  late int _index;
   final Map<int, String> _answers = {};
-  final _dbHelper = DatabaseHelper.instance; // ✅ define once
+  final _dbHelper = DatabaseHelper.instance;
 
   @override
-void initState() {
-  super.initState();
- // _clearPreviousAnswers();
-}
+  void initState() {
+    super.initState();
+    _index = widget.initialIndex; // ✅ Initialize _index with the provided value
+   // _clearPreviousAnswers();
+  }
 
 /*Future<void> _clearPreviousAnswers() async {
   await _dbHelper.clearTest('SaltA_PreliminaryTest');
@@ -58,7 +64,7 @@ void initState() {
   void _prev() {
     if (_index > 0) setState(() => _index--);
   }
-
+  
   @override
   Widget build(BuildContext context) {
     final test = _tests[_index];
@@ -164,13 +170,20 @@ void initState() {
               ),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Pushes the "Next" button to the end when on the first page (_index == 0) 
+              // and spaces them out otherwise.
+              mainAxisAlignment: (_index == 0)
+                  ? MainAxisAlignment.end
+                  : MainAxisAlignment.spaceBetween,
               children: [
-                TextButton.icon(
-                  onPressed: _prev,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text("Previous"),
-                ),
+                // CONDITIONALLY HIDES "Previous" BUTTON ON FIRST PAGE (_index == 0)
+                if (_index > 0)
+                  TextButton.icon(
+                    onPressed: _prev,
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text("Previous"),
+                  ),
+                
                 ElevatedButton.icon(
                   onPressed: selected != null ? _next : null,
                   icon: Icon(
