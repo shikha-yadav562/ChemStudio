@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+
 class DatabaseHelper {
   static const _dbName = 'chemstudio.db';
   static const _dbVersion = 1;
@@ -22,11 +23,7 @@ class DatabaseHelper {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _dbName);
 
-    return await openDatabase(
-      path,
-      version: _dbVersion,
-      onCreate: _onCreate,
-    );
+    return await openDatabase(path, version: _dbVersion, onCreate: _onCreate);
   }
 
   // -------------------- CREATE TABLES --------------------
@@ -97,16 +94,16 @@ class DatabaseHelper {
   }
 
   // -------------------- SAVE ANSWER --------------------
-  Future<void> saveAnswer(String tableName, int questionId, String answer) async {
+  Future<void> saveAnswer(
+    String tableName,
+    int questionId,
+    String answer,
+  ) async {
     final db = await database;
-    await db.insert(
-      tableName,
-      {
-        'question_id': questionId,
-        'answer': answer,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    await db.insert(tableName, {
+      'question_id': questionId,
+      'answer': answer,
+    }, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   // -------------------- GET ALL ANSWERS --------------------
@@ -149,17 +146,33 @@ class DatabaseHelper {
     _database = null;
   }
 
-  // -------------------- EXPORT DATABASE TO DOWNLOADS --------------------
+  // -------------------- EXPORT DATABASE TO DOWNLOADS (ALL PLATFORMS) --------------------
   Future<void> exportDatabase() async {
     try {
       final dbPath = await getDatabasesPath();
       final sourcePath = join(dbPath, _dbName);
-      final targetPath = '/storage/emulated/0/Download/$_dbName';
+
+      late String targetPath;
+
+      if (Platform.isAndroid) {
+        // Android Download directory
+        targetPath = "/storage/emulated/0/Download/$_dbName";
+      } else if (Platform.isWindows) {
+        // Windows Downloads directory
+        final downloads = "${Platform.environment['USERPROFILE']}\\Downloads";
+        targetPath = "$downloads\\$_dbName";
+      } else if (Platform.isMacOS || Platform.isLinux) {
+        // Mac & Linux Downloads folder
+        final home = Platform.environment['HOME'];
+        targetPath = "$home/Downloads/$_dbName";
+      } else {
+        throw Exception("❌ Unsupported platform");
+      }
 
       await File(sourcePath).copy(targetPath);
-      print('✅ Database copied to: $targetPath');
+      print("✅ Database successfully exported to: $targetPath");
     } catch (e) {
-      print('❌ Error exporting database: $e');
+      print("❌ Error exporting database: $e");
     }
   }
 }
