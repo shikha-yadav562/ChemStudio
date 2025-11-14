@@ -306,104 +306,163 @@ void _prev() {
       ),
     );
   }
-
-  Widget _heatingObservation() {
-    return Column(
-      children: [
-        Text('Coloured Residue', style: TextStyle(color: primaryBlue)),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-              child: Column(
-                children: [
-                  Image.asset('assets/images/pic_a.png',
-                      height: 160,
-                      errorBuilder: (_, __, ___) =>
-                          const PlaceholderImage(label: 'Pic A (Hot : White)')),
-                  const SizedBox(height: 4),
-                  const Text('🔥 Hot : White',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.brown)),
-                ],
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                children: [
-                  Image.asset('assets/images/pic_b.png',
-                      height: 160,
-                      errorBuilder: (_, __, ___) =>
-                          const PlaceholderImage(label: 'Pic B (Cold : Blue)')),
-                  const SizedBox(height: 4),
-                  const Text('❄️ Cold : Blue',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.brown)),
-                ],
-              ),
-            ),
-          ],
+Widget _heatingObservation() {
+  return Column(
+    children: [
+      Text(
+        'Coloured Residue',
+        style: TextStyle(
+          color: primaryBlue,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
         ),
-      ],
-    );
-  }
+      ),
+
+      const SizedBox(height: 12),
+
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          // 🔥 HOT SIDE
+          Expanded(
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/images/pic_a.png',
+                  height: 160,
+                  errorBuilder: (_, __, ___) =>
+                      const PlaceholderImage(label: 'Pic A (Hot : White)'),
+                ),
+                const SizedBox(height: 6),
+
+                // HOT TAG (highlighted text)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFE6D8),    // soft warm highlight
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '🔥 Hot : White',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.brown,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // ❄️ COLD SIDE
+          Expanded(
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/images/pic_b.png',
+                  height: 160,
+                  errorBuilder: (_, __, ___) =>
+                      const PlaceholderImage(label: 'Pic B (Cold : Blue)'),
+                ),
+                const SizedBox(height: 6),
+
+                // COLD TAG (highlighted text)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFDCE9FF),    // soft cool highlight
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '❄️ Cold : Blue',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Color.fromARGB(255, 3, 66, 255),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
 
   // 🔥 NaOH Test (Test ID 2) Update: Removed the 'Observation: ' prefix.
-  Widget _naohObservation(String observationText) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // New image asset
-        Image.asset(
-          'assets/images/turmeric_yellow.png',
-          height: 160,
-          errorBuilder: (_, __, ___) =>
-              const PlaceholderImage(label: 'Moist Turmeric Paper'),
-        ),
-        const SizedBox(height: 12),
-        // Observation text placed directly below the image, without "Observation: " prefix
-        Text(
-          observationText, // <--- CHANGE IS HERE: Removed "Observation: "
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: primaryBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+ Widget _naohObservation(String observationText) {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 450,   // keeps image visible on all screen sizes
+            maxHeight: 250,
+          ),
+          child: Image.asset(
+            'assets/images/turmeric_yellow.png',
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) =>
+                const PlaceholderImage(label: 'Moist Turmeric Paper'),
           ),
         ),
-      ],
-    );
-  }
+      ),
+
+      const SizedBox(height: 12),
+
+      Text(
+        observationText,  // your dynamic observation text
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: primaryBlue,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
+        ),
+      ),
+    ],
+  );
+}
 
   // 🔥 Flame Test (Test ID 3) Update: Replaced custom UI with image and specific text.
   Widget _flameObservation() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Display the new image asset
-        Image.asset(
-          'assets/images/flame_bluishgreen.png', // <--- NEW IMAGE PATH
-          height: 160,
-          errorBuilder: (_, __, ___) =>
-              const PlaceholderImage(label: 'Bluish Green Flame'),
-        ),
-        const SizedBox(height: 12),
-        // Display the required text below the image
-        Text(
-          'Bluish Green Flame', // <--- NEW REQUIRED TEXT
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: primaryBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+    return Center( 
+      child: Column(
+        children: [
+          Image.asset(
+            'assets/images/flame_bluishgreen.png',
+            height: 160, // Match sizing convention of other observations
+            errorBuilder: (_, __, ___) =>
+                const PlaceholderImage(label: 'flame_bluishgreen.png'),
           ),
-        ),
-      ],
+          
+          // 2. Remove all old flame-related text/widgets.
+          const SizedBox(height: 12), // Match padding convention of other observations
+          
+          // 3. Display this exact text below the image
+          Text(
+            'Bluish Green flame', // EXACT text requested
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: primaryBlue, // Match text style convention
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
+
 
 /* ---------- RESULT SCREEN ---------- */
 

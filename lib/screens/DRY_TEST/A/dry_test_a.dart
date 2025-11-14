@@ -309,104 +309,160 @@ class _DryTestAScreenState extends State<DryTestAScreen>
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
     );
   }
-
-  Widget _heatingObservation() {
-    return Column(
-      children: [
-        Text('Coloured Residue', style: TextStyle(color: primaryBlue)),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-              child: Column(children: [
-                Image.asset('assets/images/pic_a.png',
-                    height: 160,
-                    errorBuilder: (_, __, ___) =>
-                        const PlaceholderImage(label: 'Pic A (Hot : White)')),
-                const SizedBox(height: 4),
-                const Text('🔥 Hot : White',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.brown)),
-              ]),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(children: [
-                Image.asset('assets/images/pic_b.png',
-                    height: 160,
-                    errorBuilder: (_, __, ___) =>
-                        const PlaceholderImage(label: 'Pic B (Cold : Blue)')),
-                const SizedBox(height: 4),
-                const Text('❄️ Cold : Blue',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 3, 66, 255))),
-              ]),
-            ),
-          ],
+Widget _heatingObservation() {
+  return Column(
+    children: [
+      Text(
+        'Coloured Residue',
+        style: TextStyle(
+          color: primaryBlue,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
         ),
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: 12),
 
-// MODIFIED WIDGET: _naohObservation()
-  Widget _naohObservation() {
-    return Column(
-      // Ensure both are centered
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // 1. The Image (Replacing the old icon/container)
-        Image.asset(
-          'assets/images/turmeric_red.png', // The required image
-          height: 160, // Set a suitable height for the image
-          errorBuilder: (_, __, ___) => const PlaceholderImage(
-            label: 'Image: turmeric_red.png',
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          // 🔥 HOT IMAGE + LABEL
+          Expanded(
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/images/pic_a.png',
+                  height: 160,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                    const PlaceholderImage(label: 'Pic A (Hot : White)'),
+                ),
+                const SizedBox(height: 6),
+
+                // 🔥 HOT TEXT with background
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFE8D8),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '🔥 HOT : WHITE',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.brown,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          // ❄️ COLD IMAGE + LABEL
+          Expanded(
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/images/pic_b.png',
+                  height: 160,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) =>
+                    const PlaceholderImage(label: 'Pic B (Cold : Blue)'),
+                ),
+                const SizedBox(height: 6),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFE3EEFF),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '❄️ COLD : BLUE',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Color.fromARGB(255, 3, 66, 255),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
+}
+Widget _naohObservation() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      // Ensures image is always visible and properly scaled
+      Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 500,  // Prevents extra shrinking on big screens
+            minWidth: 250,
+            maxHeight: 250,  
+          ),
+          child: Image.asset(
+            'assets/images/turmeric_red.png',
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) =>
+                const PlaceholderImage(label: 'turmeric_red.png'),
           ),
         ),
-        const SizedBox(height: 8),
-        // 2. The required text
-        const Text(
-          'Moist turmeric paper turns brown on exposure to gas', // The required text
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: primaryBlue,
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-          ),
+      ),
+
+      const SizedBox(height: 15),
+
+      // Clean and readable text
+      const Text(
+        'Moist turmeric paper remains as it is on exposure to gas.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: primaryBlue,
+          fontWeight: FontWeight.w600,
+          fontSize: 16,
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
 
 // MODIFIED WIDGET: _flameObservation()
   Widget _flameObservation() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center, // Center the content
-      crossAxisAlignment: CrossAxisAlignment.center, // Center the content
-      children: [
-        // 1. The required Image
-        Image.asset(
-          'assets/images/flame_bluishgreen.png',
-          height: 180, // Adjusted height for better visibility
-          errorBuilder: (_, __, ___) => const PlaceholderImage(
-            label: 'Image: flame_bluishgreen.png',
+    return Center( 
+      child: Column(
+        children: [
+          Image.asset(
+            'assets/images/flame_bluishgreen.png',
+            height: 160, // Match sizing convention of other observations
+            errorBuilder: (_, __, ___) =>
+                const PlaceholderImage(label: 'flame_bluishgreen.png'),
           ),
-        ),
-        const SizedBox(height: 8),
-        // 2. The required Text
-        const Text(
-          'Bluish Green Flame',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: primaryBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+          
+          // 2. Remove all old flame-related text/widgets.
+          const SizedBox(height: 12), // Match padding convention of other observations
+          
+          // 3. Display this exact text below the image
+          Text(
+            'Bluish Green flame', // EXACT text requested
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: primaryBlue, // Match text style convention
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

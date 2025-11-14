@@ -306,73 +306,136 @@ void _prev() {
               color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
     );
   }
-
-  Widget _heatingObservation() {
-    return Column(
-      children: [
-        Text('Coloured Residue', style: TextStyle(color: primaryBlue)),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            Expanded(
-              child: Column(children: [
-                Image.asset('assets/images/pic_a.png',
-                    height: 160,
-                    errorBuilder: (_, __, ___) =>
-                        const PlaceholderImage(label: 'Pic A (Hot : Black)')),
-                const SizedBox(height: 4),
-                const Text('🔥 Hot : Black',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-              ]),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(children: [
-                Image.asset('assets/images/pic_b.png',
-                    height: 160,
-                    errorBuilder: (_, __, ___) =>
-                        const PlaceholderImage(label: 'Pic B (Cold : Brown)')),
-                const SizedBox(height: 4),
-                const Text('❄️ Cold : Brown',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.brown)),
-              ]),
-            ),
-          ],
+Widget _heatingObservation() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Text(
+        'Coloured Residue',
+        style: TextStyle(
+          color: primaryBlue,
+          fontWeight: FontWeight.bold,
+          fontSize: 16,
         ),
-      ],
-    );
-  }
+      ),
 
-  // UPDATED _naohObservation() METHOD (Kept unchanged as per instructions)
-  Widget _naohObservation() {
-    return Center(
-      child: Column(
+      const SizedBox(height: 12),
+
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          // Image from assets
-          Image.asset(
-            'assets/images/turmeric_yellow.png',
-            height: 160, 
-            errorBuilder: (_, __, ___) =>
-                const PlaceholderImage(label: 'turmeric_yellow.png'),
+          // 🔥 HOT IMAGE + TAG
+          Expanded(
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/images/pic_a.png',
+                  height: 160,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) =>
+                    const PlaceholderImage(label: 'Pic A (Hot : Black)'),
+                ),
+
+                const SizedBox(height: 6),
+
+                // 🔥 HOT TAG
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFEDEDED), // grey soft bg
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '🔥 HOT : BLACK',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 12),
-          // Observation Text - styled to match existing text color for emphasis (primaryBlue)
-          Text(
-            'Moist turmeric paper remains as it is on exposure to gas.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w600,
-              color: primaryBlue, // Using primaryBlue as seen in _heatingObservation()
+
+          const SizedBox(width: 16),
+
+          // ❄️ COLD IMAGE + TAG
+          Expanded(
+            child: Column(
+              children: [
+                Image.asset(
+                  'assets/images/pic_b.png',
+                  height: 160,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) =>
+                    const PlaceholderImage(label: 'Pic B (Cold : Brown)'),
+                ),
+
+                const SizedBox(height: 6),
+
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Color(0xFFFFEBD6), // light brownish bg
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '❄️ COLD : BROWN',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.brown,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
-    );
-  }
+    ],
+  );
+}
 
+
+  // UPDATED _naohObservation() METHOD (Kept unchanged as per instructions)
+ Widget _naohObservation() {
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            maxWidth: 450,   // Keep image nicely visible
+            maxHeight: 250,  // Prevent shrinking on large screens
+          ),
+          child: Image.asset(
+            'assets/images/turmeric_yellow.png',
+            fit: BoxFit.contain,
+            errorBuilder: (_, __, ___) =>
+                const PlaceholderImage(label: 'turmeric_yellow.png'),
+          ),
+        ),
+      ),
+
+      const SizedBox(height: 12),
+
+      const Text(
+        'Moist turmeric paper remains as it is on exposure to gas.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: primaryBlue,
+        ),
+      ),
+    ],
+  );
+}
 
   // 🔥 Flame Test Observation - UPDATED as per exact instructions
   Widget _flameObservation() {
