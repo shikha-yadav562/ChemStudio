@@ -6,26 +6,28 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestCScreen extends StatefulWidget {
-  const PreliminaryTestCScreen({super.key});
+  // 1. Add final startIndex
+  final int startIndex; 
+  // 2. Update constructor
+  const PreliminaryTestCScreen({super.key, this.startIndex = 0}); 
 
   @override
   State<PreliminaryTestCScreen> createState() => _PreliminaryTestCScreenState();
 }
 
 class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
-  int _index = 0;
+  // 3. Update initialization of _index
+  late int _index; 
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
+    // 4. Initialize _index from widget property
+    _index = widget.startIndex;
     //_clearPreviousAnswers(); // optional
   }
-
-  /*Future<void> _clearPreviousAnswers() async {
-    await _dbHelper.clearTest('SaltC_PreliminaryTest');
-  }*/
 
   final List<TestItem> _tests = [
     TestItem(
@@ -151,8 +153,7 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color:
-                                  selectedHere ? accentTeal : Colors.black87,
+                              color: selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),
@@ -163,13 +164,18 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
               ),
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Adjust mainAxisAlignment to push 'Next' to the right when 'Previous' is hidden
+              mainAxisAlignment:
+                  (_index == 0) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
               children: [
-                TextButton.icon(
-                  onPressed: _prev,
-                  icon: const Icon(Icons.arrow_back),
-                  label: const Text("Previous"),
-                ),
+                // Conditionally show the "Previous" button only if not on the first page
+                if (_index > 0)
+                  TextButton.icon(
+                    onPressed: _prev,
+                    icon: const Icon(Icons.arrow_back),
+                    label: const Text("Previous"),
+                  ),
+                
                 ElevatedButton.icon(
                   onPressed: selected != null ? _next : null,
                   icon: Icon(
