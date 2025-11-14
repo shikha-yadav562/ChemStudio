@@ -15,17 +15,7 @@ class PreliminaryTestAScreen extends StatefulWidget {
 class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
   int _index = 0;
   final Map<int, String> _answers = {};
-  final _dbHelper = DatabaseHelper.instance; // ✅ define once
-
-  @override
-void initState() {
-  super.initState();
- // _clearPreviousAnswers();
-}
-
-/*Future<void> _clearPreviousAnswers() async {
-  await _dbHelper.clearTest('SaltA_PreliminaryTest');
-}*/
+  final _dbHelper = DatabaseHelper.instance;
 
   final List<TestItem> _tests = [
     TestItem(
@@ -44,13 +34,25 @@ void initState() {
     ),
   ];
 
-  void _next() {
+  Future<void> _printPreliminaryAnswers() async {
+    final answers = await _dbHelper.getAnswers('SaltA_PreliminaryTest');
+    print('📘 --- Preliminary Test Answers from Database ---');
+    for (var row in answers) {
+      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+    }
+    print('----------------------------------------------');
+  }
+
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
+      await _printPreliminaryAnswers();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestAScreen()),
+        MaterialPageRoute(
+          builder: (_) => DryTestAScreen(preliminaryAnswers: _answers),
+        ),
       );
     }
   }
@@ -123,7 +125,6 @@ void initState() {
                       child: InkWell(
                         onTap: () async {
                           setState(() => _answers[test.id] = opt);
-                          // ✅ save to correct table
                           await _dbHelper.saveAnswer(
                             'SaltA_PreliminaryTest',
                             test.id,

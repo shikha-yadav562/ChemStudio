@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/DRY_TEST/C/dry_test_c.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
@@ -17,23 +17,13 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
 
-  @override
-  void initState() {
-    super.initState();
-    //_clearPreviousAnswers(); // optional
-  }
-
-  /*Future<void> _clearPreviousAnswers() async {
-    await _dbHelper.clearTest('SaltC_PreliminaryTest');
-  }*/
-
   final List<TestItem> _tests = [
     TestItem(
       id: 1,
       title: "1. Preliminary Test – Colour",
       observation: "Dark Brown",
-      options: ["Fe3+", "Cu2+", "Mn2+", "Co2+"],
-      correct: "Fe3+",
+      options: ["Fe³⁺", "Cu²⁺", "Mn²⁺", "Co²⁺"],
+      correct: "Fe³⁺",
     ),
     TestItem(
       id: 2,
@@ -44,13 +34,25 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
     ),
   ];
 
-  void _next() {
+  Future<void> _printPreliminaryAnswers() async {
+    final answers = await _dbHelper.getAnswers('SaltC_PreliminaryTest');
+    print('📘 --- Preliminary Test Answers from Database ---');
+    for (var row in answers) {
+      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+    }
+    print('----------------------------------------------');
+  }
+
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
+      await _printPreliminaryAnswers();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestCScreen()),
+        MaterialPageRoute(
+          builder: (_) => DryTestCScreen(preliminaryAnswers: _answers),
+        ),
       );
     }
   }
