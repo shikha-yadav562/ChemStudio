@@ -2,6 +2,7 @@ import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../../welcome_screen.dart';
 import 'package:ChemStudio/screens/DRY_TEST/C/preliminary_test_c.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -350,11 +351,11 @@ class _DryTestCScreenState extends State<DryTestCScreen>
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      '🔥 Hot : White',
+                      '🔥 Hot : Black',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Colors.brown,
+                        color: Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
                   ),
@@ -376,15 +377,15 @@ class _DryTestCScreenState extends State<DryTestCScreen>
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFDCE9FF),
+                      color: const Color.fromARGB(255, 255, 238, 220),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      '❄️ Cold : Blue',
+                      '❄️ Cold : Brown',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Color.fromARGB(255, 3, 66, 255),
+                        color: Color.fromARGB(255, 201, 101, 0),
                       ),
                     ),
                   ),
@@ -491,108 +492,183 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.white,
+    appBar: AppBar(
+      centerTitle: true,
+      elevation: 0,
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: ShaderMask(
-          shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue])
-                  .createShader(bounds),
-          child: const Text(
-            'Salt C: Test Summary',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+      title: ShaderMask(
+        shaderCallback: (bounds) =>
+            const LinearGradient(colors: [accentTeal, primaryBlue])
+                .createShader(bounds),
+        child: const Text(
+          'Salt C: Test Summary',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
           ),
         ),
       ),
-      body: FadeTransition(
-        opacity: _fadeCtrl,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Text(
-                'Dry Test Answers:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView(
-                  children: [
-                    ...widget.tests.map((test) {
-                      final ans =
-                          widget.userAnswers[test.id] ?? 'No answer selected';
+    ),
+    body: FadeTransition(
+      opacity: _fadeCtrl,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Dry Test Answers:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+
+            Expanded(
+              child: ListView(
+                children: [
+                  ...widget.tests.map((test) {
+                    final ans =
+                        widget.userAnswers[test.id] ??
+                            'No answer selected';
+
+                    return _resultCard(
+                      icon: Icons.assignment_turned_in_rounded,
+                      title: test.title,
+                      answer: ans,
+                    );
+                  }),
+
+                  const SizedBox(height: 30),
+
+                  const Text(
+                    'Preliminary Test Answers:',
+                    style: TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+
+                  if (widget.preliminaryAnswers.isEmpty)
+                    const Text(
+                      'No preliminary test data found.',
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                    )
+                  else
+                    ...widget.preliminaryAnswers.entries.map((entry) {
                       return _resultCard(
-                        icon: Icons.assignment_turned_in_rounded,
-                        title: test.title,
-                        answer: ans,
+                        icon: Icons.science_rounded,
+                        title: 'Preliminary Test Q${entry.key}',
+                        answer: entry.value,
                       );
                     }),
-                    const SizedBox(height: 30),
-                    const Text(
-                      'Preliminary Test Answers:',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 16),
-                    if (widget.preliminaryAnswers.isEmpty)
-                      const Text(
-                        'No preliminary test data found.',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      )
-                    else
-                      ...widget.preliminaryAnswers.entries.map((entry) {
-                        return _resultCard(
-                          icon: Icons.science_rounded,
-                          title: 'Preliminary Test Q${entry.key}',
-                          answer: entry.value,
-                        );
-                      }),
-                  ],
-                ),
+                ],
               ),
-              const SizedBox(height: 16),
-              ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-                  );
-                },
-                icon: const Icon(Icons.home_rounded, color: Colors.white),
-                label: const Text(
-                  'Back to Home',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: Colors.white,
-                  ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  backgroundColor: primaryBlue,
-                  shadowColor: accentTeal.withOpacity(0.4),
-                  elevation: 8,
-                ),
-              ),
-            ],
+            ),
+
+            const SizedBox(height: 16),
+
+           Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    // ===== PREVIOUS =====
+    Expanded(
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+        label: const Text(
+          'Previous',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.white,
           ),
         ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          backgroundColor: primaryBlue,
+        ),
       ),
-    );
-  }
+    ),
+
+    const SizedBox(width: 12),
+
+    // ===== START ANALYSIS =====
+    Expanded(
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const WetTestIntroCScreen(),
+            ),
+          );
+        },
+        icon: const Icon(Icons.science_rounded, color: Colors.white),
+        label: const Text(
+          'Start Analysis',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          backgroundColor: primaryBlue,
+        ),
+      ),
+    ),
+
+    const SizedBox(width: 12),
+
+    // ===== BACK TO HOME =====
+    Expanded(
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+          );
+        },
+        icon: const Icon(Icons.home_rounded, color: Colors.white),
+        label: const Text(
+          'Home',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          backgroundColor: primaryBlue,
+        ),
+      ),
+    ),
+  ],
+)
+
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 
   Widget _resultCard({
     required IconData icon,

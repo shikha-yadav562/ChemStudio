@@ -336,15 +336,15 @@ class _DryTestDScreenState extends State<DryTestDScreen>
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFE6D8),
+                      color: const Color.fromARGB(91, 0, 0, 0),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      '🔥 Hot : White',
+                      '🔥Hot : White',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Colors.brown,
+                        color: Color.fromARGB(255, 255, 255, 255),
                       ),
                     ),
                   ),
