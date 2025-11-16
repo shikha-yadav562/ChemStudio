@@ -1,32 +1,27 @@
-import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/DRY_TEST/C/dry_test_c.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestCScreen extends StatefulWidget {
-  // 1. Add final startIndex
-  final int startIndex; 
-  // 2. Update constructor
-  const PreliminaryTestCScreen({super.key, this.startIndex = 0}); 
+  final int startIndex;
+  const PreliminaryTestCScreen({super.key, this.startIndex = 0});
 
   @override
   State<PreliminaryTestCScreen> createState() => _PreliminaryTestCScreenState();
 }
 
 class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
-  // 3. Update initialization of _index
-  late int _index; 
+  late int _index;
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
-    // 4. Initialize _index from widget property
     _index = widget.startIndex;
-    //_clearPreviousAnswers(); // optional
   }
 
   final List<TestItem> _tests = [
@@ -34,8 +29,8 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
       id: 1,
       title: "1. Preliminary Test – Colour",
       observation: "Dark Brown",
-      options: ["Fe3+", "Cu2+", "Mn2+", "Co2+"],
-      correct: "Fe3+",
+      options: ["Fe³⁺", "Cu²⁺", "Mn²⁺", "Co²⁺"],
+      correct: "Fe³⁺",
     ),
     TestItem(
       id: 2,
@@ -46,13 +41,25 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
     ),
   ];
 
-  void _next() {
+  Future<void> _printPreliminaryAnswers() async {
+    final answers = await _dbHelper.getAnswers('SaltC_PreliminaryTest');
+    print('📘 --- Preliminary Test Answers from Database ---');
+    for (var row in answers) {
+      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+    }
+    print('----------------------------------------------');
+  }
+
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
+      await _printPreliminaryAnswers();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestCScreen()),
+        MaterialPageRoute(
+          builder: (_) => DryTestCScreen(preliminaryAnswers: _answers),
+        ),
       );
     }
   }
@@ -73,16 +80,11 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
         elevation: 2,
         centerTitle: true,
         title: ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [accentTeal, primaryBlue],
-          ).createShader(bounds),
+          shaderCallback: (bounds) =>
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
           child: const Text(
             "Salt C: Preliminary Test",
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
@@ -105,9 +107,8 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                   _buildObservationCard(test),
                   const SizedBox(height: 24),
                   ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [accentTeal, primaryBlue],
-                    ).createShader(bounds),
+                    shaderCallback: (bounds) =>
+                        const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
                     child: const Text(
                       'Based on the observation, select the correct inference:',
                       style: TextStyle(
@@ -136,23 +137,15 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: selectedHere
-                                ? accentTeal.withOpacity(0.1)
-                                : Colors.white,
+                            color: selectedHere ? accentTeal.withOpacity(0.1) : Colors.white,
                             border: Border.all(
-                              color: selectedHere
-                                  ? accentTeal
-                                  : Colors.grey.shade300,
-                              width: 1.5,
-                            ),
+                                color: selectedHere ? accentTeal : Colors.grey.shade300, width: 1.5),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             opt,
                             style: TextStyle(
-                              fontWeight: selectedHere
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
+                              fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
                               color: selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
@@ -164,35 +157,25 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
               ),
             ),
             Row(
-              // Adjust mainAxisAlignment to push 'Next' to the right when 'Previous' is hidden
               mainAxisAlignment:
                   (_index == 0) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
               children: [
-                // Conditionally show the "Previous" button only if not on the first page
                 if (_index > 0)
                   TextButton.icon(
                     onPressed: _prev,
                     icon: const Icon(Icons.arrow_back),
                     label: const Text("Previous"),
                   ),
-                
                 ElevatedButton.icon(
                   onPressed: selected != null ? _next : null,
-                  icon: Icon(
-                    _index == _tests.length - 1
-                        ? Icons.check_circle_outline
-                        : Icons.arrow_forward,
-                  ),
-                  label: Text(
-                    _index == _tests.length - 1
-                        ? "Proceed to Dry Test"
-                        : "Next",
-                  ),
+                  icon: Icon(_index == _tests.length - 1
+                      ? Icons.check_circle_outline
+                      : Icons.arrow_forward),
+                  label: Text(_index == _tests.length - 1 ? "Proceed to Dry Test" : "Next"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                 ),
               ],
@@ -213,16 +196,11 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [accentTeal, primaryBlue],
-              ).createShader(bounds),
+              shaderCallback: (bounds) => const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
               child: const Text(
                 "Observation:",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
               ),
             ),
             const SizedBox(height: 10),
@@ -260,11 +238,7 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
           end: Alignment.bottomRight,
         ),
         boxShadow: [
-          BoxShadow(
-            color: Colors.brown.withOpacity(0.4),
-            blurRadius: 8,
-            spreadRadius: 2,
-          ),
+          BoxShadow(color: Colors.brown.withOpacity(0.4), blurRadius: 8, spreadRadius: 2),
         ],
       ),
       child: const Center(
