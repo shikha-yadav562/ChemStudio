@@ -1,23 +1,20 @@
-import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
-import 'package:ChemStudio/screens/DRY_TEST/A/dry_test_a.dart';
+import 'package:ChemStudio/DB/database_helper.dart';
+import 'dry_test_a.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestAScreen extends StatefulWidget {
-  // ✅ 1. Add required field for initial index
-  final int initialIndex; 
+  final int initialIndex;
 
-  // ✅ 2. Update constructor to accept initialIndex, defaulting to 0
-  const PreliminaryTestAScreen({super.key, this.initialIndex = 0}); 
+  const PreliminaryTestAScreen({super.key, this.initialIndex = 0});
 
   @override
   State<PreliminaryTestAScreen> createState() => _PreliminaryTestAScreenState();
 }
 
 class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
-  // ✅ 3. Change initialization to use widget.initialIndex
   late int _index;
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
@@ -25,13 +22,8 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
   @override
   void initState() {
     super.initState();
-    _index = widget.initialIndex; // ✅ Initialize _index with the provided value
-   // _clearPreviousAnswers();
+    _index = widget.initialIndex;
   }
-
-/*Future<void> _clearPreviousAnswers() async {
-  await _dbHelper.clearTest('SaltA_PreliminaryTest');
-}*/
 
   final List<TestItem> _tests = [
     TestItem(
@@ -50,13 +42,25 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
     ),
   ];
 
-  void _next() {
+  Future<void> _printPreliminaryAnswers() async {
+    final answers = await _dbHelper.getAnswers('SaltA_PreliminaryTest');
+    print('📘 --- Preliminary Test Answers ---');
+    for (var row in answers) {
+      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+    }
+    print('--------------------------------');
+  }
+
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
+      await _printPreliminaryAnswers();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestAScreen()),
+        MaterialPageRoute(
+          builder: (_) => DryTestAScreen(preliminaryAnswers: _answers),
+        ),
       );
     }
   }
@@ -64,7 +68,7 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
   void _prev() {
     if (_index > 0) setState(() => _index--);
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final test = _tests[_index];
@@ -129,12 +133,8 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
                       child: InkWell(
                         onTap: () async {
                           setState(() => _answers[test.id] = opt);
-                          // ✅ save to correct table
                           await _dbHelper.saveAnswer(
-                            'SaltA_PreliminaryTest',
-                            test.id,
-                            opt,
-                          );
+                              'SaltA_PreliminaryTest', test.id, opt);
                         },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
@@ -158,8 +158,7 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color:
-                                  selectedHere ? accentTeal : Colors.black87,
+                              color: selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),
@@ -170,20 +169,16 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
               ),
             ),
             Row(
-              // Pushes the "Next" button to the end when on the first page (_index == 0) 
-              // and spaces them out otherwise.
               mainAxisAlignment: (_index == 0)
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.spaceBetween,
               children: [
-                // CONDITIONALLY HIDES "Previous" BUTTON ON FIRST PAGE (_index == 0)
                 if (_index > 0)
                   TextButton.icon(
                     onPressed: _prev,
                     icon: const Icon(Icons.arrow_back),
                     label: const Text("Previous"),
                   ),
-                
                 ElevatedButton.icon(
                   onPressed: selected != null ? _next : null,
                   icon: Icon(

@@ -12,117 +12,20 @@ class DatabaseHelper {
   DatabaseHelper._privateConstructor();
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
-  // -------------------- GET DATABASE INSTANCE --------------------
+  // Get database instance
   Future<Database> get database async {
     if (_database != null) return _database!;
     _database = await _initDatabase();
     return _database!;
   }
 
-  // -------------------- INITIALIZE DATABASE --------------------
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _dbName);
-
     return await openDatabase(path, version: _dbVersion, onCreate: _onCreate);
   }
 
-  // -------------------- CREATE TABLES --------------------
   Future<void> _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE SaltA_DryTest (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        question_id INTEGER NOT NULL,
-        answer TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE SaltA_PreliminaryTest (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        question_id INTEGER NOT NULL,
-        answer TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE SaltB_DryTest (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        question_id INTEGER NOT NULL,
-        answer TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE SaltB_PreliminaryTest (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        question_id INTEGER NOT NULL,
-        answer TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE SaltC_DryTest (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        question_id INTEGER NOT NULL,
-        answer TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE SaltC_PreliminaryTest (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        question_id INTEGER NOT NULL,
-        answer TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE SaltD_DryTest (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        question_id INTEGER NOT NULL,
-        answer TEXT NOT NULL
-      )
-    ''');
-
-    await db.execute('''
-      CREATE TABLE SaltD_PreliminaryTest (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        question_id INTEGER NOT NULL,
-        answer TEXT NOT NULL
-      )
-    ''');
-  }
-
-  // -------------------- SAVE ANSWER --------------------
-  Future<void> saveAnswer(
-    String tableName,
-    int questionId,
-    String answer,
-  ) async {
-    final db = await database;
-    await db.insert(tableName, {
-      'question_id': questionId,
-      'answer': answer,
-    }, conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  // -------------------- GET ALL ANSWERS --------------------
-  Future<List<Map<String, dynamic>>> getAnswers(String tableName) async {
-    final db = await database;
-    return await db.query(tableName);
-  }
-
-  // -------------------- CLEAR TEST DATA --------------------
-  Future<void> clearTest(String tableName) async {
-    final db = await database;
-    await db.delete(tableName);
-  }
-
-  // -------------------- CLEAR ALL USER ANSWERS --------------------
-  Future<void> clearAllAnswers() async {
-    final db = await database;
-
     final tables = [
       'SaltA_DryTest',
       'SaltA_PreliminaryTest',
@@ -135,11 +38,58 @@ class DatabaseHelper {
     ];
 
     for (var table in tables) {
-      await db.delete(table);
+      await db.execute('''
+        CREATE TABLE $table (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          question_id INTEGER NOT NULL,
+          answer TEXT NOT NULL
+        )
+      ''');
     }
   }
 
-  // -------------------- DELETE DATABASE (OPTIONAL RESET) --------------------
+  // Save answer
+  Future<void> saveAnswer(String tableName, int questionId, String answer) async {
+    final db = await database;
+    await db.insert(
+      tableName,
+      {'question_id': questionId, 'answer': answer},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  // Get answers
+  Future<List<Map<String, dynamic>>> getAnswers(String tableName) async {
+    final db = await database;
+    return await db.query(tableName);
+  }
+
+  // Clear specific test
+  Future<void> clearTest(String tableName) async {
+    final db = await database;
+    await db.delete(tableName);
+  }
+
+  // Clear all answers
+  Future<void> clearAllAnswers() async {
+    final db = await database;
+    final tables = [
+      'SaltA_DryTest',
+      'SaltA_PreliminaryTest',
+      'SaltB_DryTest',
+      'SaltB_PreliminaryTest',
+      'SaltC_DryTest',
+      'SaltC_PreliminaryTest',
+      'SaltD_DryTest',
+      'SaltD_PreliminaryTest',
+    ];
+    for (var table in tables) {
+      await db.delete(table);
+    }
+    _database = null;
+  }
+
+  // Reset database
   Future<void> resetDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _dbName);
@@ -147,8 +97,7 @@ class DatabaseHelper {
     _database = null;
   }
 
-  // -------------------- EXPORT DATABASE TO DOWNLOADS --------------------
-  // -------------------- EXPORT DATABASE TO DOWNLOADS --------------------
+  // Export database
   Future<void> exportDatabase() async {
     try {
       final dbPath = await getDatabasesPath();
@@ -160,44 +109,24 @@ class DatabaseHelper {
         return;
       }
 
-      // Detect platform and select export folder
-      Directory? exportDir;
+      String targetPath;
 
       if (Platform.isAndroid) {
-        // Android physical download folder
-        exportDir = Directory('/storage/emulated/0/Download');
-      } else if (Platform.isWindows || Platform.isMacOS) {
-        // Use the system downloads folder on desktop
-        try {
-          final downloads = await getDownloadsDirectory();
-          if (downloads != null) {
-            exportDir = downloads;
-          } else {
-            // Fallback to Documents if unavailable
-            exportDir = await getApplicationDocumentsDirectory();
-          }
-        } catch (_) {
-          exportDir = await getApplicationDocumentsDirectory();
-        }
+        targetPath = "/storage/emulated/0/Download/$_dbName";
+      } else if (Platform.isWindows) {
+        final downloads = "${Platform.environment['USERPROFILE']}\\Downloads";
+        targetPath = "$downloads\\$_dbName";
+      } else if (Platform.isMacOS || Platform.isLinux) {
+        final home = Platform.environment['HOME'];
+        targetPath = "$home/Downloads/$_dbName";
       } else {
-        // Default for other OS
-        exportDir = await getApplicationDocumentsDirectory();
+        throw Exception("❌ Unsupported platform");
       }
 
-      // Make sure export directory exists
-      if (!await exportDir.exists()) {
-        await exportDir.create(recursive: true);
-      }
-
-      // Target destination path
-      final targetPath = join(exportDir.path, _dbName);
-
-      // Copy database
       await sourceFile.copy(targetPath);
-
-      print('✅ Database exported successfully to: $targetPath');
+      print("✅ Database successfully exported to: $targetPath");
     } catch (e) {
-      print('❌ Error exporting database: $e');
+      print("❌ Error exporting database: $e");
     }
   }
 }

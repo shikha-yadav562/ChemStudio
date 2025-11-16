@@ -6,10 +6,7 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestBScreen extends StatefulWidget {
-  // ✅ 1. Add required field for initial index
   final int initialIndex;
-
-  // ✅ 2. Update constructor to accept initialIndex, defaulting to 0
   const PreliminaryTestBScreen({super.key, this.initialIndex = 0});
 
   @override
@@ -17,21 +14,9 @@ class PreliminaryTestBScreen extends StatefulWidget {
 }
 
 class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
-  // ✅ 3. Change initialization to use widget.initialIndex
   late int _index;
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    _index = widget.initialIndex; // ✅ Initialize _index with the provided value
-    //_clearPreviousAnswers();
-  }
-
-  /*Future<void> _clearPreviousAnswers() async {
-    await _dbHelper.clearTest('SaltB_PreliminaryTest');
-  }*/
 
   final List<TestItem> _tests = [
     TestItem(
@@ -49,13 +34,32 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
       correct: "Crystalline",
     ),
   ];
-  void _next() {
+
+  @override
+  void initState() {
+    super.initState();
+    _index = widget.initialIndex;
+  }
+
+  Future<void> _printPreliminaryAnswers() async {
+    final answers = await _dbHelper.getAnswers('SaltB_PreliminaryTest');
+    print('📘 --- Preliminary Test B Answers from Database ---');
+    for (var row in answers) {
+      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+    }
+    print('----------------------------------------------');
+  }
+
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
+      await _printPreliminaryAnswers();
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestBScreen()),
+        MaterialPageRoute(
+          builder: (_) => DryTestBScreen(preliminaryAnswers: _answers),
+        ),
       );
     }
   }
@@ -156,7 +160,8 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
                               fontWeight: selectedHere
                                   ? FontWeight.bold
                                   : FontWeight.normal,
-                              color: selectedHere ? accentTeal : Colors.black87,
+                              color:
+                                  selectedHere ? accentTeal : Colors.black87,
                             ),
                           ),
                         ),
@@ -167,20 +172,16 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
               ),
             ),
             Row(
-              // The mainAxisAlignment is set to MainAxisAlignment.end when _index is 0 
-              // to move the "Next" button all the way to the right.
               mainAxisAlignment: (_index == 0)
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.spaceBetween,
               children: [
-                // Only show the "Previous" button if not on the first page (_index > 0)
                 if (_index > 0)
                   TextButton.icon(
                     onPressed: _prev,
                     icon: const Icon(Icons.arrow_back),
                     label: const Text("Previous"),
                   ),
-                
                 ElevatedButton.icon(
                   onPressed: selected != null ? _next : null,
                   icon: Icon(

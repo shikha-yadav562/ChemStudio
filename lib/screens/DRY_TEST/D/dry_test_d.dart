@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../../welcome_screen.dart';
-import 'package:ChemStudio/screens/DRY_TEST/D/preliminary_test_d.dart'; // ✅ Import Preliminary Test screen
-
+import 'package:ChemStudio/screens/DRY_TEST/D/preliminary_test_d.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class DryTestDScreen extends StatefulWidget {
-  const DryTestDScreen({super.key});
+  final Map<int, String>? preliminaryAnswers; // optional
+
+  const DryTestDScreen({super.key, this.preliminaryAnswers});
 
   @override
   State<DryTestDScreen> createState() => _DryTestDScreenState();
@@ -38,7 +39,6 @@ class _DryTestDScreenState extends State<DryTestDScreen>
     _animController.forward();
   }
 
-  // ✅ Load saved answers from DB
   Future<void> _loadSavedAnswers() async {
     final data = await _dbHelper.getAnswers(_tableName);
     setState(() {
@@ -48,7 +48,6 @@ class _DryTestDScreenState extends State<DryTestDScreen>
     });
   }
 
-  // ✅ Save answer to DB
   Future<void> _saveAnswer(int id, String answer) async {
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
@@ -101,26 +100,25 @@ class _DryTestDScreenState extends State<DryTestDScreen>
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => SaltDResultScreen(userAnswers: _answers, tests: _tests),
+          builder: (_) => SaltDResultScreen(
+            userAnswers: _answers,
+            tests: _tests,
+            preliminaryAnswers: widget.preliminaryAnswers,
+          ),
         ),
       );
     }
   }
 
-void _prev() {
-    // If on the first page of Dry Test (index 0)
+  void _prev() {
     if (_index == 0) {
-      // Navigate back to the Preliminary Test, specifically the second page (index 1)
-      // The second page is the Nature Test. Use pushReplacement as we are moving back a step in the flow.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          // Navigate to PreliminaryTestCScreen and pass startIndex 1
-          builder: (_) => const PreliminaryTestDScreen(startIndex: 1), 
+          builder: (_) => const PreliminaryTestDScreen(startIndex: 1),
         ),
       );
     } else {
-      // Otherwise, navigate to the previous page within Dry Test
       setState(() {
         _index--;
         _animController.forward(from: 0);
@@ -174,7 +172,8 @@ void _prev() {
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
-                        ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold)),
+                        ?.copyWith(
+                            color: primaryBlue, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 Expanded(
                   child: ListView(
@@ -183,7 +182,8 @@ void _prev() {
                       const SizedBox(height: 24),
                       ShaderMask(
                         shaderCallback: (bounds) =>
-                            const LinearGradient(colors: [accentTeal, primaryBlue])
+                            const LinearGradient(
+                                    colors: [accentTeal, primaryBlue])
                                 .createShader(bounds),
                         child: const Text(
                           'Based on the observation, select the correct inference:',
@@ -310,7 +310,14 @@ void _prev() {
   Widget _heatingObservation() {
     return Column(
       children: [
-        Text('Coloured Residue', style: TextStyle(color: primaryBlue)),
+        Text(
+          'Coloured Residue',
+          style: TextStyle(
+            color: primaryBlue,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -318,14 +325,29 @@ void _prev() {
             Expanded(
               child: Column(
                 children: [
-                  Image.asset('assets/images/pic_a.png',
-                      height: 160,
-                      errorBuilder: (_, __, ___) =>
-                          const PlaceholderImage(label: 'Pic A (Hot : White)')),
-                  const SizedBox(height: 4),
-                  const Text('🔥 Hot : White',
+                  Image.asset(
+                    'assets/images/pic_a.png',
+                    height: 160,
+                    errorBuilder: (_, __, ___) =>
+                        const PlaceholderImage(label: 'Pic A (Hot : White)'),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFE6D8),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      '🔥 Hot : White',
                       style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.brown)),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Colors.brown,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -333,14 +355,29 @@ void _prev() {
             Expanded(
               child: Column(
                 children: [
-                  Image.asset('assets/images/pic_b.png',
-                      height: 160,
-                      errorBuilder: (_, __, ___) =>
-                          const PlaceholderImage(label: 'Pic B (Cold : Blue)')),
-                  const SizedBox(height: 4),
-                  const Text('❄️ Cold : Blue',
+                  Image.asset(
+                    'assets/images/pic_b.png',
+                    height: 160,
+                    errorBuilder: (_, __, ___) =>
+                        const PlaceholderImage(label: 'Pic B (Cold : Blue)'),
+                  ),
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFDCE9FF),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      '❄️ Cold : Blue',
                       style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.brown)),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: Color.fromARGB(255, 3, 66, 255),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -350,24 +387,27 @@ void _prev() {
     );
   }
 
-  // 🔥 NaOH Test (Test ID 2) Update: Removed the 'Observation: ' prefix.
   Widget _naohObservation(String observationText) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // New image asset
-        Image.asset(
-          'assets/images/turmeric_yellow.png',
-          height: 160,
-          errorBuilder: (_, __, ___) =>
-              const PlaceholderImage(label: 'Moist Turmeric Paper'),
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450, maxHeight: 250),
+            child: Image.asset(
+              'assets/images/turmeric_yellow.png',
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) =>
+                  const PlaceholderImage(label: 'Moist Turmeric Paper'),
+            ),
+          ),
         ),
         const SizedBox(height: 12),
-        // Observation text placed directly below the image, without "Observation: " prefix
         Text(
-          observationText, // <--- CHANGE IS HERE: Removed "Observation: "
+          observationText,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             color: primaryBlue,
             fontWeight: FontWeight.bold,
             fontSize: 16,
@@ -377,30 +417,28 @@ void _prev() {
     );
   }
 
-  // 🔥 Flame Test (Test ID 3) Update: Replaced custom UI with image and specific text.
   Widget _flameObservation() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Display the new image asset
-        Image.asset(
-          'assets/images/flame_bluishgreen.png', // <--- NEW IMAGE PATH
-          height: 160,
-          errorBuilder: (_, __, ___) =>
-              const PlaceholderImage(label: 'Bluish Green Flame'),
-        ),
-        const SizedBox(height: 12),
-        // Display the required text below the image
-        Text(
-          'Bluish Green Flame', // <--- NEW REQUIRED TEXT
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: primaryBlue,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
+    return Center(
+      child: Column(
+        children: [
+          Image.asset(
+            'assets/images/flame_bluishgreen.png',
+            height: 160,
+            errorBuilder: (_, __, ___) =>
+                const PlaceholderImage(label: 'flame_bluishgreen.png'),
           ),
-        ),
-      ],
+          const SizedBox(height: 12),
+          Text(
+            'Bluish Green flame',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: primaryBlue,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -410,9 +448,14 @@ void _prev() {
 class SaltDResultScreen extends StatelessWidget {
   final Map<int, String> userAnswers;
   final List<TestItem> tests;
+  final Map<int, String>? preliminaryAnswers; // ✅ optional
 
-  const SaltDResultScreen(
-      {super.key, required this.userAnswers, required this.tests});
+  const SaltDResultScreen({
+    super.key,
+    required this.userAnswers,
+    required this.tests,
+    this.preliminaryAnswers,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -441,46 +484,39 @@ class SaltDResultScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Your Selected Answers:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const Text(
+              'Dry Test Answers:',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             Expanded(
               child: ListView(
-                children: tests.map((test) {
-                  final ans = userAnswers[test.id] ?? 'No answer selected';
-                  return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                          colors: [accentTeal, primaryBlue],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight),
-                      borderRadius: BorderRadius.circular(16),
+                children: [
+                  // Dry Test Answers
+                  ...tests.map((test) {
+                    final ans = userAnswers[test.id] ?? 'No answer selected';
+                    return _buildAnswerTile(test.title, ans, Icons.assignment_turned_in_rounded);
+                  }),
+
+                  const SizedBox(height: 20),
+
+                  // Preliminary Test Answers
+                  if (preliminaryAnswers != null && preliminaryAnswers!.isNotEmpty)
+                    const Text(
+                      'Preliminary Test Answers:',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    child: Container(
-                      margin: const EdgeInsets.all(2.5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: ListTile(
-                        leading: const Icon(Icons.assignment_turned_in_rounded,
-                            color: accentTeal, size: 28),
-                        title: Text(test.title,
-                            style: const TextStyle(
-                                fontWeight: FontWeight.w600, fontSize: 16)),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 6),
-                          child: Text(ans,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: primaryBlue)),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
+                  const SizedBox(height: 16),
+                  if (preliminaryAnswers != null && preliminaryAnswers!.isNotEmpty)
+                    ...preliminaryAnswers!.entries.map((entry) {
+                      return _buildAnswerTile(
+                        'Preliminary Test Q${entry.key}',
+                        entry.value,
+                        Icons.science_rounded,
+                      );
+                    }),
+                ],
               ),
             ),
             ElevatedButton.icon(
@@ -501,8 +537,42 @@ class SaltDResultScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30)),
                   backgroundColor: primaryBlue),
-            )
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnswerTile(String title, String answer, IconData icon) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+            colors: [accentTeal, primaryBlue],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Container(
+        margin: const EdgeInsets.all(2.5),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: ListTile(
+          leading: Icon(icon, color: accentTeal, size: 28),
+          title: Text(title,
+              style:
+                  const TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(answer,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: primaryBlue)),
+          ),
         ),
       ),
     );

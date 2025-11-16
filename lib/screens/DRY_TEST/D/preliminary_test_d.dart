@@ -1,14 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/DRY_TEST/D/dry_test_d.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestDScreen extends StatefulWidget {
-  // 1. Add final startIndex
   final int startIndex; 
-  // 2. Update constructor
   const PreliminaryTestDScreen({super.key, this.startIndex = 0}); 
 
   @override
@@ -16,7 +14,6 @@ class PreliminaryTestDScreen extends StatefulWidget {
 }
 
 class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
-  // 3. Update initialization of _index
   late int _index; 
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
@@ -24,9 +21,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
   @override
   void initState() {
     super.initState();
-    // 4. Initialize _index from widget property
     _index = widget.startIndex;
-    //_clearPreviousAnswers(); // optional
   }
 
   final List<TestItem> _tests = [
@@ -46,13 +41,24 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     ),
   ];
 
-  void _next() {
+  Future<void> _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
+      // Save all preliminary answers before moving
+      for (var entry in _answers.entries) {
+        await _dbHelper.saveAnswer(
+          'SaltD_PreliminaryTest',
+          entry.key,
+          entry.value,
+        );
+      }
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const DryTestDScreen()),
+        MaterialPageRoute(
+          builder: (_) => DryTestDScreen(preliminaryAnswers: _answers),
+        ),
       );
     }
   }
@@ -125,7 +131,6 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                       child: InkWell(
                         onTap: () async {
                           setState(() => _answers[test.id] = opt);
-                          // ✅ Save selected answer to database
                           await _dbHelper.saveAnswer(
                             'SaltD_PreliminaryTest',
                             test.id,
@@ -165,18 +170,15 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
               ),
             ),
             Row(
-              // Change mainAxisAlignment to align 'Next' to the end on the first page
               mainAxisAlignment:
                   (_index == 0) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
               children: [
-                // Conditionally show the "Previous" button only if not on the first page
                 if (_index > 0)
                   TextButton.icon(
                     onPressed: _prev,
                     icon: const Icon(Icons.arrow_back),
                     label: const Text("Previous"),
                   ),
-                
                 ElevatedButton.icon(
                   onPressed: selected != null ? _next : null,
                   icon: Icon(
@@ -193,9 +195,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 12,
-                    ),
+                        horizontal: 20, vertical: 12),
                   ),
                 ),
               ],
