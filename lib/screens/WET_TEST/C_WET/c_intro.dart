@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'group_4/1.dart'; // Import the 1.dart file inside group_4 folder
 
 class WetTestIntroCScreen extends StatelessWidget {
   const WetTestIntroCScreen({super.key});
@@ -8,7 +9,6 @@ class WetTestIntroCScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF6FBFF),
 
-      // ------------------- APP BAR -------------------
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -33,7 +33,6 @@ class WetTestIntroCScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
 
-            // ------------------ FLASK ICON ------------------
             const SizedBox(height: 20),
             const Icon(
               Icons.science_rounded,
@@ -42,8 +41,6 @@ class WetTestIntroCScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 10),
-
-            // ------------------ TITLE ------------------
             const Text(
               "Welcome to the Wet Test Simulation",
               style: TextStyle(
@@ -55,7 +52,6 @@ class WetTestIntroCScreen extends StatelessWidget {
             ),
 
             const SizedBox(height: 8),
-
             const Text(
               "Get ready to prepare your Original Solution (O.S.) and analyze cation groups.",
               style: TextStyle(
@@ -67,7 +63,6 @@ class WetTestIntroCScreen extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // ------------------ STEPPER CONTAINER ------------------
             Container(
               padding: const EdgeInsets.symmetric(vertical: 25),
               decoration: BoxDecoration(
@@ -86,7 +81,6 @@ class WetTestIntroCScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Step 1
                       _stepCircle(isActive: true, number: "1"),
                       _stepDivider(),
                       _stepCircle(isActive: false, number: "2"),
@@ -96,7 +90,6 @@ class WetTestIntroCScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 8),
-
                   const Text(
                     "Preparation   →   Group Analysis   →   Confirmatory Tests",
                     style: TextStyle(
@@ -110,7 +103,6 @@ class WetTestIntroCScreen extends StatelessWidget {
 
             const SizedBox(height: 35),
 
-            // ------------------ FIRST CARD ------------------
             _infoCard(
               icon: Icons.opacity_rounded,
               title: "(C) PREPARATION OF ORIGINAL SOLUTION (O.S.)",
@@ -122,7 +114,6 @@ class WetTestIntroCScreen extends StatelessWidget {
 
             const SizedBox(height: 25),
 
-            // ------------------ SECOND CARD ------------------
             _infoCard(
               icon: Icons.science_outlined,
               title: "(D) DETECTION AND ANALYSIS OF GROUPS",
@@ -139,14 +130,38 @@ class WetTestIntroCScreen extends StatelessWidget {
                   "(v) With filtrate, continue analysis for the second radical.",
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 35),
+
+            // --------- NEXT BUTTON AFTER SCROLL ----------
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const WetTestCPage1(), // Replace with class name in 1.dart
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF004C91),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                  shape: const StadiumBorder(),
+                ),
+                icon: const Icon(Icons.arrow_forward, size: 20),
+                label: const Text('Next', style: TextStyle(fontSize: 16)),
+              ),
+            ),
+
+            const SizedBox(height: 25), // Padding at bottom
           ],
         ),
       ),
     );
   }
 
-  // ------------------ STEP CIRCLE ------------------
   Widget _stepCircle({required bool isActive, required String number}) {
     return Container(
       padding: const EdgeInsets.all(10),
@@ -156,7 +171,7 @@ class WetTestIntroCScreen extends StatelessWidget {
       ),
       child: Text(
         number,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white,
           fontSize: 16,
           fontWeight: FontWeight.bold,
@@ -165,7 +180,6 @@ class WetTestIntroCScreen extends StatelessWidget {
     );
   }
 
-  // Stepper divider line
   Widget _stepDivider() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 10),
@@ -175,7 +189,6 @@ class WetTestIntroCScreen extends StatelessWidget {
     );
   }
 
-  // ------------------ INFO CARD ------------------
   Widget _infoCard({required IconData icon, required String title, required String text}) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -187,7 +200,7 @@ class WetTestIntroCScreen extends StatelessWidget {
           BoxShadow(
             color: Colors.black12,
             blurRadius: 7,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -196,7 +209,7 @@ class WetTestIntroCScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(icon, color: Color(0xFF00AABD), size: 30),
+              Icon(icon, color: const Color(0xFF00AABD), size: 30),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -210,9 +223,7 @@ class WetTestIntroCScreen extends StatelessWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 12),
-
           Text(
             text,
             style: const TextStyle(
