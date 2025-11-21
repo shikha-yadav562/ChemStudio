@@ -1,5 +1,5 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_al3plus.dart
-
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/1.dart';
 import 'package:flutter/material.dart';
 // FIX: Import the collection package for the 'firstWhereOrNull' method.
 import 'package:collection/collection.dart';
@@ -93,7 +93,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const WetTestCGroupFourDetectionScreen(), 
+        builder: (_) => const WetTestCPage1(), 
       ),
     );
   }
