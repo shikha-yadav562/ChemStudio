@@ -44,6 +44,7 @@ flutter:
     - assets/images/flame_bluishwhite.png
     - assets/images/turmeric_red.png
     - assets/images/turmeric_yellow.png
+    - assets/images/wet_bg.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
