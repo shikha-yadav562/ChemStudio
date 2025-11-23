@@ -23,7 +23,8 @@ class _New1_2PageState extends State<New1_2Page> {
         centerTitle: true,
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
           child: const Text(
             'Salt C : Wet Test',
             style: TextStyle(
@@ -37,9 +38,9 @@ class _New1_2PageState extends State<New1_2Page> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Heading
-            Text(
-              "C.T For Mg²⁺ ",
-              style: const TextStyle(
+            const Text(
+              "C.T For Mg²⁺",
+              style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: primaryBlue,
@@ -50,37 +51,32 @@ class _New1_2PageState extends State<New1_2Page> {
             // Test + Observation Card
             Card(
               elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text("Test",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: primaryBlue)),
-                    SizedBox(height: 6),
-                    Text(
+                  children: [
+                    _gradientHeader("Test"),
+                    const SizedBox(height: 6),
+                    const Text(
                       "Previous solution + Titan yellow solution",
                       style: TextStyle(
                           fontSize: 15,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black),
+                    ),
+                    const Divider(height: 22),
+                    _gradientHeader("Observation"),
+                    const SizedBox(height: 6),
+                    const Text(
+                      "Rose red ppt",
+                      style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
                           color: primaryBlue),
                     ),
-                    Divider(height: 22),
-                    Text("Observation",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: primaryBlue)),
-                    SizedBox(height: 6),
-                    Text("Rose red ppt",
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: primaryBlue)),
                   ],
                 ),
               ),
@@ -101,6 +97,24 @@ class _New1_2PageState extends State<New1_2Page> {
     );
   }
 
+  // ===== Gradient Header for Test/Observation =====
+  Widget _gradientHeader(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+
+  // ===== Navigation Bar =====
   Widget _buildNavigationBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -124,8 +138,9 @@ class _New1_2PageState extends State<New1_2Page> {
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: selectedOption != null ? primaryBlue : Colors.grey.shade400,
-            foregroundColor: Colors.white,
+            backgroundColor:
+                selectedOption != null ? primaryBlue : Colors.grey.shade400,
+            foregroundColor: Colors.white, // text always white
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
@@ -136,26 +151,32 @@ class _New1_2PageState extends State<New1_2Page> {
     );
   }
 
+  // ===== Option Button =====
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: InkWell(
         onTap: () => setState(() => selectedOption = text),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(12),
+          height: 50,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
             color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(
                 color: selected ? accentTeal : Colors.grey.shade300, width: 1.5),
           ),
           child: Text(
             text,
-            style: const TextStyle(
-                fontWeight: FontWeight.w600, color: primaryBlue, fontSize: 15),
+            style: TextStyle(
+              fontSize: 15,
+              color: selected ? accentTeal : Colors.black,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
       ),

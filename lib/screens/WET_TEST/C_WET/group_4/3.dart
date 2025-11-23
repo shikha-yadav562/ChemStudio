@@ -22,7 +22,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           'Salt C : Wet Test',
           style: TextStyle(
               color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 22),
@@ -62,7 +62,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
         _testCard(),
 
         const SizedBox(height: 20),
-        _gradientHeader("Select the correct inference:"), 
+        _gradientHeader("Select the correct inference:"),
         const SizedBox(height: 10),
 
         _buildOption("Co²⁺ Confirmed"),
@@ -124,7 +124,10 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
               "(conc. HCL + conc. HNO3 in 3:1 proportion) dilute with water. "
               "Use this solution for C.T.",
               style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.bold, // same as observation
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -147,20 +150,23 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
             const Text(
               "Above solution + NH4CNS + acetone, shake well",
               style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                color: Colors.black, // test content black
+              ),
             ),
             const Divider(height: 22),
-            // Observation heading in blue color
-            Text(
-              "Observation",
-              style: const TextStyle(
-                  fontSize: 18, fontWeight: FontWeight.bold, color: primaryBlue),
-            ),
+
+            _gradientHeader("Observation"),
             const SizedBox(height: 6),
+
             const Text(
               "Blue colour",
               style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -168,6 +174,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
     );
   }
 
+  // OPTION
   Widget _buildOption(String text) {
     return InkWell(
       onTap: () => setState(() => isSelected = true),
@@ -185,8 +192,11 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
         ),
         child: Text(
           text,
-          style: const TextStyle(
-              fontWeight: FontWeight.w600, color: primaryBlue, fontSize: 15),
+          style: TextStyle(
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            color: isSelected ? accentTeal : Colors.black,
+            fontSize: 15,
+          ),
         ),
       ),
     );
@@ -200,7 +210,10 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
       child: Text(
         text,
         style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
       ),
     );
   }

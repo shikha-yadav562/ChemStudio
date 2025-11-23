@@ -27,9 +27,12 @@ class _New3PageState extends State<New3Page> {
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt C :Wet Test',
+            'Salt C : Wet Test',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
@@ -38,7 +41,6 @@ class _New3PageState extends State<New3Page> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Heading
             Text(
               "C.T For Ba²⁺ ",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -47,48 +49,49 @@ class _New3PageState extends State<New3Page> {
                   ),
             ),
             const SizedBox(height: 12),
-            // Solution Card
             _solutionCard(),
             const SizedBox(height: 12),
-            // Test Card
             _testCard(),
             const SizedBox(height: 12),
-            // Option
             _buildOption("Ba²⁺ confirmed"),
           ],
         ),
       ),
       bottomNavigationBar: Container(
         color: Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: _buildNavigationBar(),
       ),
     );
   }
 
+  // ---------------- SOLUTION CARD ----------------
   Widget _solutionCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
+          children: [
+            GradientText(
               "Solution",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: primaryBlue),
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
+
+            // ✅ Blue + Bold
             Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -96,41 +99,50 @@ class _New3PageState extends State<New3Page> {
     );
   }
 
+  // ---------------- TEST CARD ----------------
   Widget _testCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text("Test",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: primaryBlue)),
+          children: [
+            GradientText(
+              "Test",
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 6),
+
+            // ✅ BLACK normal text
             Text(
               "Above acetate solution + dil. H₂SO₄",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
             ),
             Divider(height: 22),
-            Text("Observation",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: primaryBlue)),
+
+            GradientText(
+              "Observation",
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 6),
+
+            // ✅ Blue + Bold
             Text(
               "White ppt",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -138,25 +150,25 @@ class _New3PageState extends State<New3Page> {
     );
   }
 
+  // ---------------- NAVIGATION ----------------
   Widget _buildNavigationBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Previous Button
         TextButton.icon(
           onPressed: () => Navigator.pop(context),
           style: TextButton.styleFrom(
             foregroundColor: primaryBlue,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
           label: const Text('Previous', style: TextStyle(fontSize: 16)),
         ),
-        // Next Button
+
         ElevatedButton.icon(
           onPressed: selectedOption != null
               ? () {
-                  // Navigate to Group VI page (new1_1.dart)
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -164,10 +176,12 @@ class _New3PageState extends State<New3Page> {
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                selectedOption != null ? primaryBlue : Colors.grey.shade400,
+            backgroundColor: selectedOption != null
+                ? primaryBlue
+                : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
@@ -177,8 +191,10 @@ class _New3PageState extends State<New3Page> {
     );
   }
 
+  // ---------------- OPTION ----------------
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
@@ -190,14 +206,41 @@ class _New3PageState extends State<New3Page> {
           decoration: BoxDecoration(
             color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
             borderRadius: BorderRadius.circular(8),
-            border:
-                Border.all(color: selected ? accentTeal : Colors.grey.shade300, width: 1.5),
+            border: Border.all(
+              color: selected ? accentTeal : Colors.grey.shade300,
+              width: 1.5,
+            ),
           ),
-          child: Text(text,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w600, color: primaryBlue, fontSize: 15)),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              color: selected ? accentTeal : Colors.black,
+              fontSize: 15,
+            ),
+          ),
         ),
       ),
+    );
+  }
+}
+
+// ---------------- GRADIENT TEXT ----------------
+class GradientText extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+  final Gradient gradient;
+
+  const GradientText(this.text,
+      {required this.style, required this.gradient, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          gradient.createShader(
+              Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+      child: Text(text, style: style.copyWith(color: Colors.white)),
     );
   }
 }
