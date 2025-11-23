@@ -26,22 +26,24 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
         centerTitle: true,
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
           child: const Text(
-            'Salt C : Wet Test ',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+            'Salt C : Wet Test',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
-      // Use SingleChildScrollView for the body content
       body: SingleChildScrollView(
-        // Added bottom padding to ensure content is visible above the fixed navigation bar
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80), 
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: _buildContent(),
       ),
-      // Fixed bottom navigation bar with customized buttons
       bottomNavigationBar: Container(
-        color: Colors.transparent, // Transparent background (to avoid the white patch)
+        color: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: _buildNavigationBar(),
       ),
@@ -53,7 +55,7 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          "Analysis Group V ",
+          "Analysis Group V",
           style: Theme.of(context)
               .textTheme
               .headlineSmall
@@ -63,17 +65,11 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
 
         _solutionCard(),
         const SizedBox(height: 12),
+
         _testCard(),
         const SizedBox(height: 20),
 
-        ShaderMask(
-          shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: const Text(
-            'Select the correct inference:',
-            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        ),
+        _gradientTitle("Select the correct inference:"),
         const SizedBox(height: 10),
 
         _buildOption("Ba²⁺ present"),
@@ -83,10 +79,11 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
     );
   }
 
-  // New method for the fixed navigation bar
+  // ==================== NAVIGATION ====================
+
   Widget _buildNavigationBar() {
-    // Logic for "Next" button navigation
     VoidCallback? onNextPressed;
+
     if (selectedOption != null) {
       if (selectedOption == "Ba²⁺ present") {
         onNextPressed = () {
@@ -115,7 +112,6 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Previous Button (TextButton.icon, styled to match image)
         TextButton.icon(
           onPressed: () => Navigator.pop(context),
           style: TextButton.styleFrom(
@@ -123,24 +119,31 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
-          label: const Text('Previous', style: TextStyle(fontSize: 16)),
+          label: const Text(
+            'Previous',
+            style: TextStyle(fontSize: 16),
+          ),
         ),
-
-        // Next Button (ElevatedButton.icon with StadiumBorder for circular/pill shape)
         ElevatedButton.icon(
           onPressed: onNextPressed,
           style: ElevatedButton.styleFrom(
-            backgroundColor: selectedOption != null ? primaryBlue : Colors.grey.shade400,
+            backgroundColor:
+                selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            shape: const StadiumBorder(), // Circular/Pill shape
+            shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
-          label: const Text('Next', style: TextStyle(fontSize: 16)),
+          label: const Text(
+            'Next',
+            style: TextStyle(fontSize: 16),
+          ),
         ),
       ],
     );
   }
+
+  // ==================== SOLUTION CARD ====================
 
   Widget _solutionCard() {
     return Card(
@@ -151,20 +154,29 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Solution",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 18, color: primaryBlue)),
+            GradientText(
+              "Solution",
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 6),
+
+            // ✅ Blue + Bold
             Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests.",
-              style:
-                  TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+              style: TextStyle(
+                fontSize: 15,
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
       ),
     );
   }
+
+  // ==================== TEST CARD ====================
 
   Widget _testCard() {
     return Card(
@@ -175,24 +187,40 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Test",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 18, color: primaryBlue)),
+            GradientText(
+              "Test",
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 6),
+
+            // ✅ BLACK + NORMAL
             Text(
               "Above solution + K₂CrO₄",
-              style:
-                  TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
             ),
+
             Divider(height: 22),
-            Text("Observation",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 18, color: primaryBlue)),
+
+            GradientText(
+              "Observation",
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 6),
+
+            // ✅ Blue + Bold
             Text(
               "Yellow ppt",
-              style:
-                  TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+              style: TextStyle(
+                fontSize: 15,
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
@@ -200,8 +228,11 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
     );
   }
 
+  // ==================== OPTIONS ====================
+
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
@@ -220,11 +251,62 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
           ),
           child: Text(
             text,
-            style: const TextStyle(
-                fontWeight: FontWeight.w600, color: primaryBlue, fontSize: 15),
+            style: TextStyle(
+              fontSize: 15,
+
+              // ✅ This is FIXED now
+              color: selected ? accentTeal : Colors.black,
+              fontWeight:
+                  selected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
       ),
     );
   }
+
+  // ==================== GRADIENT TITLE ====================
+
+  Widget _gradientTitle(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
 }
+
+// ==================== GRADIENT TEXT WIDGET ====================
+
+class GradientText extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+  final Gradient gradient;
+
+  const GradientText(
+    this.text, {
+    required this.style,
+    required this.gradient,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (bounds) => gradient
+          .createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+      child: Text(
+        text,
+        style: style.copyWith(color: Colors.white),
+      ),
+    );
+  }
+} 

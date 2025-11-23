@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import '../group_5/new_2.dart'; // Make sure this exists
-import '../group_6/new1_1.dart'; // Updated path to group_6
+import '../group_4/2.dart';
+import '../group_4/3.dart';
+import '../group_4/4.dart';
+import '../group_4/5.dart';
+import '../group_5/new_2.dart';
+import '../group_6/new1_1.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -13,8 +17,16 @@ class GroupVPage extends StatefulWidget {
 }
 
 class _GroupVPageState extends State<GroupVPage> {
-  int pageIndex = 0; // 0 = first page, 1 = second page
+  int pageIndex = 0;
   String? selectedOption;
+
+  // Previous C.T pages list (not used for Previous button now)
+  final List<Widget> previousPages = const [
+    Ni2ConfirmedPage(),
+    Co2ConfirmedPage(),
+    Mn2ConfirmedPage(),
+    Zn2ConfirmedPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +43,10 @@ class _GroupVPageState extends State<GroupVPage> {
           child: const Text(
             'Salt C: Wet Test',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
@@ -47,16 +62,18 @@ class _GroupVPageState extends State<GroupVPage> {
     );
   }
 
+  // ------------------ PAGE 1 ------------------
   Widget _firstPageContent() {
     return _buildPageContent(
       title: "Group V Detection",
       test:
-          "O.S/Filtrate (Remove H2S) + NH₄Cl(equal) NH₄OH(till alkaline to litmus) + (NH₄)₂CO₃",
+          "O.S/Filtrate (Remove H₂S) + NH₄Cl(equal) NH₄OH(till alkaline to litmus) + (NH₄)₂CO₃",
       observation: "White ppt",
       options: ["Group-V present", "Group-V absent"],
     );
   }
 
+  // ------------------ PAGE 2 ------------------
   Widget _secondPageContent() {
     return _buildPageContent(
       title: "Analysis Group V",
@@ -66,13 +83,14 @@ class _GroupVPageState extends State<GroupVPage> {
     );
   }
 
+  // ------------------ NAV BAR ------------------
   Widget _buildNavigationBar() {
     VoidCallback? onNextPressed;
 
+    // NEXT button logic
     if (selectedOption != null) {
       if (pageIndex == 0) {
         if (selectedOption == "Group-V absent") {
-          // Navigate to group_6/new1_1.dart
           onNextPressed = () {
             Navigator.push(
               context,
@@ -91,7 +109,9 @@ class _GroupVPageState extends State<GroupVPage> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const WetTestCGroupVPage2()), // group_5/new_2.dart
+            MaterialPageRoute(
+              builder: (_) => const WetTestCGroupVPage2(),
+            ),
           );
         };
       }
@@ -100,29 +120,42 @@ class _GroupVPageState extends State<GroupVPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        // PREVIOUS BUTTON
         TextButton.icon(
-          onPressed: pageIndex == 0
-              ? null
-              : () {
-                  setState(() {
-                    pageIndex = 0;
-                    selectedOption = null;
-                  });
-                },
+          onPressed: () {
+            if (pageIndex == 1) {
+              // Go back to first internal page
+              setState(() {
+                pageIndex = 0;
+                selectedOption = null;
+              });
+            } else {
+              // Go back to external page dynamically
+              Navigator.pop(context);
+            }
+          },
           style: TextButton.styleFrom(
-            foregroundColor: pageIndex == 0 ? Colors.grey : primaryBlue,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            foregroundColor: primaryBlue,
+            padding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 16,
+            ),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
           label: const Text('Previous', style: TextStyle(fontSize: 16)),
         ),
+
+        // NEXT BUTTON
         ElevatedButton.icon(
           onPressed: onNextPressed,
           style: ElevatedButton.styleFrom(
             backgroundColor:
                 selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(
+              vertical: 12,
+              horizontal: 16,
+            ),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
@@ -132,6 +165,7 @@ class _GroupVPageState extends State<GroupVPage> {
     );
   }
 
+  // ------------------ COMMON PAGE CONTENT ------------------
   Widget _buildPageContent({
     required String title,
     required String test,
@@ -141,25 +175,24 @@ class _GroupVPageState extends State<GroupVPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(title,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: primaryBlue,
-                  fontWeight: FontWeight.bold,
-                )),
+        Text(
+          title,
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
+        ),
         const SizedBox(height: 12),
         _testCard(test, observation),
         const SizedBox(height: 16),
-        const Text(
-          'Select the correct inference:',
-          style: TextStyle(
-              color: primaryBlue, fontSize: 16, fontWeight: FontWeight.bold),
-        ),
+        _gradientTitle("Select the correct inference:"),
         const SizedBox(height: 10),
         for (var option in options) _buildOption(option),
       ],
     );
   }
 
+  // ------------------ OPTION TILE ------------------
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
     return Padding(
@@ -171,46 +204,93 @@ class _GroupVPageState extends State<GroupVPage> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
+            color: selected ? accentTeal.withOpacity(0.12) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-                color: selected ? accentTeal : Colors.grey.shade300, width: 1.5),
+              color: selected ? accentTeal : Colors.grey.shade300,
+              width: 1.5,
+            ),
           ),
           child: Text(
             text,
-            style: const TextStyle(
-                fontWeight: FontWeight.w600, color: primaryBlue, fontSize: 15),
+            style: TextStyle(
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              color: selected ? accentTeal : Colors.black,
+              fontSize: 15,
+            ),
           ),
         ),
       ),
     );
   }
 
+  // ------------------ TEST + OBSERVATION CARD ------------------
   Widget _testCard(String test, String observation) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Test",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 18, color: primaryBlue)),
+            _gradientHeader("Test"),
             const SizedBox(height: 6),
-            Text(test,
-                style: const TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue)),
+            Text(
+              test,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                color: Colors.black,
+              ),
+            ),
             const Divider(height: 22),
-            const Text("Observation",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 18, color: primaryBlue)),
+            _gradientHeader("Observation"),
             const SizedBox(height: 6),
-            Text(observation,
-                style: const TextStyle(
-                    fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue)),
+            Text(
+              observation,
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  // ------------------ GRADIENT TEXT ------------------
+  Widget _gradientTitle(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [accentTeal, primaryBlue],
+      ).createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
+    );
+  }
+
+  Widget _gradientHeader(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [accentTeal, primaryBlue],
+      ).createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
         ),
       ),
     );

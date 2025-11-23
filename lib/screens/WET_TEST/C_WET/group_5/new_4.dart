@@ -29,7 +29,9 @@ class _New4PageState extends State<New4Page> {
           child: const Text(
             'Salt C : Wet Test',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 22),
           ),
         ),
       ),
@@ -38,7 +40,6 @@ class _New4PageState extends State<New4Page> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Heading
             Text(
               "C.T For Ca²⁺",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -47,21 +48,37 @@ class _New4PageState extends State<New4Page> {
                   ),
             ),
             const SizedBox(height: 12),
-            // Solution Card
+
             _solutionCard(),
             const SizedBox(height: 12),
-            // Test Card
+
             _testCard(),
             const SizedBox(height: 12),
-            // Option
+
             _buildOption("Ca²⁺ confirmed"),
           ],
         ),
       ),
       bottomNavigationBar: Container(
-        color: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: _buildNavigationBar(),
+      ),
+    );
+  }
+
+  // ---------------- GRADIENT HEADER WIDGET ----------------
+  Widget _gradientHeaderText(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [accentTeal, primaryBlue],
+      ).createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -70,25 +87,24 @@ class _New4PageState extends State<New4Page> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
+          children: [
+            GradientText(
               "Solution",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: primaryBlue),
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
             Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -100,37 +116,39 @@ class _New4PageState extends State<New4Page> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text("Test",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: primaryBlue)),
+          children: [
+            GradientText(
+              "Test",
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 6),
             Text(
               "Above acetate solution + (NH₄)₂C₂O₄",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                color: Colors.black,
+              ),
             ),
             Divider(height: 22),
-            Text("Observation",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: primaryBlue)),
+            GradientText(
+              "Observation",
+              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             SizedBox(height: 6),
             Text(
               "White ppt",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -142,7 +160,6 @@ class _New4PageState extends State<New4Page> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Previous Button
         TextButton.icon(
           onPressed: () => Navigator.pop(context),
           style: TextButton.styleFrom(
@@ -150,35 +167,43 @@ class _New4PageState extends State<New4Page> {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
-          label: const Text('Previous', style: TextStyle(fontSize: 16)),
+          label: const Text(
+            'Previous',
+            style: TextStyle(fontSize: 16),
+          ),
         ),
-        // Next Button
         ElevatedButton.icon(
           onPressed: selectedOption != null
               ? () {
-                  // Navigate to Group VI page (new1_1.dart)
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const New1_1Page()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const New1_1Page()),
+                  );
                 }
               : null,
           style: ElevatedButton.styleFrom(
             backgroundColor:
                 selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(
+                vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
-          label: const Text('Next', style: TextStyle(fontSize: 16)),
+          label: const Text(
+            'Next',
+            style: TextStyle(fontSize: 16),
+          ),
         ),
       ],
     );
   }
 
+  // ✅ FIXED OPTIONS STYLE
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
@@ -191,13 +216,45 @@ class _New4PageState extends State<New4Page> {
             color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-                color: selected ? accentTeal : Colors.grey.shade300, width: 1.5),
+              color: selected ? accentTeal : Colors.grey.shade300,
+              width: 1.5,
+            ),
           ),
-          child: Text(text,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w600, color: primaryBlue, fontSize: 15)),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 15,
+              color: selected ? accentTeal : Colors.black,
+              fontWeight:
+                  selected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
         ),
       ),
+    );
+  }
+}
+
+// ✅ GRADIENT TEXT WIDGET
+class GradientText extends StatelessWidget {
+  final String text;
+  final TextStyle style;
+  final Gradient gradient;
+
+  const GradientText(
+    this.text, {
+    required this.style,
+    required this.gradient,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          gradient.createShader(Rect.fromLTWH(
+              0, 0, bounds.width, bounds.height)),
+      child: Text(text, style: style.copyWith(color: Colors.white)),
     );
   }
 }

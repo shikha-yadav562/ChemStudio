@@ -31,15 +31,12 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
           ),
         ),
       ),
-      // Use SingleChildScrollView for the body content
       body: SingleChildScrollView(
-        // Added bottom padding to ensure content is visible above the fixed navigation bar
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80), 
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: _buildContent(),
       ),
-      // Fixed bottom navigation bar with customized buttons
       bottomNavigationBar: Container(
-        color: Colors.transparent, // Transparent background (to avoid the white patch)
+        color: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: _buildNavigationBar(),
       ),
@@ -47,12 +44,11 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
   }
 
   Widget _buildContent() {
-    // Replaced Stack with Column to work with SingleChildScrollView
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          "C.T For Mn²⁺ ",
+          "C.T For Mn²⁺",
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
@@ -69,13 +65,11 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
       ],
     );
   }
-  
-  // New method for the navigation bar
+
   Widget _buildNavigationBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Previous Button (TextButton.icon, styled to match image)
         TextButton.icon(
           onPressed: () => Navigator.pop(context),
           style: TextButton.styleFrom(
@@ -85,12 +79,9 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
           icon: const Icon(Icons.arrow_back, size: 20),
           label: const Text('Previous', style: TextStyle(fontSize: 16)),
         ),
-
-        // Next Button (ElevatedButton.icon with StadiumBorder for circular/pill shape)
         ElevatedButton.icon(
           onPressed: selectedOption != null
               ? () {
-                  // Navigate to new_1.dart (Group 5 page)
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -103,7 +94,7 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
             backgroundColor: selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            shape: const StadiumBorder(), // Circular/Pill shape
+            shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
           label: const Text('Next', style: TextStyle(fontSize: 16)),
@@ -116,20 +107,17 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Solution",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 18, color: primaryBlue)),
-            SizedBox(height: 6),
-            Text(
-              "Dissolve the Buff/flesh/pink ppt of group IV in dil. H₂S gas by boiling  "
+            _gradientHeader("Solution"),
+            const SizedBox(height: 6),
+            const Text(
+              "Dissolve the Buff/flesh/pink ppt of group IV in dil. H₂S gas by boiling. "
               "Use this solution for C.T.",
-              style:
-                  TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],
         ),
@@ -141,29 +129,23 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Test",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 18, color: primaryBlue)),
-            SizedBox(height: 6),
-            Text(
+            _gradientHeader("Test"),
+            const SizedBox(height: 6),
+            const Text(
               "Above solution + PbO₂+ conc. HNO3 boil, cool, allow to settle",
-              style:
-                  TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal, color: Colors.black),
             ),
-            Divider(height: 22),
-            Text("Observation",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 18, color: primaryBlue)),
-            SizedBox(height: 6),
-            Text(
-              " Pink or violet colour",
-              style:
-                  TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: primaryBlue),
+            const Divider(height: 22),
+            _gradientHeader("Observation"),
+            const SizedBox(height: 6),
+            const Text(
+              "Pink or violet colour",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],
         ),
@@ -172,6 +154,17 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
   }
 
   Widget _gradientTitle(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+    );
+  }
+
+  Widget _gradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
           const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
@@ -194,15 +187,20 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
+            color: selected ? accentTeal.withOpacity(0.12) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-                color: selected ? accentTeal : Colors.grey.shade300, width: 1.5),
+              color: selected ? accentTeal : Colors.grey.shade300,
+              width: 1.5,
+            ),
           ),
           child: Text(
             text,
-            style: const TextStyle(
-                fontWeight: FontWeight.w600, color: primaryBlue, fontSize: 15),
+            style: TextStyle(
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              color: selected ? accentTeal : Colors.black,
+              fontSize: 15,
+            ),
           ),
         ),
       ),

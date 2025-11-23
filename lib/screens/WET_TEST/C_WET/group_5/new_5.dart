@@ -29,7 +29,10 @@ class _New5PageState extends State<New5Page> {
           child: const Text(
             'Salt C : Wet Test',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
@@ -38,7 +41,6 @@ class _New5PageState extends State<New5Page> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Heading
             Text(
               "C.T For Sr²⁺",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
@@ -47,21 +49,35 @@ class _New5PageState extends State<New5Page> {
                   ),
             ),
             const SizedBox(height: 12),
-            // Solution Card
             _solutionCard(),
             const SizedBox(height: 12),
-            // Test Card
             _testCard(),
             const SizedBox(height: 12),
-            // Option
             _buildOption("Sr²⁺ confirmed"),
           ],
         ),
       ),
       bottomNavigationBar: Container(
-        color: Colors.transparent,
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        padding:
+            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: _buildNavigationBar(),
+      ),
+    );
+  }
+
+  // ✅ GRADIENT HEADING
+  Widget _gradientHeaderText(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -74,21 +90,18 @@ class _New5PageState extends State<New5Page> {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text(
-              "Solution",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: primaryBlue),
-            ),
-            SizedBox(height: 6),
-            Text(
+          children: [
+            _gradientHeaderText("Solution"),
+            const SizedBox(height: 6),
+
+            // ✅ BLUE + BOLD (NO GRADIENT)
+            const Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -104,33 +117,33 @@ class _New5PageState extends State<New5Page> {
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-            Text("Test",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: primaryBlue)),
-            SizedBox(height: 6),
-            Text(
+          children: [
+            _gradientHeaderText("Test"),
+            const SizedBox(height: 6),
+
+            // ✅ BLACK + NORMAL
+            const Text(
               "Above acetate solution + dil. H₂SO₄",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                color: Colors.black,
+                fontWeight: FontWeight.normal,
+              ),
             ),
-            Divider(height: 22),
-            Text("Observation",
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: primaryBlue)),
-            SizedBox(height: 6),
-            Text(
+
+            const Divider(height: 22),
+
+            _gradientHeaderText("Observation"),
+            const SizedBox(height: 6),
+
+            // ✅ BLUE + BOLD
+            const Text(
               "White ppt on warming",
               style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: primaryBlue),
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -142,31 +155,32 @@ class _New5PageState extends State<New5Page> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Previous Button
         TextButton.icon(
           onPressed: () => Navigator.pop(context),
           style: TextButton.styleFrom(
             foregroundColor: primaryBlue,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
           label: const Text('Previous', style: TextStyle(fontSize: 16)),
         ),
-        // Next Button
         ElevatedButton.icon(
           onPressed: selectedOption != null
               ? () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const New1_1Page()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const New5Page()),
+                  );
                 }
               : null,
           style: ElevatedButton.styleFrom(
             backgroundColor:
                 selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
@@ -178,6 +192,7 @@ class _New5PageState extends State<New5Page> {
 
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: InkWell(
@@ -190,11 +205,19 @@ class _New5PageState extends State<New5Page> {
             color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-                color: selected ? accentTeal : Colors.grey.shade300, width: 1.5),
+              color: selected ? accentTeal : Colors.grey.shade300,
+              width: 1.5,
+            ),
           ),
-          child: Text(text,
-              style: const TextStyle(
-                  fontWeight: FontWeight.w600, color: primaryBlue, fontSize: 15)),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight:
+                  selected ? FontWeight.bold : FontWeight.normal,
+              color: selected ? accentTeal : Colors.black,
+            ),
+          ),
         ),
       ),
     );
