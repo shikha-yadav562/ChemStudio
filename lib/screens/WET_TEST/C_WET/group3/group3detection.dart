@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 
 // Required imports for navigation
-// For 'Group 3 is present'
+// For 'Group III is present'
 import 'group3analysis.dart'; // <<< NOW IMPORTS THE REAL ANALYSIS SCREEN
-// For 'Group 3 is absent'
+// For 'Group III is absent'
 //import '../group4/group4detection.dart'; 
 // --- FIX: Define firstWhereOrNull Extension to resolve the error ---
 extension IterableExtension<E> on Iterable<E> {
@@ -24,7 +24,7 @@ const Color accentTeal = Color(0xFF00A6A6);
 
 // --- Placeholder for next screens (needed for compilation) ---
 
-// Placeholder for Group 4 Detection (when Group 3 is Absent)
+// Placeholder for Group 4 Detection (when Group III is Absent)
 class WetTestCGroupFourDetectionScreen extends StatelessWidget {
     const WetTestCGroupFourDetectionScreen({super.key});
     @override
@@ -57,14 +57,14 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
     final _dbHelper = DatabaseHelper.instance;
     final String _tableName = 'SaltC_WetTest';
 
-    // *** Group 3 Detection Content ***
+    // *** Group III Detection Content ***
     late final WetTestItem _test = WetTestItem(
         id: 9, // Assuming a sequential ID
-        title: 'Group 3 Detection',
+        title: 'Group III Detection',
         procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
         observation: 'White gelatineous ppt or reddish brown ppt',
-        options: ['Group 3 is present', 'Group 3 is Absent'],
-        correct: 'Group 3 is present', // Assumed correct option for initial data saving
+        options: ['Group III is present', 'Group III is Absent'],
+        correct: 'Group III is present', // Assumed correct option for initial data saving
     );
 
     @override
@@ -96,15 +96,15 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
 
     // *** Navigation Logic ***
     void _next() async {
-        if (_selectedOption == 'Group 3 is present') {
-            // Navigate to Group 3 Analysis (The full screen now imported from 'group3analysis.dart')
+        if (_selectedOption == 'Group III is present') {
+            // Navigate to Group III Analysis (The full screen now imported from 'group3analysis.dart')
             await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (_) => const WetTestCGroupThreeAnalysisScreen(), 
                 ),
             );
-        } else if (_selectedOption == 'Group 3 is Absent') {
+        } else if (_selectedOption == 'Group III is Absent') {
             // Navigate to Group 4 Detection
              await Navigator.push(
                 context,

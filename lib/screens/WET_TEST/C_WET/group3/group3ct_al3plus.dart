@@ -99,7 +99,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
   }
 
   void _prev() {
-    // Go back to the Group 3 initial separation/detection screen.
+    // Go back to the Group III initial separation/detection screen.
     if (Navigator.canPop(context)) {
         Navigator.pop(context);
     }
@@ -138,7 +138,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildGradientHeader('Solution Preparation'), 
+            _buildGradientHeader('Solution'), 
             const SizedBox(height: 8),
             Text(
               content,

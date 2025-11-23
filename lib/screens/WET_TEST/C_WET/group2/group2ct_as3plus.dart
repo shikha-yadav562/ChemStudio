@@ -89,7 +89,7 @@ void _next() async {
  }
 
   void _prev() {
-    // Navigate back to the Group 2 Analysis screen
+    // Navigate back to the Group II Analysis screen
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -128,7 +128,7 @@ void _next() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildGradientHeader('Solution Preparation'), 
+            _buildGradientHeader('Solution'), 
             const SizedBox(height: 8),
             Text(
               content,
