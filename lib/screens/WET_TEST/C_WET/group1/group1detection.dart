@@ -32,11 +32,11 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
     late final List<WetTestItem> _tests = [
         WetTestItem(
             id: 3,
-            title: 'Group 1 Detection',
+            title: 'Group I Detection',
             procedure: 'O.S + Dil. HCl',
             observation: 'White Precipitate', 
-            options: ['Group 1 is present', 'Group 1 is absent'],
-            correct: 'Group 1 is present',
+            options: ['Group I is present', 'Group I is absent'],
+            correct: 'Group I is present',
         ),
     ];
 
@@ -85,8 +85,8 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
     void _next() async {
         final selectedBefore = _selectedOption;
 
-        if (_selectedOption == 'Group 1 is present') {
-            // Navigate to the Group 1 Analysis page
+        if (_selectedOption == 'Group I is present') {
+            // Navigate to the Group I Analysis page
             await Navigator.push(
                 context,
                 MaterialPageRoute(

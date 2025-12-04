@@ -41,13 +41,13 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
     // *** Group 3 Analysis Content ***
     late final WetTestItem _test = WetTestItem(
         id: 10, // Assuming a sequential ID
-        title: 'Analysis of Group 3',
+        title: 'Analysis of Group III',
         // Using plain ASCII for procedure string (O.S/Filtrate + NH4Cl + NH4OH)
         procedure: 'O.S/Filtrate + NH4Cl + NH4OH',
         observation: 'reddish-brown ppt',
         // Using plain ASCII for options (Fe3+, Al3+)
-        options: ['Fe3+ may be present', 'Al3+ may be present'],
-        correct: 'Fe3+ may be present', // Assumed for initial data saving
+        options: ['Fe³⁺ may be present', 'Al³⁺ may be present'],
+        correct: 'Fe³⁺ may be present', // Assumed for initial data saving
     );
 
     @override
@@ -79,7 +79,7 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
 
     // *** Navigation Logic ***
     void _next() async {
-        if (_selectedOption == 'Fe3+ may be present') {
+        if (_selectedOption == 'Fe³⁺ may be present') {
             // Navigate to Fe³⁺ Confirmation Test
             await Navigator.push(
                 context,
@@ -87,7 +87,7 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
                     builder: (_) => const WetTestCGroupThreeCTFeScreen(),
                 ),
             );
-        } else if (_selectedOption == 'Al3+ may be present') {
+        } else if (_selectedOption == 'Al³⁺ may be present') {
             // ⭐ LOGIC IS CORRECT: Navigate to Al³⁺ Confirmation Test
             await Navigator.push(
                 context,
@@ -100,7 +100,7 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
     }
 
     void _prev() {
-        // Go back to Group 3 Detection screen.
+        // Go back to III Detection screen.
         if (Navigator.canPop(context)) {
             Navigator.pop(context);
         }
@@ -249,25 +249,27 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
                                         ],
                                     ),
                                 ),
-                                // Navigation Buttons
+                                // Navigation Buttons (Prev/Next)
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                        OutlinedButton(
+                                        // 🌟 CHANGED: From OutlinedButton to TextButton.icon
+                                        TextButton.icon(
                                             onPressed: _prev,
-                                            style: OutlinedButton.styleFrom(
-                                                foregroundColor: primaryBlue,
-                                                side: const BorderSide(color: primaryBlue),
-                                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
-                                            child: const Text('Previous'),
+                                            icon: const Icon(Icons.arrow_back),
+                                            label: const Text('Previous'),
                                         ),
-                                        ElevatedButton(
+                                        // 🌟 CHANGED: Modified ElevatedButton to ElevatedButton.icon with new styling
+                                        ElevatedButton.icon(
                                             onPressed: _selectedOption != null ? _next : null,
+                                            icon: const Icon(Icons.arrow_forward),
+                                            label: const Text('Next'),
                                             style: ElevatedButton.styleFrom(
                                                 backgroundColor: primaryBlue,
                                                 foregroundColor: Colors.white,
-                                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12)),
-                                            child: const Text('Next'),
+                                                padding: const EdgeInsets.symmetric(
+                                                    horizontal: 20, vertical: 12),
+                                            ),
                                         ),
                                     ],
                                 )

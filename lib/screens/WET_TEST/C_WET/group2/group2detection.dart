@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; 
-import 'group2analysis.dart'; // Target for successful detection (Group 2 present)
+import 'group2analysis.dart'; // Target for successful detection (Group II present)
 // FIX: Removed the incorrect 'hide IterableExtension' combinator.
 // This resolves both the 'WetTestCGroupThreeDetectionScreen isn't a class'
 // and the 'library doesn't export a member with the hidden name' errors.
@@ -40,15 +40,15 @@ class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetect
     final _dbHelper = DatabaseHelper.instance;
     final String _tableName = 'SaltC_WetTest';
 
-    // Content for Group 2 Detection
+    // Content for Group II Detection
     late final List<WetTestItem> _tests = [
         WetTestItem(
             id: 4, 
-            title: 'Group 2 Detection',
+            title: 'Group II Detection',
             procedure: 'O.S + Dil. HCl + H₂S gas or water',
             observation: 'Black Precipitate', 
-            options: ['Group 2 is present', 'Group 2 is absent'],
-            correct: 'Group 2 is present',
+            options: ['Group II is present', 'Group II is absent'],
+            correct: 'Group II is present',
         ),
     ];
 
@@ -84,8 +84,8 @@ Future<void> _loadSavedAnswers() async {
 
     // Navigate forward (NEXT)
     void _next() async {
-        if (_selectedOption == 'Group 2 is present') {
-            // Group 2 Present -> Group 2 Analysis
+        if (_selectedOption == 'Group II is present') {
+            // Group II Present -> Group II Analysis
             await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -93,7 +93,7 @@ Future<void> _loadSavedAnswers() async {
                 ),
             );
         } else {
-            // Group 2 Absent -> Group 3 Detection
+            // Group II Absent -> Group 3 Detection
              await Navigator.push(
                 context,
                 MaterialPageRoute(

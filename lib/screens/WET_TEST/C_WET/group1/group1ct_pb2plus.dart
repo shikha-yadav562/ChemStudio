@@ -79,7 +79,7 @@ class _WetTestCGroupOneCTPbScreenState extends State<WetTestCGroupOneCTPbScreen>
     }
 
     void _prev() {
-        // Navigate back to the Group 1 Analysis screen
+        // Navigate back to the Group II Analysis screen
         if (Navigator.canPop(context)) {
             Navigator.pop(context);
         }

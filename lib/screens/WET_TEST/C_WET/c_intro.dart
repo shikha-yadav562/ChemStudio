@@ -19,7 +19,7 @@ class WetTestIntroCScreen extends StatelessWidget {
         ),
         centerTitle: true,
         title: const Text(
-          "Salt A : Wet Test",
+          "Salt C : Wet Test",
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w600,

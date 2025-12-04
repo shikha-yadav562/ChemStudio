@@ -61,7 +61,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
 
   // Content for the Fe3+ Confirmation Test
   late final WetTestItem _test = WetTestItem(
-      id: 11, // Unique ID after Group 3 Analysis (ID 10)
+      id: 11, // Unique ID after Group III Analysis (ID 10)
       title: 'C.T For Fe³⁺',
       procedure: 'Above Solution+ K4[ Fe (CN)6] (Potassium ferrocyanide)', 
       observation: 'Prussian blue ppt or colour',
@@ -106,7 +106,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
   }
 
   void _prev() {
-    // Navigate back to the Group 3 Analysis screen
+    // Navigate back to the Group III Analysis screen
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -145,7 +145,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildGradientHeader('Solution Preparation'), 
+            _buildGradientHeader('Solution'), 
             const SizedBox(height: 8),
             Text(
               content,
