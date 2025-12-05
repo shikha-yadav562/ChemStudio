@@ -82,9 +82,9 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
       procedure:
           'Take Original Solution (O.S.) in a test tube, add NaOH solution, and heat gently. Hold moist turmeric paper near the mouth of the test tube.',
       observation:
-          'No Evolution of NH3 gas.',
+          'Evolution of NH₄ gas, which turns moist turmeric paper brown / red.',
       options: ['Group Zero is present', 'Group Zero is absent'],
-      correct: 'Group Zero is absent',
+      correct: 'Group Zero is present',
     ),
   ];
 
@@ -186,7 +186,7 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt C : Wet Test',
+            'Salt B : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,

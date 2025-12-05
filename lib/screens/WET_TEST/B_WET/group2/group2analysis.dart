@@ -1,54 +1,26 @@
-// E:\flutter chemistry\wet\wet\lib\C\group3\group3detection.dart
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/1.dart';
+// E:\flutter chemistry\wet\wet\lib\C\group2\group2analysis.dart
+
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
+// Import the next screen: Confirmation Test for Cu2+
+import 'group2ct_cu2plus.dart'; 
+import 'group2ct_as3plus.dart' hide IterableExtension;
 
-// Required imports for navigation
-// For 'Group III is present'
-import 'group3analysis.dart'; // <<< NOW IMPORTS THE REAL ANALYSIS SCREEN
-// For 'Group III is absent'
-//import '../group4/group4detection.dart'; 
-// --- FIX: Define firstWhereOrNull Extension to resolve the error ---
-extension IterableExtension<E> on Iterable<E> {
-  E? firstWhereOrNull(bool Function(E) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
-}
-// --- End of Extension Fix ---
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// --- Placeholder for next screens (needed for compilation) ---
-
-// Placeholder for Group 4 Detection (when Group III is Absent)
-class WetTestCGroupFourDetectionScreen extends StatelessWidget {
-    const WetTestCGroupFourDetectionScreen({super.key});
-    @override
-    Widget build(BuildContext context) {
-        return Scaffold(
-            appBar: AppBar(title: const Text("Group 4 Detection")),
-            body: const Center(child: Text("Proceeding to Group IV Detection...")),
-        );
-    }
-}
-// --- End of Placeholders ---
-
-
-class WetTestCGroupThreeDetectionScreen extends StatefulWidget {
-    const WetTestCGroupThreeDetectionScreen({super.key});
+class WetTestCGroupTwoAnalysisScreen extends StatefulWidget {
+    const WetTestCGroupTwoAnalysisScreen({super.key});
 
     @override
-    State<WetTestCGroupThreeDetectionScreen> createState() =>
-        _WetTestCGroupThreeDetectionScreenState();
+    State<WetTestCGroupTwoAnalysisScreen> createState() => 
+        _WetTestCGroupTwoAnalysisScreenState();
 }
-
-class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDetectionScreen>
+class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysisScreen>
     with SingleTickerProviderStateMixin {
     
+    final int _index = 0; 
     String? _selectedOption; 
     
     late final AnimationController _animController;
@@ -57,15 +29,17 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
     final _dbHelper = DatabaseHelper.instance;
     final String _tableName = 'SaltC_WetTest';
 
-    // *** Group III Detection Content ***
-    late final WetTestItem _test = WetTestItem(
-        id: 9, // Assuming a sequential ID
-        title: 'Group III Detection',
-        procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
-        observation: 'White gelatineous ppt or reddish brown ppt',
-        options: ['Group III is present', 'Group III is Absent'],
-        correct: 'Group III is present', // Assumed correct option for initial data saving
-    );
+    // *** CORRECTED: This is the content for ANALYSIS ***
+    late final List<WetTestItem> _tests = [
+        WetTestItem(
+            id: 6, // Sequential ID
+            title: 'Analysis of Group II',
+            procedure: 'O.S + dil. HCL + H₂S gas or water',
+            observation: 'Black ppt',
+            options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
+            correct: 'Cu²⁺ may be present', 
+        ),
+    ];
 
     @override
     void initState() {
@@ -76,16 +50,17 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
         );
         _fadeSlide =
             CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-        _loadSavedAnswer();
+        _loadSavedAnswers();
         _animController.forward();
     }
 
-    Future<void> _loadSavedAnswer() async {
+    Future<void> _loadSavedAnswers() async {
         final data = await _dbHelper.getAnswers(_tableName);
         setState(() {
-            // Assuming firstWhereOrNull is available (using the utility extension)
-            final savedAnswer = data.firstWhereOrNull(
-                (row) => row['question_id'] == _test.id)?['answer'];
+            final testId = _tests[_index].id;
+            // Assuming firstWhereOrNull is available (e.g., from group0analysis.dart or globally)
+            final savedAnswer = data.firstWhereOrNull( 
+                (row) => row['question_id'] == testId)?['answer'];
             _selectedOption = savedAnswer;
         });
     }
@@ -94,28 +69,32 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
         await _dbHelper.saveAnswer(_tableName, id, answer);
     }
 
-    // *** Navigation Logic ***
-    void _next() async {
-        if (_selectedOption == 'Group III is present') {
-            // Navigate to Group III Analysis (The full screen now imported from 'group3analysis.dart')
-            await Navigator.push(
+void _next() async {
+        if (_selectedOption == 'Cu²⁺ may be present') {
+            // Navigate to Copper Confirmation Test
+            Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeAnalysisScreen(), 
+                    builder: (_) => const WetTestCGroupTwoCTCuScreen(), 
                 ),
             );
-        } else if (_selectedOption == 'Group III is Absent') {
-            // Navigate to Group 4 Detection
-             await Navigator.push(
+        } else if (_selectedOption == 'As³⁺ may be present') {
+            // Navigate to Arsenic Confirmation Test
+            Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCPage1(), 
+                    // Navigate to the correct screen for As³⁺ confirmation
+                    builder: (_) => const WetTestCGroupTwoCTAsScreen(), 
                 ),
             );
+        } else {
+            // Optional: Handle case where no option is selected, though the button should be disabled.
+            // If the button is enabled without selection, we can show a prompt.
         }
     }
     
     void _prev() {
+        // Navigate back to the Group II Detection screen
         if (Navigator.canPop(context)) {
             Navigator.pop(context);
         }
@@ -127,55 +106,10 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
         super.dispose();
     }
 
-    // Helper methods for UI consistency
-    Widget _buildGradientHeader(String text) {
-        return ShaderMask(
-            shaderCallback: (bounds) =>
-                const LinearGradient(colors: [accentTeal, primaryBlue])
-                    .createShader(bounds),
-            child: Text(
-                text,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-        );
-    }
-
-    Widget _buildTestCard(WetTestItem test) {
-        return Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                        _buildGradientHeader('Test'),
-                        const SizedBox(height: 4),
-                        Text(test.procedure, style: const TextStyle(fontSize: 14)),
-                        const Divider(height: 24),
-                        _buildGradientHeader('Observation'),
-                        const SizedBox(height: 8),
-                        Text(
-                            test.observation,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                color: primaryBlue,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                            ),
-                        ),
-                    ],
-                ),
-            ),
-        );
-    }
-    // End of Helper methods
-
     @override
     Widget build(BuildContext context) {
-        final test = _test;
-
+        final test = _tests[_index];
+        
         return Scaffold(
             backgroundColor: Colors.grey[50],
             appBar: AppBar(
@@ -216,9 +150,9 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                                 Expanded(
                                     child: ListView(
                                         children: [
-                                            _buildTestCard(test),
+                                            _buildTestCard(test), // Card with Test and Observation
                                             const SizedBox(height: 24),
-                                            _buildGradientHeader('Select the correct inference:'),
+                                            _buildInferenceHeader(),
                                             const SizedBox(height: 10),
                                             // Options
                                             ...test.options.map((opt) {
@@ -290,6 +224,65 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                         ),
                     ),
                 ),
+            ),
+        );
+    }
+
+    Widget _buildInferenceHeader() {
+        return ShaderMask(
+            shaderCallback: (bounds) =>
+                const LinearGradient(colors: [accentTeal, primaryBlue])
+                    .createShader(bounds),
+            child: const Text(
+                'Select the correct inference:',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                ),
+            ),
+        );
+    }
+
+    Widget _buildTestCard(WetTestItem test) {
+        return Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                        _gradientHeader('Test'),
+                        const SizedBox(height: 4),
+                        Text(test.procedure, style: const TextStyle(fontSize: 14)),
+                        const Divider(height: 24),
+                        _gradientHeader('Observation'),
+                        const SizedBox(height: 8),
+                        Text(
+                            test.observation,
+                            textAlign: TextAlign.start,
+                            style: TextStyle(
+                                color: primaryBlue,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                            ),
+                        ),
+                    ],
+                ),
+            ),
+        );
+    }
+
+    Widget _gradientHeader(String text) {
+        return ShaderMask(
+            shaderCallback: (bounds) =>
+                const LinearGradient(colors: [accentTeal, primaryBlue])
+                    .createShader(bounds),
+            child: Text(
+                text,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
             ),
         );
     }

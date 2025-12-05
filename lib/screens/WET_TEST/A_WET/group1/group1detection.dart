@@ -34,7 +34,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
             id: 3,
             title: 'Group I Detection',
             procedure: 'O.S + Dil. HCl',
-            observation: 'White Precipitate', 
+            observation: 'No White ppt', 
             options: ['Group I is present', 'Group I is absent'],
             correct: 'Group I is present',
         ),
@@ -141,7 +141,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
                             const LinearGradient(colors: [accentTeal, primaryBlue])
                                 .createShader(bounds),
                         child: const Text(
-                            'Salt C : Wet Test',
+                            'Salt A : Wet Test',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,

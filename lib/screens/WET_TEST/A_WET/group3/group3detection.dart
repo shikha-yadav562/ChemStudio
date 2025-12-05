@@ -62,7 +62,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
         id: 9, // Assuming a sequential ID
         title: 'Group III Detection',
         procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
-        observation: 'White gelatineous ppt or reddish brown ppt',
+        observation: 'No ppt',
         options: ['Group III is present', 'Group III is Absent'],
         correct: 'Group III is present', // Assumed correct option for initial data saving
     );
@@ -187,7 +187,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
                     child: const Text(
-                        'Salt C : Wet Test',
+                        'Salt A : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

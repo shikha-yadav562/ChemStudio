@@ -1,32 +1,49 @@
-// group2ct_cu2plus.dart
-
+// E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_fe3plus.dart
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/1.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
-import '../group3/group3detection.dart';
+//import '../group4/group4detection.dart'; // Next screen for navigation
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// FIX: Keeping the extension here to support _loadSavedAnswer() unless it's defined in group0analysis.dart
-extension IterableExtension<T> on Iterable<T> {
- T? firstWhereOrNull(bool Function(T element) test) {
- for (var element in this) {
-if (test(element)) return element;
- }
- return null;
-}
+// --- Placeholder for next screen (Group 4) ---
+// Note: Assuming WetTestCGroupFourDetectionScreen is defined in group4detection.dart
+// If not, you may need a placeholder or the actual import.
+class WetTestCGroupFourDetectionScreen extends StatelessWidget {
+  const WetTestCGroupFourDetectionScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Group 4 Detection")),
+      body: const Center(child: Text("Proceeding to Group 4 Detection...")),
+    );
+  }
 }
 
-class WetTestCGroupTwoCTCuScreen extends StatefulWidget {
-  const WetTestCGroupTwoCTCuScreen({super.key});
+// Extension to safely get the first element or null, required for consistency.
+// Since you are using it here, we will include it, or if it's already in 
+// a globally imported file, you can remove this block.
+extension IterableExtension<T> on Iterable<T> {
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (var element in this) {
+      if (test(element)) return element;
+    }
+    return null;
+  }
+}
+
+
+class WetTestCGroupThreeCTFeScreen extends StatefulWidget {
+  const WetTestCGroupThreeCTFeScreen({super.key});
 
   @override
-  State<WetTestCGroupTwoCTCuScreen> createState() => 
-      _WetTestCGroupTwoCTCuScreenState();
+  State<WetTestCGroupThreeCTFeScreen> createState() => 
+      _WetTestCGroupThreeCTFeScreenState();
 }
 
-class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
+class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScreen>
     with SingleTickerProviderStateMixin {
   
   String? _selectedOption; 
@@ -37,17 +54,19 @@ class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
   final _dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltC_WetTest';
 
+  // Content provided by the user for the solution preparation
   static const String SOLUTION_PREPARATION = 
-    'Dissolve the black ppt of group II in aquaregia (conc. HCl + conc. HNO₃ in 3:1 proportion), dilute with water. Use this solution for C.T of Cu²⁺';
+    'Dissolve the group 3 ppt in dil. HCl and use this solution for C.T.';
 
-  // Content for the Cu2+ Confirmation Test
+
+  // Content for the Fe3+ Confirmation Test
   late final WetTestItem _test = WetTestItem(
-      id: 7, 
-      title: 'C.T for Cu²⁺',
-      procedure: 'Above Solution + KI', 
-      observation: 'White ppt in brown coloured solution',
-      options: ['Cu²⁺ confirmed'],
-      correct: 'Cu²⁺ confirmed', 
+      id: 11, // Unique ID after Group III Analysis (ID 10)
+      title: 'C.T For Fe³⁺',
+      procedure: 'Above Solution+ K4[ Fe (CN)6] (Potassium ferrocyanide)', 
+      observation: 'Prussian blue ppt or colour',
+      options: ['Fe³⁺ confirmed'],
+      correct: 'Fe³⁺ confirmed', 
   );
 
   @override
@@ -64,29 +83,30 @@ class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
   }
 
   Future<void> _loadSavedAnswer() async {
-  final data = await _dbHelper.getAnswers(_tableName);
- setState(() {
-   // Using the Extension Override to explicitly choose the local IterableExtension
-   final savedAnswer = IterableExtension(data).firstWhereOrNull(
-     (row) => row['question_id'] == _test.id)?['answer'];
-   _selectedOption = savedAnswer;
-  });
- }
+    final data = await _dbHelper.getAnswers(_tableName);
+    setState(() {
+      final savedAnswer = data.firstWhereOrNull(
+          (row) => row['question_id'] == _test.id)?['answer'];
+      _selectedOption = savedAnswer;
+    });
+  }
+
   Future<void> _saveAnswer(int id, String answer) async {
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
-void _next() async {
-  // FIX 2: Navigate to the imported Group 3 Detection screen.
-  Navigator.push(
-   context,
-   MaterialPageRoute(
-    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
-   ),
-  );
- }
+  void _next() async {
+    // Navigate to the Group 4 Detection screen.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const  WetTestCPage1(), 
+      ),
+    );
+  }
+
   void _prev() {
-    // Navigate back to the Group II Analysis screen
+    // Navigate back to the Group III Analysis screen
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -98,38 +118,7 @@ void _next() async {
     super.dispose();
   }
 
-  // Helper method to build the preparation/solution box
-  Widget _buildSolutionBox(String content) {
-    // FIX: Use a standard Card with no custom color or side border to match _buildTestCard
-    return Card(
-      elevation: 4, // Same shadow as Test/Observation card
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), // Same border radius
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Uses the same gradient header as 'Test' and 'Observation'
-            _buildGradientHeader('Solution'), 
-            const SizedBox(height: 8),
-            Text(
-              content,
-              // Uses the same bold, primary blue color styling as the Observation text
-              style: const TextStyle(
-                fontSize: 14,
-                color: primaryBlue,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
+  // Helper method for the gradient header (consistent with previous files)
   Widget _buildGradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
@@ -142,10 +131,38 @@ void _next() async {
       ),
     );
   }
+  
+  // Solution Box (Consistent white card style with shadow)
+  Widget _buildSolutionBox(String content) {
+    return Card(
+      elevation: 4, 
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildGradientHeader('Solution'), 
+            const SizedBox(height: 8),
+            Text(
+              content,
+              style: const TextStyle(
+                fontSize: 14,
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  // Uses the WetTestItem's procedure field for the Test step
+  // Test and Observation Card (Consistent style)
   Widget _buildTestCard(String testProcedure, String observation) {
-    // This Card is the one being copied
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -188,7 +205,7 @@ void _next() async {
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt C : Wet Test',
+            'Salt A : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -217,7 +234,7 @@ void _next() async {
                 Expanded(
                   child: ListView(
                     children: [
-                      // Solution/Preparation Box (Now visually consistent with the card below)
+                      // Solution/Preparation Box
                       _buildSolutionBox(SOLUTION_PREPARATION),
                       
                       // Test and Observation Card.
@@ -227,7 +244,7 @@ void _next() async {
                       _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
                       
-                      // Options (Only one for confirmation)
+                      // Options
                       ..._test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
@@ -281,7 +298,9 @@ void _next() async {
                       label: const Text('Previous'),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _selectedOption != null ? _next : null,
+                      // Since there is only one option, it should be selected immediately after the test
+                      // However, we maintain the check for consistency with other screens.
+                      onPressed: _selectedOption != null ? _next : null, 
                       icon: const Icon(Icons.arrow_forward),
                       label: const Text('Next'),
                       style: ElevatedButton.styleFrom(

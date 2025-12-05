@@ -1,70 +1,51 @@
-// E:\flutter chemistry\wet\wet\lib\C\group3\group3detection.dart
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/1.dart';
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
+// Assuming the import path for DatabaseHelper and WetTestItem is correct
+import '../group0/group0analysis.dart';
+// Import for Fe3+ Confirmation Test
+import 'group3ct_fe3plus.dart';
+// ⭐ ADDED: Import for Al3+ Confirmation Test (from the file we created previously)
+import 'group3ct_al3plus.dart';
 
-// Required imports for navigation
-// For 'Group III is present'
-import 'group3analysis.dart'; // <<< NOW IMPORTS THE REAL ANALYSIS SCREEN
-// For 'Group III is absent'
-//import '../group4/group4detection.dart'; 
-// --- FIX: Define firstWhereOrNull Extension to resolve the error ---
-extension IterableExtension<E> on Iterable<E> {
-  E? firstWhereOrNull(bool Function(E) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
-}
-// --- End of Extension Fix ---
-// --- Theme Constants ---
+
+// --- Theme Constants (Moved here for consistent access) ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
+// ------------------------------------------------------------------------
 
-// --- Placeholder for next screens (needed for compilation) ---
-
-// Placeholder for Group 4 Detection (when Group III is Absent)
-class WetTestCGroupFourDetectionScreen extends StatelessWidget {
-    const WetTestCGroupFourDetectionScreen({super.key});
-    @override
-    Widget build(BuildContext context) {
-        return Scaffold(
-            appBar: AppBar(title: const Text("Group 4 Detection")),
-            body: const Center(child: Text("Proceeding to Group IV Detection...")),
-        );
-    }
-}
-// --- End of Placeholders ---
+// NOTE: The placeholder class for WetTestCGroupThreeCTAlScreen has been removed, 
+// as it is now imported from 'group3ct_al3plus.dart'.
 
 
-class WetTestCGroupThreeDetectionScreen extends StatefulWidget {
-    const WetTestCGroupThreeDetectionScreen({super.key});
+class WetTestCGroupThreeAnalysisScreen extends StatefulWidget {
+    const WetTestCGroupThreeAnalysisScreen({super.key});
 
     @override
-    State<WetTestCGroupThreeDetectionScreen> createState() =>
-        _WetTestCGroupThreeDetectionScreenState();
+    State<WetTestCGroupThreeAnalysisScreen> createState() =>
+        _WetTestCGroupThreeAnalysisScreenState();
 }
 
-class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDetectionScreen>
+class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAnalysisScreen>
     with SingleTickerProviderStateMixin {
-    
-    String? _selectedOption; 
-    
+
+    String? _selectedOption;
+
     late final AnimationController _animController;
     late final Animation<double> _fadeSlide;
 
+    // NOTE: Assuming DatabaseHelper and WetTestItem classes exist and are imported/accessible
     final _dbHelper = DatabaseHelper.instance;
     final String _tableName = 'SaltC_WetTest';
 
-    // *** Group III Detection Content ***
+    // *** Group 3 Analysis Content ***
     late final WetTestItem _test = WetTestItem(
-        id: 9, // Assuming a sequential ID
-        title: 'Group III Detection',
-        procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
-        observation: 'White gelatineous ppt or reddish brown ppt',
-        options: ['Group III is present', 'Group III is Absent'],
-        correct: 'Group III is present', // Assumed correct option for initial data saving
+        id: 10, // Assuming a sequential ID
+        title: 'Analysis of Group III',
+        // Using plain ASCII for procedure string (O.S/Filtrate + NH4Cl + NH4OH)
+        procedure: 'O.S/Filtrate + NH4Cl + NH4OH',
+        observation: 'No ppt',
+        // Using plain ASCII for options (Fe3+, Al3+)
+        options: ['Fe³⁺ may be present', 'Al³⁺ may be present'],
+        correct: 'Fe³⁺ may be present', // Assumed for initial data saving
     );
 
     @override
@@ -83,7 +64,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
     Future<void> _loadSavedAnswer() async {
         final data = await _dbHelper.getAnswers(_tableName);
         setState(() {
-            // Assuming firstWhereOrNull is available (using the utility extension)
+            // Assumed firstWhereOrNull is now accessible (via collection import or group0analysis.dart)
             final savedAnswer = data.firstWhereOrNull(
                 (row) => row['question_id'] == _test.id)?['answer'];
             _selectedOption = savedAnswer;
@@ -96,26 +77,28 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
 
     // *** Navigation Logic ***
     void _next() async {
-        if (_selectedOption == 'Group III is present') {
-            // Navigate to Group III Analysis (The full screen now imported from 'group3analysis.dart')
+        if (_selectedOption == 'Fe³⁺ may be present') {
+            // Navigate to Fe³⁺ Confirmation Test
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeAnalysisScreen(), 
+                    builder: (_) => const WetTestCGroupThreeCTFeScreen(),
                 ),
             );
-        } else if (_selectedOption == 'Group III is Absent') {
-            // Navigate to Group 4 Detection
-             await Navigator.push(
+        } else if (_selectedOption == 'Al³⁺ may be present') {
+            // ⭐ LOGIC IS CORRECT: Navigate to Al³⁺ Confirmation Test
+            await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCPage1(), 
+                    // WetTestCGroupThreeCTAlScreen is now imported from group3ct_al3plus.dart
+                    builder: (_) => const WetTestCGroupThreeCTAlScreen(), 
                 ),
             );
         }
     }
-    
+
     void _prev() {
+        // Go back to III Detection screen.
         if (Navigator.canPop(context)) {
             Navigator.pop(context);
         }
@@ -159,7 +142,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                         Text(
                             test.observation,
                             textAlign: TextAlign.start,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: primaryBlue,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -187,7 +170,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
                     child: const Text(
-                        'Salt C : Wet Test',
+                        'Salt A : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -268,11 +251,13 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
+                                        // 🌟 CHANGED: From OutlinedButton to TextButton.icon
                                         TextButton.icon(
                                             onPressed: _prev,
                                             icon: const Icon(Icons.arrow_back),
                                             label: const Text('Previous'),
                                         ),
+                                        // 🌟 CHANGED: Modified ElevatedButton to ElevatedButton.icon with new styling
                                         ElevatedButton.icon(
                                             onPressed: _selectedOption != null ? _next : null,
                                             icon: const Icon(Icons.arrow_forward),
@@ -285,7 +270,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                                             ),
                                         ),
                                     ],
-                                ),
+                                )
                             ],
                         ),
                     ),
@@ -293,4 +278,5 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
             ),
         );
     }
-}
+
+}  

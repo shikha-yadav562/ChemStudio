@@ -33,9 +33,9 @@ class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysi
     late final List<WetTestItem> _tests = [
         WetTestItem(
             id: 6, // Sequential ID
-            title: 'Analysis of Group 2',
+            title: 'Analysis of Group II',
             procedure: 'O.S + dil. HCL + H₂S gas or water',
-            observation: 'Black ppt',
+            observation: 'No Black ppt',
             options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
             correct: 'Cu²⁺ may be present', 
         ),
@@ -94,7 +94,7 @@ void _next() async {
     }
     
     void _prev() {
-        // Navigate back to the Group 2 Detection screen
+        // Navigate back to the Group II Detection screen
         if (Navigator.canPop(context)) {
             Navigator.pop(context);
         }
