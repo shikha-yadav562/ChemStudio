@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../../welcome_screen.dart';
-import 'preliminary_test_b.dart'; // Import your Preliminary Test B screen
+import 'preliminary_test_b.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/b_intro.dart'; // ⭐ ADD THIS IMPORT
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class DryTestBScreen extends StatefulWidget {
-  final Map<int, String>? preliminaryAnswers; // If coming from preliminary test
+  final Map<int, String>? preliminaryAnswers;
   const DryTestBScreen({super.key, this.preliminaryAnswers});
 
   @override
@@ -103,9 +104,7 @@ class _DryTestBScreenState extends State<DryTestBScreen>
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => PreliminaryTestBScreen(
-            initialIndex: 1, // load second preliminary test
-          ),
+          builder: (_) => PreliminaryTestBScreen(initialIndex: 1),
         ),
       );
     } else {
@@ -138,11 +137,7 @@ class _DryTestBScreenState extends State<DryTestBScreen>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
           child: const Text(
             'Salt B : Dry Tests',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
@@ -209,12 +204,9 @@ class _DryTestBScreenState extends State<DryTestBScreen>
                               child: Text(
                                 opt,
                                 style: TextStyle(
-                                  fontWeight: selectedHere
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.black87,
+                                  fontWeight:
+                                      selectedHere ? FontWeight.bold : FontWeight.normal,
+                                  color: selectedHere ? accentTeal : Colors.black87,
                                 ),
                               ),
                             ),
@@ -237,13 +229,12 @@ class _DryTestBScreenState extends State<DryTestBScreen>
                       icon: Icon(_index == _tests.length - 1
                           ? Icons.check_circle_outline
                           : Icons.arrow_forward),
-                      label: Text(
-                          _index == _tests.length - 1 ? 'Finish' : 'Next'),
+                      label: Text(_index == _tests.length - 1 ? 'Finish' : 'Next'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                     ),
                   ],
@@ -286,10 +277,7 @@ class _DryTestBScreenState extends State<DryTestBScreen>
         child: Text(
           text,
           style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       );
 
@@ -364,66 +352,57 @@ class _DryTestBScreenState extends State<DryTestBScreen>
         ],
       );
 
-Widget _naohObservation() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      // Ensures image is always visible and properly scaled
-      Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            maxWidth: 500,  // Prevents extra shrinking on big screens
-            minWidth: 250,
-            maxHeight: 250,  
-          ),
-          child: Image.asset(
-            'assets/images/turmeric_red.png',
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) =>
-                const PlaceholderImage(label: 'turmeric_red.png'),
+  Widget _naohObservation() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              maxWidth: 500,
+              minWidth: 250,
+              maxHeight: 250,
+            ),
+            child: Image.asset(
+              'assets/images/turmeric_red.png',
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) =>
+                  const PlaceholderImage(label: 'turmeric_red.png'),
+            ),
           ),
         ),
-      ),
-
-      const SizedBox(height: 15),
-
-      // Clean and readable text
-      const Text(
-        'Moist turmeric paper remains as it is on exposure to gas.',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: primaryBlue,
-          fontWeight: FontWeight.w600,
-          fontSize: 16,
+        const SizedBox(height: 15),
+        const Text(
+          'Moist turmeric paper remains as it is on exposure to gas.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: primaryBlue,
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
-// MODIFIED WIDGET: _flameObservation()
   Widget _flameObservation() {
-    return Center( 
+    return Center(
       child: Column(
         children: [
           Image.asset(
             'assets/images/flame_bluishwhite.png',
-            height: 160, // Match sizing convention of other observations
+            height: 160,
             errorBuilder: (_, __, ___) =>
                 const PlaceholderImage(label: 'flame_bluishwhite.png'),
           ),
-          
-          // 2. Remove all old flame-related text/widgets.
-          const SizedBox(height: 12), // Match padding convention of other observations
-          
-          // 3. Display this exact text below the image
-          Text(
-            'Bluish White flame', // EXACT text requested
+          const SizedBox(height: 12),
+          const Text(
+            'Bluish White flame',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: primaryBlue, // Match text style convention
+              color: primaryBlue,
             ),
           ),
         ],
@@ -431,6 +410,7 @@ Widget _naohObservation() {
     );
   }
 }
+
 // ------------------------ RESULT SCREEN ------------------------
 
 class SaltBResultScreen extends StatelessWidget {
@@ -459,10 +439,7 @@ class SaltBResultScreen extends StatelessWidget {
           child: const Text(
             'Salt B : Test Summary',
             style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
@@ -554,26 +531,100 @@ class SaltBResultScreen extends StatelessWidget {
                         ),
                       );
                     }).toList(),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-                      );
-                    },
-                    icon: const Icon(Icons.home_rounded, color: Colors.white),
-                    label: const Text('Back to Home',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.white)),
-                    style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30)),
-                        backgroundColor: primaryBlue),
-                  )
+
+                  const SizedBox(height: 20),
+
+                  // -------- BUTTON GRID --------
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => DryTestBScreen(
+                                    preliminaryAnswers: preliminaryAnswers,
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            label: const Text(
+                              "Previous",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: primaryBlue,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const WetTestIntroCScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.science, color: Colors.white),
+                            label: const Text(
+                              "Start Analysis",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: primaryBlue,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const WelcomeScreen()),
+                              );
+                            },
+                            icon: const Icon(Icons.home, color: Colors.white),
+                            label: const Text(
+                              "Home",
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30)),
+                              backgroundColor: primaryBlue,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -584,7 +635,7 @@ class SaltBResultScreen extends StatelessWidget {
   }
 }
 
-// ------------------------ MODELS & PLACEHOLDER ------------------------
+// ------------------------ MODELS ------------------------
 
 class TestItem {
   final int id;
@@ -618,9 +669,11 @@ class PlaceholderImage extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade400),
       ),
       child: Center(
-        child: Text(label,
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.grey.shade600)),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.grey.shade600),
+        ),
       ),
     );
   }

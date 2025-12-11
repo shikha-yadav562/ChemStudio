@@ -752,7 +752,7 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => const WetTestIntroAScreen(),
+                builder: (_) => const WetTestIntroCScreen(),
               ),
             );
           },

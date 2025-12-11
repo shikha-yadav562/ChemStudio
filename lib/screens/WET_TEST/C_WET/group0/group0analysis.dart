@@ -82,9 +82,9 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
       procedure:
           'Take Original Solution (O.S.) in a test tube, add NaOH solution, and heat gently. Hold moist turmeric paper near the mouth of the test tube.',
       observation:
-          'Evolution of NH₄ gas, which turns moist turmeric paper brown / red.',
+          'No Evolution of NH3 gas.',
       options: ['Group Zero is present', 'Group Zero is absent'],
-      correct: 'Group Zero is present',
+      correct: 'Group Zero is absent',
     ),
   ];
 
@@ -353,4 +353,4 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
       ),
     );
   }
-}
+}   
