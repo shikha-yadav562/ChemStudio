@@ -5,6 +5,8 @@ import '../group0/group0analysis.dart';
 import 'group3ct_fe3plus.dart';
 // ⭐ ADDED: Import for Al3+ Confirmation Test (from the file we created previously)
 import 'group3ct_al3plus.dart';
+import '../c_intro.dart';
+
 
 
 // --- Theme Constants (Moved here for consistent access) ---
@@ -165,6 +167,16 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
                 backgroundColor: Colors.white,
                 elevation: 2,
                 centerTitle: true,
+                leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
                 title: ShaderMask(
                     shaderCallback: (bounds) =>
                         const LinearGradient(colors: [accentTeal, primaryBlue])

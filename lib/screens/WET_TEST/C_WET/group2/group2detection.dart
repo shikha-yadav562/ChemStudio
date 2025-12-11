@@ -7,6 +7,7 @@ import 'group2analysis.dart'; // Target for successful detection (Group II prese
 // This resolves both the 'WetTestCGroupThreeDetectionScreen isn't a class'
 // and the 'library doesn't export a member with the hidden name' errors.
 import '../group3/group3detection.dart'; 
+import '../c_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
@@ -123,6 +124,16 @@ Future<void> _loadSavedAnswers() async {
                 backgroundColor: Colors.white,
                 elevation: 2,
                 centerTitle: true,
+                leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
                 title: ShaderMask(
                     shaderCallback: (bounds) =>
                         const LinearGradient(colors: [accentTeal, primaryBlue])
