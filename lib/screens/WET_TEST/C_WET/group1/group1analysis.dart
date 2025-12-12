@@ -2,7 +2,8 @@
 
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // For DatabaseHelper, WetTestItem, etc.
-import 'group1ct_pb2plus.dart'; 
+import 'group1ct_pb2plus.dart';
+import '../c_intro.dart'; 
 
 // --- Theme Constants (Must match existing design) ---
 const Color primaryBlue = Color(0xFF004C91);
@@ -116,6 +117,16 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])

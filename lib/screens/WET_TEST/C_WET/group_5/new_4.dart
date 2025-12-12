@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../group_6/new1_1.dart';
+import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -22,6 +23,16 @@ class _New4PageState extends State<New4Page> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
@@ -67,21 +78,21 @@ class _New4PageState extends State<New4Page> {
   }
 
   // ---------------- GRADIENT HEADER WIDGET ----------------
-  Widget _gradientHeaderText(String text) {
-    return ShaderMask(
-      shaderCallback: (bounds) => const LinearGradient(
-        colors: [accentTeal, primaryBlue],
-      ).createShader(bounds),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
+  // Widget _gradientHeaderText(String text) {
+  //   return ShaderMask(
+  //     shaderCallback: (bounds) => const LinearGradient(
+  //       colors: [accentTeal, primaryBlue],
+  //     ).createShader(bounds),
+  //     child: Text(
+  //       text,
+  //       style: const TextStyle(
+  //         fontWeight: FontWeight.bold,
+  //         fontSize: 18,
+  //         color: Colors.white,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _solutionCard() {
     return Card(

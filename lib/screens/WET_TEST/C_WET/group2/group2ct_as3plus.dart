@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 import '../group3/group3detection.dart';
+import '../c_intro.dart';
 
 
 // --- Theme Constants ---
@@ -183,6 +184,16 @@ void _next() async {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])

@@ -3,6 +3,8 @@ import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/1.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 //import '../group4/group4detection.dart'; // Next screen for navigation
+import '../c_intro.dart';
+
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
@@ -200,6 +202,16 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
