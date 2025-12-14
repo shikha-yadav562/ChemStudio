@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'new_3.dart';
-import 'new_4.dart';
-import 'new_5.dart';
+import 'group5_BA_ct.dart';
+import 'group5_CA_ct.dart';
+import 'group5_SR_ct.dart';
 import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../group_5/new_1.dart';
+import '../group_5/group5detection_firstanalysis.dart';
 import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);

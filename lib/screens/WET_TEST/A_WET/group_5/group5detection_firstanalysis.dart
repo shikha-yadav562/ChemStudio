@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../group_4/2.dart';
-import '../group_4/3.dart';
-import '../group_4/4.dart';
-import '../group_4/5.dart';
+import '../group_4/group4_Ni_ct.dart';
+import '../group_4/group4_Co_ct.dart';
+import '../group_4/group4_Mn_ct.dart';
+import '../group_4/group4_Zn_ct.dart';
 import 'group5analysis_BA_SR_CA.dart';
 import '../group_6/group6detection_analysis.dart';
 

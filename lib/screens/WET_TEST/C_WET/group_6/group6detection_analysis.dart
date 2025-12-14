@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'new1_2.dart';
+import 'group6_ct_MG.dart';
 import '../c_intro.dart';
 
 

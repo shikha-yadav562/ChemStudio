@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'BA_ct.dart';
-import 'SR_ct.dart';
-import 'CA_ct.dart';
+import 'group5_BA_ct.dart';
+import 'group5_SR_ct.dart';
+import 'group5_CA_ct.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
