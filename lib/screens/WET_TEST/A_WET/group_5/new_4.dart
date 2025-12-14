@@ -67,21 +67,21 @@ class _New4PageState extends State<New4Page> {
   }
 
   // ---------------- GRADIENT HEADER WIDGET ----------------
-  Widget _gradientHeaderText(String text) {
-    return ShaderMask(
-      shaderCallback: (bounds) => const LinearGradient(
-        colors: [accentTeal, primaryBlue],
-      ).createShader(bounds),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
+  // Widget _gradientHeaderText(String text) {
+  //   return ShaderMask(
+  //     shaderCallback: (bounds) => const LinearGradient(
+  //       colors: [accentTeal, primaryBlue],
+  //     ).createShader(bounds),
+  //     child: Text(
+  //       text,
+  //       style: const TextStyle(
+  //         fontWeight: FontWeight.bold,
+  //         fontSize: 18,
+  //         color: Colors.white,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _solutionCard() {
     return Card(
