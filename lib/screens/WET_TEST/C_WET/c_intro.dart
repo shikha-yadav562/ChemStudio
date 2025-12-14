@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group0/group0analysis.dart';
+import '../../welcome_screen.dart';
+
+const Color primaryBlue = Color(0xFF004C91);
 
 class WetTestIntroCScreen extends StatelessWidget {
   const WetTestIntroCScreen({super.key});
@@ -13,11 +16,17 @@ class WetTestIntroCScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
-          onPressed: () => Navigator.pop(context),
-        ),
         centerTitle: true,
+        leading: IconButton(
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WelcomeScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
         title: const Text(
           "Salt C : Wet Test",
           style: TextStyle(

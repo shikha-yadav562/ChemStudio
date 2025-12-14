@@ -171,7 +171,7 @@ class _New5PageState extends State<New5Page> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const New5Page()),
+                        builder: (_) => const New1_1Page()),
                   );
                 }
               : null,
