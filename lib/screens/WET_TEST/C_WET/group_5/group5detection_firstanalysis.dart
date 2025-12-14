@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../group_4/2.dart';
-import '../group_4/3.dart';
-import '../group_4/4.dart';
-import '../group_4/5.dart';
-import '../group_5/new_2.dart';
-import '../group_6/new1_1.dart';
+import '../group_4/group4_Ni_ct.dart';
+import '../group_4/group4_co_ct.dart';
+import '../group_4/group4_Mn_ct.dart';
+import '../group_4/group4_zn_ct.dart';
+import 'group5analysis_BA_SR_CA.dart';
+import '../group_6/group6detection_analysis.dart';
 import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
