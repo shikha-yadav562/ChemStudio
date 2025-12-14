@@ -127,7 +127,7 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
             const SizedBox(height: 6),
             const Text(
               "Dissolve the white ppt in dilute HCl and remove H₂S gas by boiling. "
-              "Use this solution for C.T .",
+              "Use this solution for C.T.",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],
