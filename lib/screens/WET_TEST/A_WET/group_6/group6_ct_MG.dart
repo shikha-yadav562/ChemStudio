@@ -26,7 +26,7 @@ class _New1_2PageState extends State<New1_2Page> {
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt A : Wet Test',
+            'Salt C : Wet Test',
             style: TextStyle(
                 color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),

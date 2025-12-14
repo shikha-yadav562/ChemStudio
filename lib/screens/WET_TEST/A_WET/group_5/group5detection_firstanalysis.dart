@@ -3,8 +3,8 @@ import '../group_4/2.dart';
 import '../group_4/3.dart';
 import '../group_4/4.dart';
 import '../group_4/5.dart';
-import '../group_5/new_2.dart';
-import '../group_6/new1_1.dart';
+import 'group5analysis_BA_SR_CA.dart';
+import '../group_6/group6detection_analysis.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -41,7 +41,7 @@ class _GroupVPageState extends State<GroupVPage> {
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt A: Wet Test',
+            'Salt C : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
