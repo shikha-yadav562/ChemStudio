@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import '../group_5/new_1.dart';
+import '../group_5/group5detection_firstanalysis.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Mn2ConfirmedPage extends StatefulWidget {
-  const Mn2ConfirmedPage({super.key});
+class Zn2ConfirmedPage extends StatefulWidget {
+  const Zn2ConfirmedPage({super.key});
 
   @override
-  State<Mn2ConfirmedPage> createState() => _Mn2ConfirmedPageState();
+  State<Zn2ConfirmedPage> createState() => _Zn2ConfirmedPageState();
 }
 
-class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
+class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
   String? selectedOption;
 
   @override
@@ -26,7 +26,7 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
           child: const Text(
-            'Salt A: Wet Test',
+            'Salt C : Wet Test',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
@@ -48,7 +48,7 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          "C.T For Mn²⁺",
+          "C.T For Zn²⁺",
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
@@ -61,7 +61,7 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
         const SizedBox(height: 16),
         _gradientTitle("Select the correct inference:"),
         const SizedBox(height: 10),
-        _buildOption("Mn²⁺ confirmed"),
+        _buildOption("Zn²⁺ confirmed"),
       ],
     );
   }
@@ -115,7 +115,7 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
             _gradientHeader("Solution"),
             const SizedBox(height: 6),
             const Text(
-              "Dissolve the Buff/flesh/pink ppt of group IV in dil. H₂S gas by boiling. "
+              "Dissolve the white ppt in dilute HCl and remove H₂S gas by boiling. "
               "Use this solution for C.T.",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
@@ -137,14 +137,14 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage> {
             _gradientHeader("Test"),
             const SizedBox(height: 6),
             const Text(
-              "Above solution + PbO₂+ conc. HNO3 boil, cool, allow to settle",
+              "Above solution + NaOH.",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal, color: Colors.black),
             ),
             const Divider(height: 22),
             _gradientHeader("Observation"),
             const SizedBox(height: 6),
             const Text(
-              "Pink or violet colour",
+              "White ppt soluble in excess of NaOH, re-precipitated by passing H₂S gas.",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],

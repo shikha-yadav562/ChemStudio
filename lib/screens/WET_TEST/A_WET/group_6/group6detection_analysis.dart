@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'new1_2.dart';
+import 'ct_MG.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -29,7 +29,7 @@ class _New1_1PageState extends State<New1_1Page> {
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt A : Wet Test',
+            'Salt C : Wet Test',
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,

@@ -35,9 +35,9 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
             id: 3,
             title: 'Group I Detection',
             procedure: 'O.S + Dil. HCl',
-            observation: 'White Precipitate', 
-            options: ['Group I is present', 'Group I is absent'],
-            correct: 'Group I is present',
+            observation: 'No White ppt', 
+            options: ['Group-I is present', 'Group-I is absent'],
+            correct: 'Group-I is present',
         ),
     ];
 

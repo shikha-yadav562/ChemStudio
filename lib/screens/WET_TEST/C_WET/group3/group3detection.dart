@@ -65,8 +65,8 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
         title: 'Group III Detection',
         procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
         observation: 'White gelatineous ppt or reddish brown ppt',
-        options: ['Group III is present', 'Group III is Absent'],
-        correct: 'Group III is present', // Assumed correct option for initial data saving
+        options: ['Group-III is present', 'Group-III is Absent'],
+        correct: 'Group-III is present', // Assumed correct option for initial data saving
     );
 
     @override
@@ -98,7 +98,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
 
     // *** Navigation Logic ***
     void _next() async {
-        if (_selectedOption == 'Group III is present') {
+        if (_selectedOption == 'Group-III is present') {
             // Navigate to Group III Analysis (The full screen now imported from 'group3analysis.dart')
             await Navigator.push(
                 context,
@@ -106,7 +106,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                     builder: (_) => const WetTestCGroupThreeAnalysisScreen(), 
                 ),
             );
-        } else if (_selectedOption == 'Group III is Absent') {
+        } else if (_selectedOption == 'Group-III is Absent') {
             // Navigate to Group 4 Detection
              await Navigator.push(
                 context,

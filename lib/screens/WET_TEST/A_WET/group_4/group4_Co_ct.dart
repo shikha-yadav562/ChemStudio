@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../group_5/new_1.dart';
+import '../group_5/group5detection_firstanalysis.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -23,7 +23,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
         elevation: 2,
         centerTitle: true,
         title: const Text(
-          'Salt A : Wet Test',
+          'Salt C : Wet Test',
           style: TextStyle(
               color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 22),
         ),

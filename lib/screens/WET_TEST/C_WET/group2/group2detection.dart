@@ -47,9 +47,9 @@ class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetect
             id: 4, 
             title: 'Group II Detection',
             procedure: 'O.S + Dil. HCl + H₂S gas or water',
-            observation: 'Black Precipitate', 
-            options: ['Group II is present', 'Group II is absent'],
-            correct: 'Group II is present',
+            observation: 'No Black ppt', 
+            options: ['Group-II is present', 'Group-II is absent'],
+            correct: 'Group-II is present',
         ),
     ];
 

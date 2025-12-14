@@ -3,7 +3,7 @@ import '2.dart';
 import '3.dart';
 import '4.dart';
 import '5.dart';
-import '../group_5/new_1.dart';
+import '../group_5/group5detection_firstanalysis.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -33,7 +33,7 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt A : Wet Test',
+            'Salt C : Wet Test',
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
