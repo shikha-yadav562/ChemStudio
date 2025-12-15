@@ -1,57 +1,91 @@
-// E:\flutter chemistry\wet\wet\lib\C\group1\group1analysis.dart
-
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // For DatabaseHelper, WetTestItem, etc.
-import 'group1ct_pb2plus.dart';
-import '../c_intro.dart'; 
+// Import the NH4+ Confirmation Test page (0CT.dart)
+import '0CT.dart';
+// Import Group1 detection screen
+import '../group1/group1detection.dart'; 
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 
-// --- Theme Constants (Must match existing design) ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// FIX: Re-defining the extension method here. 
-// NOTE: To prevent future name collisions, ensure this extension is NOT defined 
-// in group1detection.dart, group2detection.dart, or group1ct_pb2plus.dart.
-extension IterableExtension<T> on Iterable<T> {
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
+// The placeholder now uses the actual Group 1 Detection screen,
+// which is defined in group1detection.dart.
+// Note: This helper widget might not be necessary if you only push the screen directly.
+class WetTestDGroupOneScreen extends StatelessWidget {
+  final String? restoredSelection;
+  const WetTestDGroupOneScreen({super.key, this.restoredSelection});
+  @override
+  Widget build(BuildContext context) {
+    // Return the Group 1 detection screen (allowing an injected restoredSelection)
+    // Assuming WetTestDGroupOneDetectionScreen is the main widget in group1detection.dart
+    return WetTestDGroupOneDetectionScreen(restoredSelection: restoredSelection);
   }
 }
 
+// Re-defining the TestItem model to match the Wet Test structure
+class WetTestItem {
+  final int id;
+  final String title;
+  final String procedure;
+  final String observation;
+  final List<String> options;
+  final String correct;
 
-class WetTestCGroupOneAnalysisScreen extends StatefulWidget {
-  const WetTestCGroupOneAnalysisScreen({super.key});
-
-  @override
-  State<WetTestCGroupOneAnalysisScreen> createState() => 
-      _WetTestCGroupOneAnalysisScreenState();
+  WetTestItem({
+    required this.id,
+    required this.title,
+    required this.procedure,
+    required this.observation,
+    required this.options,
+    required this.correct,
+  });
 }
 
-class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysisScreen>
+// Placeholder for DatabaseHelper (assuming it works the same way)
+class DatabaseHelper {
+  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
+  DatabaseHelper._privateConstructor();
+
+  // Dummy methods to satisfy the code structure
+  Future<void> saveAnswer(String table, int id, String answer) async {
+    // Implement DB saving in real app
+    return;
+  }
+
+  Future<List<Map<String, dynamic>>> getAnswers(String table) async {
+    // Implement DB retrieval in real app
+    return [];
+  }
+}
+
+class WetTestDGroupZeroScreen extends StatefulWidget {
+  const WetTestDGroupZeroScreen({super.key});
+
+  @override
+  State<WetTestDGroupZeroScreen> createState() => _WetTestDGroupZeroScreenState();
+}
+
+class _WetTestDGroupZeroScreenState extends State<WetTestDGroupZeroScreen>
     with SingleTickerProviderStateMixin {
-  
-  final int _index = 0; 
-  String? _selectedOption; 
-  
+  int _index = 0; // We only have one test for Group Zero
+  final Map<int, String> _answers = {};
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
-  // Use dummy/placeholder DatabaseHelper if the original is not provided
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
+  final String _tableName = 'SaltD_WetTest';
 
-  // Content for the Wet Test - Group I Analysis for Lead
+  // Content for the Wet Test - Group Zero
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 4, // Next sequential ID
-      title: 'Analysis of Group I',
-      procedure: 'Group I ppt + H₂O (excess) and boil',
-      observation: 'Precipitate dissolve',
-      options: ['Pb²⁺ present'],
-      correct: 'Pb²⁺ present',
+      id: 1,
+      title: 'Analysis of Group Zero',
+      procedure:
+          'Take Original Solution (O.S.) in a test tube, add NaOH solution, and heat gently. Hold moist turmeric paper near the mouth of the test tube.',
+      observation:
+          'No Evolution of NH3 gas.',
+      options: ['Group Zero is present', 'Group Zero is absent'],
+      correct: 'Group Zero is absent',
     ),
   ];
 
@@ -72,11 +106,9 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
     // Load saved answers for persistence across sessions
     final data = await _dbHelper.getAnswers(_tableName);
     setState(() {
-      final testId = _tests[_index].id;
-      // .firstWhereOrNull is now available
-      final savedAnswer = data.firstWhereOrNull(
-          (row) => row['question_id'] == testId)?['answer'];
-      _selectedOption = savedAnswer;
+      for (var row in data) {
+        _answers[row['question_id']] = row['answer'];
+      }
     });
   }
 
@@ -84,18 +116,50 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
+  // --- NAVIGATION LOGIC IMPLEMENTING SCENARIOS 1 & 2 ---
   void _next() async {
-    // Navigate to the Confirmation Test for the detected ion (Pb²⁺).
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WetTestCGroupOneCTPbScreen(),
-      ),
-    );
+    final test = _tests[_index];
+    final selectedOption = _answers[test.id]; // Get the selected option
+
+    if (selectedOption == null) {
+      // Optional: Show a Snackbar if no option is selected
+      // ScaffoldMessenger.of(context).showSnackBar(...);
+      return; 
+    }
+
+    if (selectedOption == 'Group Zero is present') {
+        // SCENARIO 1: Group 0 Analysis -> CT for NH4+ -> Group 1 Detection
+        
+        // 1. Push the CT page (WetTestDGroupZeroCTScreen).
+        // The CT page will handle navigation to Group 1 Detection when 'Next' is pressed there.
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                // Use WetTestDGroupZeroCTScreen from 0CT.dart
+                builder: (_) => const WetTestDGroupZeroCTScreen(), 
+            ),
+        );
+
+    } else if (selectedOption == 'Group Zero is absent') {
+        // SCENARIO 2: Group 0 Analysis -> Group 1 Detection
+        
+        // 1. Push the Group 1 Detection page directly.
+        await Navigator.push(
+            context,
+            MaterialPageRoute(
+                // Use WetTestDGroupOneDetectionScreen from group1detection.dart
+                builder: (_) => const WetTestDGroupOneDetectionScreen(),
+            ),
+        );
+    }
+    
+    // Refresh the screen state after the pushed screen returns
+    setState(() {});
   }
+  // --- END NAVIGATION LOGIC ---
 
   void _prev() {
-    // Navigate back to the Group II Detection screen (WetTestCGroupOneDetectionScreen)
+    // Navigate back to the previous screen.
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -110,19 +174,20 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
   @override
   Widget build(BuildContext context) {
     final test = _tests[_index];
-    
+    final selected = _answers[test.id];
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        leading: IconButton(
+         leading: IconButton(
     icon: const Icon(Icons.arrow_back, color: primaryBlue),
     onPressed: () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
         (route) => false, // This clears the navigation stack
       );
     },
@@ -132,7 +197,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt C : Wet Test',
+            'Salt D : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -165,14 +230,14 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
                       const SizedBox(height: 24),
                       _buildInferenceHeader(),
                       const SizedBox(height: 10),
-                      // Options (Only one, acts as a confirmation label)
+                      // Options
                       ...test.options.map((opt) {
-                        final selectedHere = _selectedOption == opt;
+                        final selectedHere = selected == opt;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
                             onTap: () async {
-                              setState(() => _selectedOption = opt);
+                              setState(() => _answers[test.id] = opt);
                               await _saveAnswer(test.id, opt);
                             },
                             borderRadius: BorderRadius.circular(8),
@@ -219,7 +284,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
                       label: const Text('Previous'),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _selectedOption != null ? _next : null,
+                      onPressed: selected != null ? _next : null,
                       icon: const Icon(Icons.arrow_forward),
                       label: const Text('Next'),
                       style: ElevatedButton.styleFrom(
@@ -256,6 +321,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
   }
 
   Widget _buildTestCard(WetTestItem test) {
+    // ... (rest of _buildTestCard implementation)
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -286,6 +352,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
   }
 
   Widget _gradientHeader(String text) {
+    // ... (rest of _gradientHeader implementation)
     return ShaderMask(
       shaderCallback: (bounds) =>
           const LinearGradient(colors: [accentTeal, primaryBlue])
@@ -297,4 +364,4 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
       ),
     );
   }
-}
+}   

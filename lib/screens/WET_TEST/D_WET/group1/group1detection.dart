@@ -5,22 +5,22 @@ import '../group0/group0analysis.dart';
 import 'group1analysis.dart'; 
 // FIX: Hiding IterableExtension to resolve name collision with group1analysis.dart
 import '../group2/group2detection.dart' hide IterableExtension; 
-import '../c_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 
 // --- Theme Constants (Must match analysis.dart) ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class WetTestCGroupOneDetectionScreen extends StatefulWidget {
+class WetTestDGroupOneDetectionScreen extends StatefulWidget {
     final String? restoredSelection;
-    const WetTestCGroupOneDetectionScreen({super.key, this.restoredSelection});
+    const WetTestDGroupOneDetectionScreen({super.key, this.restoredSelection});
 
     @override
-    State<WetTestCGroupOneDetectionScreen> createState() =>
-        _WetTestCGroupOneDetectionScreenState();
+    State<WetTestDGroupOneDetectionScreen> createState() =>
+        _WetTestDGroupOneDetectionScreenState();
 }
 
-class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetectionScreen>
+class _WetTestDGroupOneDetectionScreenState extends State<WetTestDGroupOneDetectionScreen>
     with SingleTickerProviderStateMixin {
     int _index = 0; 
     String? _selectedOption; 
@@ -28,7 +28,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
     late final Animation<double> _fadeSlide;
 
     final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+    final String _tableName = 'SaltD_WetTest';
 
     late final List<WetTestItem> _tests = [
         WetTestItem(
@@ -91,7 +91,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupOneAnalysisScreen(),
+                    builder: (_) => const WetTestDGroupOneAnalysisScreen(),
                 ),
             );
         } else {
@@ -100,7 +100,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
                 context,
                 MaterialPageRoute(
                     // This class must correctly display the Group 2 Detection content.
-                    builder: (_) => const WetTestCGroupTwoDetectionScreen(), 
+                    builder: (_) => const WetTestDGroupTwoDetectionScreen(), 
                 ),
             );
         }
@@ -142,7 +142,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
     onPressed: () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
         (route) => false, // This clears the navigation stack
       );
     },
@@ -152,7 +152,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
                             const LinearGradient(colors: [accentTeal, primaryBlue])
                                 .createShader(bounds),
                         child: const Text(
-                            'Salt C : Wet Test',
+                            'Salt D : Wet Test',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
