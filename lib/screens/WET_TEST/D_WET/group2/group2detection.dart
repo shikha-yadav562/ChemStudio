@@ -7,7 +7,7 @@ import 'group2analysis.dart'; // Target for successful detection (Group II prese
 // This resolves both the 'WetTestCGroupThreeDetectionScreen isn't a class'
 // and the 'library doesn't export a member with the hidden name' errors.
 import '../group3/group3detection.dart'; 
-import '../c_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
@@ -23,15 +23,15 @@ extension IterableExtension<T> on Iterable<T> {
   }
 }
 
-class WetTestCGroupTwoDetectionScreen extends StatefulWidget {
-    const WetTestCGroupTwoDetectionScreen({super.key});
+class WetTestDGroupTwoDetectionScreen extends StatefulWidget {
+    const WetTestDGroupTwoDetectionScreen({super.key});
 
     @override
-    State<WetTestCGroupTwoDetectionScreen> createState() =>
-        _WetTestCGroupTwoDetectionScreenState();
+    State<WetTestDGroupTwoDetectionScreen> createState() =>
+        _WetTestDGroupTwoDetectionScreenState();
 }
 
-class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetectionScreen>
+class _WetTestDGroupTwoDetectionScreenState extends State<WetTestDGroupTwoDetectionScreen>
     with SingleTickerProviderStateMixin {
     int _index = 0; 
     String? _selectedOption; 
@@ -39,7 +39,7 @@ class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetect
     late final Animation<double> _fadeSlide;
 
     final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+    final String _tableName = 'SaltD_WetTest';
 
     // Content for Group II Detection
     late final List<WetTestItem> _tests = [
@@ -90,7 +90,7 @@ Future<void> _loadSavedAnswers() async {
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupTwoAnalysisScreen(), 
+                    builder: (_) => const WetTestDGroupTwoAnalysisScreen(), 
                 ),
             );
         } else {
@@ -129,7 +129,7 @@ Future<void> _loadSavedAnswers() async {
     onPressed: () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
         (route) => false, // This clears the navigation stack
       );
     },
@@ -139,7 +139,7 @@ Future<void> _loadSavedAnswers() async {
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
                     child: const Text(
-                        'Salt C : Wet Test',
+                        'Salt D : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

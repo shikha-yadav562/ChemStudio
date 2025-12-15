@@ -1,55 +1,45 @@
-// E:\flutter chemistry\wet\wet\lib\C\group2\group2detection.dart
+// E:\flutter chemistry\wet\wet\lib\C\group2\group2analysis.dart
 
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; 
-import 'group2analysis.dart'; // Target for successful detection (Group II present)
-// FIX: Removed the incorrect 'hide IterableExtension' combinator.
-// This resolves both the 'WetTestCGroupThreeDetectionScreen isn't a class'
-// and the 'library doesn't export a member with the hidden name' errors.
-import '../group3/group3detection.dart'; 
-import '../c_intro.dart';
+import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
+// Import the next screen: Confirmation Test for Cu2+
+import 'group2ct_cu2plus.dart'; 
+import 'group2ct_as3plus.dart' hide IterableExtension;
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
+
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// Re-defining for local usage (safest way to ensure availability)
-extension IterableExtension<T> on Iterable<T> {
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
-}
-
-class WetTestCGroupTwoDetectionScreen extends StatefulWidget {
-    const WetTestCGroupTwoDetectionScreen({super.key});
+class WetTestDGroupTwoAnalysisScreen extends StatefulWidget {
+    const WetTestDGroupTwoAnalysisScreen({super.key});
 
     @override
-    State<WetTestCGroupTwoDetectionScreen> createState() =>
-        _WetTestCGroupTwoDetectionScreenState();
+    State<WetTestDGroupTwoAnalysisScreen> createState() => 
+        _WetTestDGroupTwoAnalysisScreenState();
 }
-
-class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetectionScreen>
+class _WetTestDGroupTwoAnalysisScreenState extends State<WetTestDGroupTwoAnalysisScreen>
     with SingleTickerProviderStateMixin {
-    int _index = 0; 
+    
+    final int _index = 0; 
     String? _selectedOption; 
+    
     late final AnimationController _animController;
     late final Animation<double> _fadeSlide;
 
     final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+    final String _tableName = 'SaltD_WetTest';
 
-    // Content for Group II Detection
+    // *** CORRECTED: This is the content for ANALYSIS ***
     late final List<WetTestItem> _tests = [
         WetTestItem(
-            id: 4, 
-            title: 'Group II Detection',
-            procedure: 'O.S + Dil. HCl + H₂S gas or water',
-            observation: 'No Black ppt', 
-            options: ['Group-II is present', 'Group-II is absent'],
-            correct: 'Group-II is present',
+            id: 6, // Sequential ID
+            title: 'Analysis of Group II',
+            procedure: 'O.S + dil. HCL + H₂S gas or water',
+            observation: 'No Black ppt',
+            options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
+            correct: 'Cu²⁺ may be present', 
         ),
     ];
 
@@ -66,46 +56,50 @@ class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetect
         _animController.forward();
     }
 
-Future<void> _loadSavedAnswers() async {
+    Future<void> _loadSavedAnswers() async {
         final data = await _dbHelper.getAnswers(_tableName);
         setState(() {
             final testId = _tests[_index].id;
-            
-            // --- FIX: USE EXTENSION OVERRIDE HERE ---
-            final savedAnswer = IterableExtension(data).firstWhereOrNull( 
+            // Assuming firstWhereOrNull is available (e.g., from group0analysis.dart or globally)
+            final savedAnswer = data.firstWhereOrNull( 
                 (row) => row['question_id'] == testId)?['answer'];
-            // ----------------------------------------
-            
             _selectedOption = savedAnswer;
         });
     }
+
     Future<void> _saveAnswer(int id, String answer) async {
         await _dbHelper.saveAnswer(_tableName, id, answer);
     }
 
-    // Navigate forward (NEXT)
-    void _next() async {
-        if (_selectedOption == 'Group-II is present') {
-            // Group II Present -> Group II Analysis
-            await Navigator.push(
+void _next() async {
+        if (_selectedOption == 'Cu²⁺ may be present') {
+            // Navigate to Copper Confirmation Test
+            Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupTwoAnalysisScreen(), 
+                    builder: (_) => const WetTestDGroupTwoCTCuScreen(), 
+                ),
+            );
+        } else if (_selectedOption == 'As³⁺ may be present') {
+            // Navigate to Arsenic Confirmation Test
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    // Navigate to the correct screen for As³⁺ confirmation
+                    builder: (_) => const WetTestDGroupTwoCTAsScreen(), 
                 ),
             );
         } else {
-            // Group II Absent -> Group 3 Detection
-             await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
-                ),
-            );
+            // Optional: Handle case where no option is selected, though the button should be disabled.
+            // If the button is enabled without selection, we can show a prompt.
         }
     }
     
     void _prev() {
-        Navigator.pop(context, _selectedOption);
+        // Navigate back to the Group II Detection screen
+        if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+        }
     }
 
     @override
@@ -117,7 +111,7 @@ Future<void> _loadSavedAnswers() async {
     @override
     Widget build(BuildContext context) {
         final test = _tests[_index];
-
+        
         return Scaffold(
             backgroundColor: Colors.grey[50],
             appBar: AppBar(
@@ -129,7 +123,7 @@ Future<void> _loadSavedAnswers() async {
     onPressed: () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
         (route) => false, // This clears the navigation stack
       );
     },
@@ -139,7 +133,7 @@ Future<void> _loadSavedAnswers() async {
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
                     child: const Text(
-                        'Salt C : Wet Test',
+                        'Salt D : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

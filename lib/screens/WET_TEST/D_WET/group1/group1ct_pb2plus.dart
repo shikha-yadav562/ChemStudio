@@ -1,55 +1,44 @@
-// E:\flutter chemistry\wet\wet\lib\C\group2\group2detection.dart
+// E:\flutter chemistry\wet\wet\lib\C\group1\group1ct_pb2plus.dart
 
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; 
-import 'group2analysis.dart'; // Target for successful detection (Group II present)
-// FIX: Removed the incorrect 'hide IterableExtension' combinator.
-// This resolves both the 'WetTestCGroupThreeDetectionScreen isn't a class'
-// and the 'library doesn't export a member with the hidden name' errors.
-import '../group3/group3detection.dart'; 
-import '../c_intro.dart';
+// Ensure this imports the detection screen
+import '../group2/group2detection.dart'; 
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// Re-defining for local usage (safest way to ensure availability)
-extension IterableExtension<T> on Iterable<T> {
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
-}
-
-class WetTestCGroupTwoDetectionScreen extends StatefulWidget {
-    const WetTestCGroupTwoDetectionScreen({super.key});
+class WetTestDGroupOneCTPbScreen extends StatefulWidget {
+    const WetTestDGroupOneCTPbScreen({super.key});
 
     @override
-    State<WetTestCGroupTwoDetectionScreen> createState() =>
-        _WetTestCGroupTwoDetectionScreenState();
+    State<WetTestDGroupOneCTPbScreen> createState() => 
+        _WetTestDGroupOneCTPbScreenState();
 }
 
-class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetectionScreen>
+class _WetTestDGroupOneCTPbScreenState extends State<WetTestDGroupOneCTPbScreen>
     with SingleTickerProviderStateMixin {
-    int _index = 0; 
+    
+    final int _index = 0; 
     String? _selectedOption; 
+    
     late final AnimationController _animController;
     late final Animation<double> _fadeSlide;
 
     final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+    final String _tableName = 'SaltD_WetTest';
 
-    // Content for Group II Detection
+    // Content for the Pb2+ Confirmation Test
     late final List<WetTestItem> _tests = [
         WetTestItem(
-            id: 4, 
-            title: 'Group II Detection',
-            procedure: 'O.S + Dil. HCl + H₂S gas or water',
-            observation: 'No Black ppt', 
-            options: ['Group-II is present', 'Group-II is absent'],
-            correct: 'Group-II is present',
+            id: 5, // Sequential ID
+            title: 'C.T for Pb²⁺',
+            procedure: 'Group I ppt + Diluted HCl (hot), filter, add K₂CrO₄ to filtrate',
+            observation: 'Yellow Precipitate',
+            options: ['Pb²⁺ confirmed'],
+            correct: 'Pb²⁺ confirmed',
         ),
     ];
 
@@ -66,46 +55,35 @@ class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetect
         _animController.forward();
     }
 
-Future<void> _loadSavedAnswers() async {
+    Future<void> _loadSavedAnswers() async {
         final data = await _dbHelper.getAnswers(_tableName);
         setState(() {
             final testId = _tests[_index].id;
-            
-            // --- FIX: USE EXTENSION OVERRIDE HERE ---
-            final savedAnswer = IterableExtension(data).firstWhereOrNull( 
+            final savedAnswer = data.firstWhereOrNull(
                 (row) => row['question_id'] == testId)?['answer'];
-            // ----------------------------------------
-            
             _selectedOption = savedAnswer;
         });
     }
+
     Future<void> _saveAnswer(int id, String answer) async {
         await _dbHelper.saveAnswer(_tableName, id, answer);
     }
 
-    // Navigate forward (NEXT)
     void _next() async {
-        if (_selectedOption == 'Group-II is present') {
-            // Group II Present -> Group II Analysis
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupTwoAnalysisScreen(), 
-                ),
-            );
-        } else {
-            // Group II Absent -> Group 3 Detection
-             await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
-                ),
-            );
-        }
+        // FIXED: Navigate to Group 2 Detection screen.
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) =>  WetTestDGroupTwoDetectionScreen(), 
+            ),
+        );
     }
-    
+
     void _prev() {
-        Navigator.pop(context, _selectedOption);
+        // Navigate back to the Group II Analysis screen
+        if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+        }
     }
 
     @override
@@ -117,7 +95,7 @@ Future<void> _loadSavedAnswers() async {
     @override
     Widget build(BuildContext context) {
         final test = _tests[_index];
-
+        
         return Scaffold(
             backgroundColor: Colors.grey[50],
             appBar: AppBar(
@@ -129,7 +107,7 @@ Future<void> _loadSavedAnswers() async {
     onPressed: () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
         (route) => false, // This clears the navigation stack
       );
     },
@@ -139,7 +117,7 @@ Future<void> _loadSavedAnswers() async {
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
                     child: const Text(
-                        'Salt C : Wet Test',
+                        'Salt D : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -172,7 +150,7 @@ Future<void> _loadSavedAnswers() async {
                                             const SizedBox(height: 24),
                                             _buildInferenceHeader(),
                                             const SizedBox(height: 10),
-                                            // Options
+                                            // Options (Only one, acts as a confirmation label)
                                             ...test.options.map((opt) {
                                                 final selectedHere = _selectedOption == opt;
                                                 return Padding(

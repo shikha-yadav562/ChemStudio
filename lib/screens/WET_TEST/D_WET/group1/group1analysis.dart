@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // For DatabaseHelper, WetTestItem, etc.
 import 'group1ct_pb2plus.dart';
-import '../c_intro.dart'; 
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart'; 
 
 // --- Theme Constants (Must match existing design) ---
 const Color primaryBlue = Color(0xFF004C91);
@@ -22,15 +22,15 @@ extension IterableExtension<T> on Iterable<T> {
 }
 
 
-class WetTestCGroupOneAnalysisScreen extends StatefulWidget {
-  const WetTestCGroupOneAnalysisScreen({super.key});
+class WetTestDGroupOneAnalysisScreen extends StatefulWidget {
+  const WetTestDGroupOneAnalysisScreen({super.key});
 
   @override
-  State<WetTestCGroupOneAnalysisScreen> createState() => 
-      _WetTestCGroupOneAnalysisScreenState();
+  State<WetTestDGroupOneAnalysisScreen> createState() => 
+      _WetTestDGroupOneAnalysisScreenState();
 }
 
-class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysisScreen>
+class _WetTestDGroupOneAnalysisScreenState extends State<WetTestDGroupOneAnalysisScreen>
     with SingleTickerProviderStateMixin {
   
   final int _index = 0; 
@@ -41,7 +41,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
 
   // Use dummy/placeholder DatabaseHelper if the original is not provided
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
+  final String _tableName = 'SaltD_WetTest';
 
   // Content for the Wet Test - Group I Analysis for Lead
   late final List<WetTestItem> _tests = [
@@ -89,13 +89,13 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const WetTestCGroupOneCTPbScreen(),
+        builder: (_) => const WetTestDGroupOneCTPbScreen(),
       ),
     );
   }
 
   void _prev() {
-    // Navigate back to the Group II Detection screen (WetTestCGroupOneDetectionScreen)
+    // Navigate back to the Group II Detection screen (WetTestDGroupOneDetectionScreen)
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -122,7 +122,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
     onPressed: () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
         (route) => false, // This clears the navigation stack
       );
     },
@@ -132,7 +132,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt C : Wet Test',
+            'Salt D : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,

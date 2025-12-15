@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../../welcome_screen.dart';
 import 'package:ChemStudio/screens/DRY_TEST/D/preliminary_test_d.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
+
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -519,31 +521,105 @@ class SaltDResultScreen extends StatelessWidget {
                 ],
               ),
             ),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-                );
-              },
-              icon: const Icon(Icons.home_rounded, color: Colors.white),
-              label: const Text('Back to Home',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.white)),
-              style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  backgroundColor: primaryBlue),
+            const SizedBox(height: 16),
+
+           Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    // ===== PREVIOUS =====
+    Expanded(
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+        label: const Text(
+          'Previous',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          backgroundColor: primaryBlue,
+        ),
+      ),
+    ),
+
+    const SizedBox(width: 12),
+
+    // ===== START ANALYSIS =====
+    Expanded(
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const WetTestIntroDScreen(),
             ),
+          );
+        },
+        icon: const Icon(Icons.science_rounded, color: Colors.white),
+        label: const Text(
+          'Start Analysis',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          backgroundColor: primaryBlue,
+        ),
+      ),
+    ),
+
+    const SizedBox(width: 12),
+
+    // ===== BACK TO HOME =====
+    Expanded(
+      child: ElevatedButton.icon(
+        onPressed: () {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+          );
+        },
+        icon: const Icon(Icons.home_rounded, color: Colors.white),
+        label: const Text(
+          'Home',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: Colors.white,
+          ),
+        ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          backgroundColor: primaryBlue,
+        ),
+      ),
+    ),
+  ],
+)
+
           ],
         ),
       ),
-    );
-  }
-
+  );
+}
   Widget _buildAnswerTile(String title, String answer, IconData icon) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10),

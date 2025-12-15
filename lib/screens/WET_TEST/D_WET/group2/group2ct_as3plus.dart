@@ -1,59 +1,57 @@
-// E:\flutter chemistry\wet\wet\lib\C\group1\group1analysis.dart
+// group2ct_as3plus.dart
 
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // For DatabaseHelper, WetTestItem, etc.
-import 'group1ct_pb2plus.dart';
-import '../c_intro.dart'; 
+import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
+import '../group3/group3detection.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 
-// --- Theme Constants (Must match existing design) ---
+
+// --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// FIX: Re-defining the extension method here. 
-// NOTE: To prevent future name collisions, ensure this extension is NOT defined 
-// in group1detection.dart, group2detection.dart, or group1ct_pb2plus.dart.
+// Extension to safely get the first element or null, required for consistency
 extension IterableExtension<T> on Iterable<T> {
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
+T? firstWhereOrNull(bool Function(T element) test) {
+ for (var element in this) {
+ if (test(element)) return element;
+ }
+ return null;
 }
-
-
-class WetTestCGroupOneAnalysisScreen extends StatefulWidget {
-  const WetTestCGroupOneAnalysisScreen({super.key});
+}
+class WetTestDGroupTwoCTAsScreen extends StatefulWidget {
+  const WetTestDGroupTwoCTAsScreen({super.key});
 
   @override
-  State<WetTestCGroupOneAnalysisScreen> createState() => 
-      _WetTestCGroupOneAnalysisScreenState();
+  State<WetTestDGroupTwoCTAsScreen> createState() => 
+      _WetTestDGroupTwoCTAsScreenState();
 }
 
-class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysisScreen>
+class _WetTestDGroupTwoCTAsScreenState extends State<WetTestDGroupTwoCTAsScreen>
     with SingleTickerProviderStateMixin {
   
-  final int _index = 0; 
   String? _selectedOption; 
   
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
-  // Use dummy/placeholder DatabaseHelper if the original is not provided
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
+  final String _tableName = 'SaltD_WetTest';
 
-  // Content for the Wet Test - Group I Analysis for Lead
-  late final List<WetTestItem> _tests = [
-    WetTestItem(
-      id: 4, // Next sequential ID
-      title: 'Analysis of Group I',
-      procedure: 'Group I ppt + H₂O (excess) and boil',
-      observation: 'Precipitate dissolve',
-      options: ['Pb²⁺ present'],
-      correct: 'Pb²⁺ present',
-    ),
-  ];
+  // Content provided by the user for the solution preparation
+  static const String SOLUTION_PREPARATION = 
+    'Dissolve the yellow ppt of Group 2 in conc. HNO₃ use this solution for C.T of As³⁺';
+
+
+  // Content for the As3+ Confirmation Test
+  late final WetTestItem _test = WetTestItem(
+      id: 8, // Assuming ID 7 was Cu2+
+      title: 'C.T for As³⁺',
+      procedure: 'Above Solution + ammonium molybdate solution + heat', 
+      observation: 'Yellow ppt',
+      options: ['As³⁺ confirmed'],
+      correct: 'As³⁺ confirmed', 
+  );
 
   @override
   void initState() {
@@ -64,38 +62,35 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
     );
     _fadeSlide =
         CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-    _loadSavedAnswers();
+    _loadSavedAnswer();
     _animController.forward();
   }
 
-  Future<void> _loadSavedAnswers() async {
-    // Load saved answers for persistence across sessions
-    final data = await _dbHelper.getAnswers(_tableName);
-    setState(() {
-      final testId = _tests[_index].id;
-      // .firstWhereOrNull is now available
-      final savedAnswer = data.firstWhereOrNull(
-          (row) => row['question_id'] == testId)?['answer'];
-      _selectedOption = savedAnswer;
-    });
-  }
-
+Future<void> _loadSavedAnswer() async {
+  final data = await _dbHelper.getAnswers(_tableName);
+  setState(() {
+   // ⭐ FIX APPLIED: Using Extension Override to specify the local extension.
+   final savedAnswer = IterableExtension(data).firstWhereOrNull(
+     (row) => row['question_id'] == _test.id)?['answer'];
+   _selectedOption = savedAnswer;
+  });
+ }
   Future<void> _saveAnswer(int id, String answer) async {
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
-  void _next() async {
-    // Navigate to the Confirmation Test for the detected ion (Pb²⁺).
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WetTestCGroupOneCTPbScreen(),
-      ),
-    );
-  }
+void _next() async {
+  // FIX 2: Navigate to the imported Group 3 Detection screen.
+ Navigator.push(
+   context,
+   MaterialPageRoute(
+    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
+   ),
+  );
+ }
 
   void _prev() {
-    // Navigate back to the Group II Detection screen (WetTestCGroupOneDetectionScreen)
+    // Navigate back to the Group II Analysis screen
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -107,10 +102,82 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
     super.dispose();
   }
 
+  // Helper method for the gradient header (consistent with previous files)
+  Widget _buildGradientHeader(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+    );
+  }
+  
+  // Solution Box (Consistent white card style with shadow)
+  Widget _buildSolutionBox(String content) {
+    return Card(
+      elevation: 4, 
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildGradientHeader('Solution'), 
+            const SizedBox(height: 8),
+            Text(
+              content,
+              style: const TextStyle(
+                fontSize: 14,
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Test and Observation Card (Consistent style)
+  Widget _buildTestCard(String testProcedure, String observation) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildGradientHeader('Test'),
+            const SizedBox(height: 4),
+            Text(testProcedure, style: const TextStyle(fontSize: 14)),
+            const Divider(height: 24),
+            _buildGradientHeader('Observation'),
+            const SizedBox(height: 8),
+            Text(
+              observation,
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final test = _tests[_index];
-    
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -122,7 +189,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
     onPressed: () {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
+        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
         (route) => false, // This clears the navigation stack
       );
     },
@@ -132,7 +199,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt C : Wet Test',
+            'Salt D : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -152,7 +219,7 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(test.title,
+                Text(_test.title,
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
@@ -161,19 +228,25 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
                 Expanded(
                   child: ListView(
                     children: [
-                      _buildTestCard(test), // Card with Test and Observation
+                      // Solution/Preparation Box
+                      _buildSolutionBox(SOLUTION_PREPARATION),
+                      
+                      // Test and Observation Card.
+                      _buildTestCard(_test.procedure, _test.observation), 
+
                       const SizedBox(height: 24),
-                      _buildInferenceHeader(),
+                      _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
-                      // Options (Only one, acts as a confirmation label)
-                      ...test.options.map((opt) {
+                      
+                      // Options
+                      ..._test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
                             onTap: () async {
                               setState(() => _selectedOption = opt);
-                              await _saveAnswer(test.id, opt);
+                              await _saveAnswer(_test.id, opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
@@ -235,65 +308,6 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildInferenceHeader() {
-    return ShaderMask(
-      shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue])
-              .createShader(bounds),
-      child: const Text(
-        'Select the correct inference:',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTestCard(WetTestItem test) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _gradientHeader('Test'),
-            const SizedBox(height: 4),
-            Text(test.procedure, style: const TextStyle(fontSize: 14)),
-            const Divider(height: 24),
-            _gradientHeader('Observation'),
-            const SizedBox(height: 8),
-            Text(
-              test.observation,
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                color: primaryBlue,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _gradientHeader(String text) {
-    return ShaderMask(
-      shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue])
-              .createShader(bounds),
-      child: Text(
-        text,
-        style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }
