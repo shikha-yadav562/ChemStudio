@@ -37,7 +37,7 @@ class _WetTestDGroupOneDetectionScreenState extends State<WetTestDGroupOneDetect
             procedure: 'O.S + Dil. HCl',
             observation: 'No White ppt', 
             options: ['Group-I is present', 'Group-I is absent'],
-            correct: 'Group-I is present',
+            correct: 'Group-I is absent',
         ),
     ];
 

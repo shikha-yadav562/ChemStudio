@@ -47,7 +47,7 @@ class _WetTestDGroupTwoDetectionScreenState extends State<WetTestDGroupTwoDetect
             id: 4, 
             title: 'Group II Detection',
             procedure: 'O.S + Dil. HCl + H₂S gas or water',
-            observation: 'No Black ppt', 
+            observation: 'Black ppt', 
             options: ['Group-II is present', 'Group-II is absent'],
             correct: 'Group-II is present',
         ),
@@ -98,7 +98,7 @@ Future<void> _loadSavedAnswers() async {
              await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
+                    builder: (_) => const WetTestDGroupThreeDetectionScreen(), 
                 ),
             );
         }

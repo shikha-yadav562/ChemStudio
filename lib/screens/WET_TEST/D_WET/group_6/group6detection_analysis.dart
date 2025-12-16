@@ -6,14 +6,14 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New1_1Page extends StatefulWidget {
-  const New1_1Page({super.key});
+class saltDdetectiongroup6Page extends StatefulWidget {
+  const saltDdetectiongroup6Page({super.key});
 
   @override
-  State<New1_1Page> createState() => _New1_1PageState();
+  State<saltDdetectiongroup6Page> createState() => _detectiongroup6PageState();
 }
 
-class _New1_1PageState extends State<New1_1Page> {
+class _detectiongroup6PageState extends State<saltDdetectiongroup6Page> {
   String? selectedOptionPage1;
   String? selectedOptionPage2;
   bool showPage2 = false;
@@ -41,8 +41,8 @@ class _New1_1PageState extends State<New1_1Page> {
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt D : Wet Test',
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -286,7 +286,7 @@ class _New1_1PageState extends State<New1_1Page> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const New1_2Page()),
+                          builder: (_) => const group6ctMGPage()),
                     );
                   }
                 }

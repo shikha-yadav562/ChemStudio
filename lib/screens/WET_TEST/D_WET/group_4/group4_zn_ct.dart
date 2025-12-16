@@ -5,14 +5,14 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Zn2ConfirmedPage extends StatefulWidget {
-  const Zn2ConfirmedPage({super.key});
+class saltDZn2ConfirmedPage extends StatefulWidget {
+  const saltDZn2ConfirmedPage({super.key});
 
   @override
-  State<Zn2ConfirmedPage> createState() => _Zn2ConfirmedPageState();
+  State<saltDZn2ConfirmedPage> createState() => _saltDZn2ConfirmedPageState();
 }
 
-class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
+class _saltDZn2ConfirmedPageState extends State<saltDZn2ConfirmedPage> {
   String? selectedOption;
 
   @override
@@ -36,8 +36,8 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt D : Wet Test',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
@@ -96,7 +96,7 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const GroupVPage(),
+                      builder: (_) => const saltDGroupVPage(),
                     ),
                   );
                 }

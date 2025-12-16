@@ -9,14 +9,14 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class WetTestCPage1 extends StatefulWidget {
-  const WetTestCPage1({super.key});
+class WetTestDPage1 extends StatefulWidget {
+  const WetTestDPage1({super.key});
 
   @override
-  State<WetTestCPage1> createState() => _WetTestCPage1State();
+  State<WetTestDPage1> createState() => _WetTestDPage1State();
 }
 
-class _WetTestCPage1State extends State<WetTestCPage1> {
+class _WetTestDPage1State extends State<WetTestDPage1> {
   String? selectedOption;
   String? selectedInference;
   bool showPage2 = false;
@@ -43,8 +43,8 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt D : Wet Test',
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -123,7 +123,7 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
                   } else {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => const GroupVPage()),
+                      MaterialPageRoute(builder: (_) => const saltDGroupVPage()),
                     );
                   }
                 }
@@ -201,7 +201,7 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
 
             // ✅ OBSERVATION STILL BOLD
             const Text(
-              "No ppt",
+              "White/Black/Flesh or Buff ppt",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
@@ -288,16 +288,16 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
               ? () {
                   if (selectedInference == "Ni²⁺") {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Ni2ConfirmedPage()));
+                        MaterialPageRoute(builder: (_) => const saltDNi2ConfirmedPage()));
                   } else if (selectedInference == "Co²⁺") {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Co2ConfirmedPage()));
+                        MaterialPageRoute(builder: (_) => const saltDCo2ConfirmedPage()));
                   } else if (selectedInference == "Mn²⁺") {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Mn2ConfirmedPage()));
+                        MaterialPageRoute(builder: (_) => const saltDMn2ConfirmedPage()));
                   } else if (selectedInference == "Zn²⁺") {
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Zn2ConfirmedPage()));
+                        MaterialPageRoute(builder: (_) => const saltDZn2ConfirmedPage()));
                   }
                 }
               : null,

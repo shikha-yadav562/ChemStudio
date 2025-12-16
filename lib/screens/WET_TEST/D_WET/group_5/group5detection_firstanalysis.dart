@@ -10,23 +10,23 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class GroupVPage extends StatefulWidget {
-  const GroupVPage({super.key});
+class saltDGroupVPage extends StatefulWidget {
+  const saltDGroupVPage({super.key});
 
   @override
-  State<GroupVPage> createState() => _GroupVPageState();
+  State<saltDGroupVPage> createState() => _saltDGroupVPageState();
 }
 
-class _GroupVPageState extends State<GroupVPage> {
+class _saltDGroupVPageState extends State<saltDGroupVPage> {
   int pageIndex = 0;
   String? selectedOption;
 
   // Previous C.T pages list (not used for Previous button now)
   final List<Widget> previousPages = const [
-    Ni2ConfirmedPage(),
-    Co2ConfirmedPage(),
-    Mn2ConfirmedPage(),
-    Zn2ConfirmedPage(),
+    saltDNi2ConfirmedPage(),
+    saltDCo2ConfirmedPage(),
+    saltDMn2ConfirmedPage(),
+    saltDZn2ConfirmedPage(),
   ];
 
   @override
@@ -51,8 +51,8 @@ class _GroupVPageState extends State<GroupVPage> {
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C: Wet Test',
+          child: Text(
+            'Salt D: Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -79,7 +79,7 @@ class _GroupVPageState extends State<GroupVPage> {
       title: "Group V Detection",
       test:
           "O.S/Filtrate (Remove H₂S) + NH₄Cl(equal) NH₄OH(till alkaline to litmus) + (NH₄)₂CO₃",
-      observation: "White ppt",
+      observation: "No ppt",
       options: ["Group-V present", "Group-V absent"],
     );
   }
@@ -105,7 +105,7 @@ class _GroupVPageState extends State<GroupVPage> {
           onNextPressed = () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const New1_1Page()),
+              MaterialPageRoute(builder: (_) => const saltDdetectiongroup6Page()),
             );
           };
         } else {
@@ -121,7 +121,7 @@ class _GroupVPageState extends State<GroupVPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => const WetTestCGroupVPage2(),
+              builder: (_) => const saltDWetTestDGroupVPage2(),
             ),
           );
         };

@@ -1,5 +1,5 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_fe3plus.dart
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group_4/group4detection_analysis.dart.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 //import '../group4/group4detection.dart'; // Next screen for navigation
@@ -11,10 +11,10 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 // --- Placeholder for next screen (Group 4) ---
-// Note: Assuming WetTestCGroupFourDetectionScreen is defined in group4detection.dart
+// Note: Assuming WetTestDGroupFourDetectionScreen is defined in group4detection.dart
 // If not, you may need a placeholder or the actual import.
-class WetTestCGroupFourDetectionScreen extends StatelessWidget {
-  const WetTestCGroupFourDetectionScreen({super.key});
+class WetTestDGroupFourDetectionScreen extends StatelessWidget {
+  const WetTestDGroupFourDetectionScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,15 +37,15 @@ extension IterableExtension<T> on Iterable<T> {
 }
 
 
-class WetTestCGroupThreeCTFeScreen extends StatefulWidget {
-  const WetTestCGroupThreeCTFeScreen({super.key});
+class WetTestDGroupThreeCTFeScreen extends StatefulWidget {
+  const WetTestDGroupThreeCTFeScreen({super.key});
 
   @override
-  State<WetTestCGroupThreeCTFeScreen> createState() => 
-      _WetTestCGroupThreeCTFeScreenState();
+  State<WetTestDGroupThreeCTFeScreen> createState() => 
+      _WetTestDGroupThreeCTFeScreenState();
 }
 
-class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScreen>
+class _WetTestDGroupThreeCTFeScreenState extends State<WetTestDGroupThreeCTFeScreen>
     with SingleTickerProviderStateMixin {
   
   String? _selectedOption; 
@@ -102,7 +102,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const  WetTestCPage1(), 
+        builder: (_) => const WetTestDPage1(), 
       ),
     );
   }
@@ -217,7 +217,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: const Text(
-            'Salt C : Wet Test',
+            'Salt D : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
