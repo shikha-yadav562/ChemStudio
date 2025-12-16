@@ -84,7 +84,7 @@ void _next() async {
  Navigator.push(
    context,
    MaterialPageRoute(
-    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
+    builder: (_) => const WetTestDGroupThreeDetectionScreen(), 
    ),
   );
  }

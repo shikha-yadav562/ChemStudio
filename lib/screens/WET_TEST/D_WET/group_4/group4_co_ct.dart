@@ -5,14 +5,14 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Co2ConfirmedPage extends StatefulWidget {
-  const Co2ConfirmedPage({super.key});
+class saltDCo2ConfirmedPage extends StatefulWidget {
+  const saltDCo2ConfirmedPage({super.key});
 
   @override
-  State<Co2ConfirmedPage> createState() => _Co2ConfirmedPageState();
+  State<saltDCo2ConfirmedPage> createState() => _saltDCo2ConfirmedPageState();
 }
 
-class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
+class _saltDCo2ConfirmedPageState extends State<saltDCo2ConfirmedPage> {
   bool isSelected = false;
 
   @override
@@ -33,8 +33,8 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
       );
     },
   ),
-        title: const Text(
-          'Salt C : Wet Test',
+        title: Text(
+          'Salt D : Wet Test',
           style: TextStyle(
               color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 22),
         ),
@@ -100,7 +100,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const GroupVPage(),
+                      builder: (_) => const saltDGroupVPage(),
                     ),
                   );
                 }

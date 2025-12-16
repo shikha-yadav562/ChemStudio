@@ -7,14 +7,14 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class WetTestCGroupVPage2 extends StatefulWidget {
-  const WetTestCGroupVPage2({super.key});
+class saltDWetTestDGroupVPage2 extends StatefulWidget {
+  const saltDWetTestDGroupVPage2({super.key});
 
   @override
-  State<WetTestCGroupVPage2> createState() => _WetTestCGroupVPage2State();
+  State<saltDWetTestDGroupVPage2> createState() => _saltDWetTestDGroupVPage2State();
 }
 
-class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
+class _saltDWetTestDGroupVPage2State extends State<saltDWetTestDGroupVPage2> {
   String? selectedOption;
 
   @override
@@ -39,8 +39,8 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt D : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -100,21 +100,21 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New3Page()),
+            MaterialPageRoute(builder: (_) => const saltDctBApage()),
           );
         };
       } else if (selectedOption == "Ca²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New4Page()),
+            MaterialPageRoute(builder: (_) => const saltDctCApage()),
           );
         };
       } else if (selectedOption == "Sr²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New5Page()),
+            MaterialPageRoute(builder: (_) => const saltDctSRpage()),
           );
         };
       }

@@ -5,14 +5,14 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New3Page extends StatefulWidget {
-  const New3Page({super.key});
+class saltDctBApage extends StatefulWidget {
+  const saltDctBApage({super.key});
 
   @override
-  State<New3Page> createState() => _New3PageState();
+  State<saltDctBApage> createState() => _saltDctBApageState();
 }
 
-class _New3PageState extends State<New3Page> {
+class _saltDctBApageState extends State<saltDctBApage> {
   String? selectedOption;
 
   @override
@@ -37,8 +37,8 @@ class _New3PageState extends State<New3Page> {
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt D : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -183,7 +183,7 @@ class _New3PageState extends State<New3Page> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const New1_1Page()));
+                          builder: (_) => const saltDdetectiongroup6Page()));
                 }
               : null,
           style: ElevatedButton.styleFrom(

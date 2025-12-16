@@ -1,13 +1,14 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_al3plus.dart
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group_4/group4detection_analysis.dart.dart';
 import 'package:flutter/material.dart';
 // FIX: Import the collection package for the 'firstWhereOrNull' method.
 import 'package:collection/collection.dart';
 // Assuming the import path for DatabaseHelper and WetTestItem is correct
 import '../group0/group0analysis.dart';
 // Import the next screen's definition (or its placeholder)
-// Note: If WetTestCGroupFourDetectionScreen is defined elsewhere, adjust this import.
+// Note: If WetTestDGroupFourDetectionScreen is defined elsewhere, adjust this import.
 import '../d_intro.dart';
+
 
 
 // --- Theme Constants (Copied for local consistency) ---
@@ -16,8 +17,8 @@ const Color accentTeal = Color(0xFF00A6A6);
 // --------------------------------------------------------
 
 // --- Placeholder for next screen (Group 4) ---
-class WetTestCGroupFourDetectionScreen extends StatelessWidget {
-  const WetTestCGroupFourDetectionScreen({super.key});
+class WetTestDGroupFourDetectionScreen extends StatelessWidget {
+  const WetTestDGroupFourDetectionScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,15 +29,15 @@ class WetTestCGroupFourDetectionScreen extends StatelessWidget {
 }
 
 
-class WetTestCGroupThreeCTAlScreen extends StatefulWidget {
-  const WetTestCGroupThreeCTAlScreen({super.key});
+class WetTestDGroupThreeCTAlScreen extends StatefulWidget {
+  const WetTestDGroupThreeCTAlScreen({super.key});
 
   @override
-  State<WetTestCGroupThreeCTAlScreen> createState() =>
-      _WetTestCGroupThreeCTAlScreenState();
+  State<WetTestDGroupThreeCTAlScreen> createState() =>
+      _WetTestDGroupThreeCTAlScreenState();
 }
 
-class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScreen>
+class _WetTestDGroupThreeCTAlScreenState extends State<WetTestDGroupThreeCTAlScreen>
     with SingleTickerProviderStateMixin {
 
   String? _selectedOption;
@@ -45,7 +46,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
+  final String _tableName = 'SaltD_WetTest';
 
   // Content provided by the user for the solution preparation
   static const String SOLUTION_PREPARATION = 
@@ -95,7 +96,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const WetTestCPage1(), 
+        builder: (_) => const WetTestDPage1(), 
       ),
     );
   }
@@ -213,7 +214,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
                     const LinearGradient(colors: [accentTeal, primaryBlue])
                         .createShader(bounds),
                 child: const Text( 
-                    'Salt C : Wet Test',
+                    'Salt D : Wet Test',
                     style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

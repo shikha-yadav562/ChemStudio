@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import '../d_intro.dart';
 
-
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New1_2Page extends StatefulWidget {
-  const New1_2Page({super.key});
+class group6ctMGPage extends StatefulWidget {
+  const group6ctMGPage({super.key});
 
   @override
-  State<New1_2Page> createState() => _New1_2PageState();
+  State<group6ctMGPage> createState() => _grop6ctMGPageState();
 }
 
-class _New1_2PageState extends State<New1_2Page> {
+class _grop6ctMGPageState extends State<group6ctMGPage> {
   String? selectedOption;
 
   @override
@@ -38,8 +37,8 @@ class _New1_2PageState extends State<New1_2Page> {
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt D : Wet Test',
             style: TextStyle(
                 color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),

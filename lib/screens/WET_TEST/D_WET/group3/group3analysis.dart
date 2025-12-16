@@ -18,15 +18,15 @@ const Color accentTeal = Color(0xFF00A6A6);
 // as it is now imported from 'group3ct_al3plus.dart'.
 
 
-class WetTestCGroupThreeAnalysisScreen extends StatefulWidget {
-    const WetTestCGroupThreeAnalysisScreen({super.key});
+class WetTestDGroupThreeAnalysisScreen extends StatefulWidget {
+    const WetTestDGroupThreeAnalysisScreen({super.key});
 
     @override
-    State<WetTestCGroupThreeAnalysisScreen> createState() =>
-        _WetTestCGroupThreeAnalysisScreenState();
+    State<WetTestDGroupThreeAnalysisScreen> createState() =>
+        _WetTestDGroupThreeAnalysisScreenState();
 }
 
-class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAnalysisScreen>
+class _WetTestDGroupThreeAnalysisScreenState extends State<WetTestDGroupThreeAnalysisScreen>
     with SingleTickerProviderStateMixin {
 
     String? _selectedOption;
@@ -84,7 +84,7 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeCTFeScreen(),
+                    builder: (_) => const WetTestDGroupThreeCTFeScreen(),
                 ),
             );
         } else if (_selectedOption == 'Al³⁺ may be present') {
@@ -92,8 +92,8 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    // WetTestCGroupThreeCTAlScreen is now imported from group3ct_al3plus.dart
-                    builder: (_) => const WetTestCGroupThreeCTAlScreen(), 
+                    // WetTestDGroupThreeCTAlScreen is now imported from group3ct_al3plus.dart
+                    builder: (_) => const WetTestDGroupThreeCTAlScreen(), 
                 ),
             );
         }
@@ -182,7 +182,7 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
                     child: const Text(
-                        'Salt C : Wet Test',
+                        'Salt D : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,

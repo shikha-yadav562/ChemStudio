@@ -1,5 +1,5 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3detection.dart
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group_4/group4detection_analysis.dart.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 import '../d_intro.dart';
@@ -27,8 +27,8 @@ const Color accentTeal = Color(0xFF00A6A6);
 // --- Placeholder for next screens (needed for compilation) ---
 
 // Placeholder for Group 4 Detection (when Group III is Absent)
-class WetTestCGroupFourDetectionScreen extends StatelessWidget {
-    const WetTestCGroupFourDetectionScreen({super.key});
+class WetTestDGroupFourDetectionScreen extends StatelessWidget {
+    const WetTestDGroupFourDetectionScreen({super.key});
     @override
     Widget build(BuildContext context) {
         return Scaffold(
@@ -40,15 +40,15 @@ class WetTestCGroupFourDetectionScreen extends StatelessWidget {
 // --- End of Placeholders ---
 
 
-class WetTestCGroupThreeDetectionScreen extends StatefulWidget {
-    const WetTestCGroupThreeDetectionScreen({super.key});
+class WetTestDGroupThreeDetectionScreen extends StatefulWidget {
+    const WetTestDGroupThreeDetectionScreen({super.key});
 
     @override
-    State<WetTestCGroupThreeDetectionScreen> createState() =>
-        _WetTestCGroupThreeDetectionScreenState();
+    State<WetTestDGroupThreeDetectionScreen> createState() =>
+        _WetTestDGroupThreeDetectionScreenState();
 }
 
-class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDetectionScreen>
+class _WetTestDGroupThreeDetectionScreenState extends State<WetTestDGroupThreeDetectionScreen>
     with SingleTickerProviderStateMixin {
     
     String? _selectedOption; 
@@ -64,9 +64,9 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
         id: 9, // Assuming a sequential ID
         title: 'Group III Detection',
         procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
-        observation: 'White gelatineous ppt or reddish brown ppt',
+        observation: 'No ppt',
         options: ['Group-III is present', 'Group-III is Absent'],
-        correct: 'Group-III is present', // Assumed correct option for initial data saving
+        correct: 'Group-III is Absent', // Assumed correct option for initial data saving
     );
 
     @override
@@ -103,7 +103,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeAnalysisScreen(), 
+                    builder: (_) => const WetTestDGroupThreeAnalysisScreen(), 
                 ),
             );
         } else if (_selectedOption == 'Group-III is Absent') {
@@ -111,7 +111,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
              await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCPage1(), 
+                    builder: (_) => const WetTestDPage1(), 
                 ),
             );
         }
@@ -199,7 +199,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
                     child: const Text(
-                        'Salt C : Wet Test',
+                        'Salt D : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
