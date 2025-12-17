@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import '../group_6/group6detection_analysis.dart';
+import '../group_6/group6_detection.dart';
 import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New5Page extends StatefulWidget {
-  const New5Page({super.key});
+class group5_SR_ct extends StatefulWidget {
+  const group5_SR_ct({super.key});
 
   @override
-  State<New5Page> createState() => _New5PageState();
+  State<group5_SR_ct> createState() => _group5_SR_ctState();
 }
 
-class _New5PageState extends State<New5Page> {
+class _group5_SR_ctState extends State<group5_SR_ct> {
   String? selectedOption;
 
   @override
@@ -182,7 +182,7 @@ class _New5PageState extends State<New5Page> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const New1_1Page()),
+                        builder: (_) => const Group6Detection()),
                   );
                 }
               : null,

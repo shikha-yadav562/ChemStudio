@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import '../group_6/group6detection_analysis.dart';
+import '../group_6/group6_detection.dart';
 import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New3Page extends StatefulWidget {
-  const New3Page({super.key});
+class group5_BA_ct extends StatefulWidget {
+  const group5_BA_ct({super.key});
 
   @override
-  State<New3Page> createState() => _New3PageState();
+  State<group5_BA_ct> createState() => _group5_BA_ctState();
 }
 
-class _New3PageState extends State<New3Page> {
+class _group5_BA_ctState extends State<group5_BA_ct> {
   String? selectedOption;
 
   @override
@@ -183,7 +183,7 @@ class _New3PageState extends State<New3Page> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const New1_1Page()));
+                          builder: (_) => const Group6Detection()));
                 }
               : null,
           style: ElevatedButton.styleFrom(
