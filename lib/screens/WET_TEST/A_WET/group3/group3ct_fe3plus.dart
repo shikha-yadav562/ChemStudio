@@ -1,5 +1,5 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_fe3plus.dart
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4_detection.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 //import '../group4/group4detection.dart'; // Next screen for navigation
@@ -100,7 +100,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const  WetTestCPage1(), 
+        builder: (_) => const  Group4DetectionScreen(), 
       ),
     );
   }

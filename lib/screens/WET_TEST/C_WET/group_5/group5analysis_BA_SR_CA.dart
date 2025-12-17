@@ -7,14 +7,14 @@ import '../c_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class WetTestCGroupVPage2 extends StatefulWidget {
-  const WetTestCGroupVPage2({super.key});
+class Analysis_BA_SR_CA extends StatefulWidget {
+  const Analysis_BA_SR_CA({super.key});
 
   @override
-  State<WetTestCGroupVPage2> createState() => _WetTestCGroupVPage2State();
+  State<Analysis_BA_SR_CA> createState() => _Analysis_BA_SR_CAState();
 }
 
-class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
+class _Analysis_BA_SR_CAState extends State<Analysis_BA_SR_CA> {
   String? selectedOption;
 
   @override
@@ -100,21 +100,21 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New3Page()),
+            MaterialPageRoute(builder: (_) => const group5_BA_ct()),
           );
         };
       } else if (selectedOption == "Ca²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New4Page()),
+            MaterialPageRoute(builder: (_) => const group5_CA_ct()),
           );
         };
       } else if (selectedOption == "Sr²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New5Page()),
+            MaterialPageRoute(builder: (_) => const group5_SR_ct()),
           );
         };
       }

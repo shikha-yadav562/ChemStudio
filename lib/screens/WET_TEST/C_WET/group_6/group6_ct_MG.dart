@@ -5,14 +5,14 @@ import '../c_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New1_2Page extends StatefulWidget {
-  const New1_2Page({super.key});
+class group6_ct_MG extends StatefulWidget {
+  const group6_ct_MG({super.key});
 
   @override
-  State<New1_2Page> createState() => _New1_2PageState();
+  State<group6_ct_MG> createState() => _group6_ct_MGState();
 }
 
-class _New1_2PageState extends State<New1_2Page> {
+class _group6_ct_MGState extends State<group6_ct_MG> {
   String? selectedOption;
 
   @override

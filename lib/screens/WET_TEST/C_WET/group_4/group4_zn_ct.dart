@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../group_5/group5detection_firstanalysis.dart';
+import '../group_5/group5_detection.dart';
 import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
@@ -96,7 +96,7 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const GroupVPage(),
+                      builder: (_) => const Group5DetectionScreen(),
                     ),
                   );
                 }
