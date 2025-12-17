@@ -1,5 +1,6 @@
 // E:\flutter chemistry\wet\wet\lib\C\group2\group2analysis.dart
 
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 // Import the next screen: Confirmation Test for Cu2+
@@ -37,7 +38,7 @@ class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysi
             id: 6, // Sequential ID
             title: 'Analysis of Group II',
             procedure: 'O.S + dil. HCL + H₂S gas or water',
-            observation: 'No Black ppt',
+            observation: 'Black ppt',
             options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
             correct: 'Cu²⁺ may be present', 
         ),
@@ -62,13 +63,14 @@ class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysi
             final testId = _tests[_index].id;
             // Assuming firstWhereOrNull is available (e.g., from group0analysis.dart or globally)
             final savedAnswer = data.firstWhereOrNull( 
-                (row) => row['question_id'] == testId)?['answer'];
+                (row) => row['question_id'] == testId)?['student_answer'];
             _selectedOption = savedAnswer;
         });
     }
 
     Future<void> _saveAnswer(int id, String answer) async {
-        await _dbHelper.saveAnswer(_tableName, id, answer);
+        await _dbHelper.saveStudentAnswer(_tableName, id, answer);
+        await _dbHelper.saveCorrectAnswer(_tableName, id, answer);
     }
 
 void _next() async {

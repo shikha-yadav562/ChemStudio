@@ -19,11 +19,17 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
 
-  @override
-  void initState() {
-    super.initState();
-    _index = widget.initialIndex;
+ @override
+void initState() {
+  super.initState();
+  _index = widget.initialIndex;
+
+  // Save correct answers in DB for comparison
+  for (var test in _tests) {
+    _dbHelper.saveCorrectAnswer('SaltA_PreliminaryTest', test.id, test.correct);
   }
+}
+
 
   final List<TestItem> _tests = [
     TestItem(
@@ -131,11 +137,19 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
-                        onTap: () async {
-                          setState(() => _answers[test.id] = opt);
-                          await _dbHelper.saveAnswer(
-                              'SaltA_PreliminaryTest', test.id, opt);
-                        },
+                      onTap: () async {
+  setState(() => _answers[test.id] = opt);
+
+  // Save student answer
+  await _dbHelper.saveStudentAnswer(
+    'SaltA_PreliminaryTest',
+    test.id,
+    opt,
+  );
+
+
+},
+
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),

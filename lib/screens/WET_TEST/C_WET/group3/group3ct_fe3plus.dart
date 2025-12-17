@@ -1,5 +1,7 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_fe3plus.dart
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/final_result.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 //import '../group4/group4detection.dart'; // Next screen for navigation
@@ -88,14 +90,39 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
     final data = await _dbHelper.getAnswers(_tableName);
     setState(() {
       final savedAnswer = data.firstWhereOrNull(
-          (row) => row['question_id'] == _test.id)?['answer'];
+          (row) => row['question_id'] == _test.id)?['student_answer'];
       _selectedOption = savedAnswer;
     });
   }
 
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+  Future<void> _onOptionSelected(String option) async {
+  setState(() => _selectedOption = option);
+
+  // Save student answer
+  await _dbHelper.saveStudentAnswer(_tableName, _test.id, option);
+
+  // Save correct answer
+  await _dbHelper.saveCorrectAnswer(_tableName, _test.id, _test.correct);
+
+  // Mark group 3 as present
+  await _dbHelper.markGroupPresent(3);
+
+  // Check present groups
+  final presentGroups = await _dbHelper.getPresentGroups();
+
+  if (presentGroups.length >= 2) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const FinalResultScreen()),
+    );
+  } else {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const WetTestCGroupFourDetectionScreen()),
+    );
   }
+}
+
 
   void _next() async {
     // Navigate to the Group 4 Detection screen.
@@ -264,7 +291,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
                           child: InkWell(
                             onTap: () async {
                               setState(() => _selectedOption = opt);
-                              await _saveAnswer(_test.id, opt);
+                              await _onOptionSelected(opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(

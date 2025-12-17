@@ -1,4 +1,5 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3detection.dart
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
@@ -87,14 +88,25 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
         setState(() {
             // Assuming firstWhereOrNull is available (using the utility extension)
             final savedAnswer = data.firstWhereOrNull(
-                (row) => row['question_id'] == _test.id)?['answer'];
-            _selectedOption = savedAnswer;
+    (row) => row['question_id'] == _test.id)?['student_answer'] as String?;
+_selectedOption = savedAnswer;
+
         });
     }
 
-    Future<void> _saveAnswer(int id, String answer) async {
-        await _dbHelper.saveAnswer(_tableName, id, answer);
-    }
+   Future<void> _saveAnswer(int id, String answer) async {
+  // Save student's answer
+  await _dbHelper.saveStudentAnswer(_tableName, id, answer);
+  
+  // Save correct answer
+  await _dbHelper.saveCorrectAnswer(_tableName, id, _test.correct);
+
+  // If the student selects present, mark the group
+  if (answer == 'Group-III is present') {
+    await _dbHelper.markGroupPresent(3);
+  }
+}
+
 
     // *** Navigation Logic ***
     void _next() async {

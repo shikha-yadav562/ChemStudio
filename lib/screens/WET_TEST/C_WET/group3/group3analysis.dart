@@ -1,3 +1,4 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 // Assuming the import path for DatabaseHelper and WetTestItem is correct
 import '../group0/group0analysis.dart';
@@ -68,13 +69,14 @@ class _WetTestCGroupThreeAnalysisScreenState extends State<WetTestCGroupThreeAna
         setState(() {
             // Assumed firstWhereOrNull is now accessible (via collection import or group0analysis.dart)
             final savedAnswer = data.firstWhereOrNull(
-                (row) => row['question_id'] == _test.id)?['answer'];
+                (row) => row['question_id'] == _test.id)?['student_answer'];
             _selectedOption = savedAnswer;
         });
     }
 
     Future<void> _saveAnswer(int id, String answer) async {
-        await _dbHelper.saveAnswer(_tableName, id, answer);
+        await _dbHelper.saveStudentAnswer(_tableName, id, answer);
+        await _dbHelper.saveCorrectAnswer(_tableName, id, answer);
     }
 
     // *** Navigation Logic ***

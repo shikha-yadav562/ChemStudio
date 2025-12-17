@@ -1,5 +1,7 @@
 // group2ct_cu2plus.dart
 
+import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/final_result.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 import '../group3/group3detection.dart';
@@ -64,18 +66,44 @@ class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
     _animController.forward();
   }
 
-  Future<void> _loadSavedAnswer() async {
-  final data = await _dbHelper.getAnswers(_tableName);
- setState(() {
-   // Using the Extension Override to explicitly choose the local IterableExtension
-   final savedAnswer = IterableExtension(data).firstWhereOrNull(
-     (row) => row['question_id'] == _test.id)?['answer'];
-   _selectedOption = savedAnswer;
-  });
- }
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+ Future<void> _loadSavedAnswer() async {
+  final studentAnswer = await _dbHelper.getStudentAnswer(_tableName, _test.id);
+  if (studentAnswer != null) {
+    setState(() {
+      _selectedOption = studentAnswer;
+    });
   }
+}
+
+Future<void> _onOptionSelected(String option) async {
+  setState(() => _selectedOption = option);
+
+  // Save student answer
+  await _dbHelper.saveStudentAnswer(_tableName, _test.id, option);
+
+  // Save correct answer
+  await _dbHelper.saveCorrectAnswer(_tableName, _test.id, _test.correct);
+
+  // Mark group 2 as present
+  await _dbHelper.markGroupPresent(2);
+
+  // Get all present groups
+  final presentGroups = await _dbHelper.getPresentGroups();
+
+  if (presentGroups.length >= 2) {
+    // Two groups detected → Final Result
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const FinalResultScreen()),
+    );
+  } else {
+    // Only one group → continue to Group 3 Detection
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const WetTestCGroupThreeDetectionScreen()),
+    );
+  }
+}
 
 void _next() async {
   // FIX 2: Navigate to the imported Group 3 Detection screen.
@@ -246,7 +274,7 @@ void _next() async {
                           child: InkWell(
                             onTap: () async {
                               setState(() => _selectedOption = opt);
-                              await _saveAnswer(_test.id, opt);
+                              await  _onOptionSelected(opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(

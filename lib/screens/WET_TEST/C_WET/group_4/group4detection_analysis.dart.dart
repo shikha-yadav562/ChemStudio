@@ -17,9 +17,12 @@ class WetTestCPage1 extends StatefulWidget {
 }
 
 class _WetTestCPage1State extends State<WetTestCPage1> {
-  String? selectedOption;
-  String? selectedInference;
+  String? selectedOption; // Group-IV Present / Absent
+  String? selectedInference; // Ni²⁺ / Co²⁺ / Mn²⁺ / Zn²⁺
   bool showPage2 = false;
+
+  // Store answers to evaluate later
+  Map<String, String> studentAnswers = {};
 
   @override
   Widget build(BuildContext context) {
@@ -30,15 +33,15 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
         elevation: 2,
         centerTitle: true,
         leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: primaryBlue),
-    onPressed: () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
-        (route) => false, // This clears the navigation stack
-      );
-    },
-  ),
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
@@ -46,9 +49,7 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
           child: const Text(
             'Salt C : Wet Test',
             style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 22),
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
@@ -58,8 +59,7 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
       ),
       bottomNavigationBar: Container(
         color: Colors.transparent,
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: showPage2 ? _page2NavigationBar() : _page1NavigationBar(),
       ),
     );
@@ -86,9 +86,7 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
           child: const Text(
             'Select the correct inference:',
             style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold),
+                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(height: 10),
@@ -106,8 +104,7 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
           onPressed: () => Navigator.pop(context),
           style: TextButton.styleFrom(
             foregroundColor: primaryBlue,
-            padding: const EdgeInsets.symmetric(
-                vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
           label: const Text('Previous', style: TextStyle(fontSize: 16)),
@@ -115,26 +112,28 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
         ElevatedButton.icon(
           onPressed: selectedOption != null
               ? () {
+                  // Save student choice for Page1
+                  studentAnswers['GroupIV'] = selectedOption!;
+
                   if (selectedOption == "Group-IV Present") {
                     setState(() {
                       showPage2 = true;
                       selectedInference = null;
                     });
                   } else {
+                    // Absent → go to Group V
                     Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const GroupVPage()),
-                    );
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const GroupVPage()));
                   }
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: selectedOption != null
-                ? primaryBlue
-                : Colors.grey.shade400,
+            backgroundColor:
+                selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(
-                vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
@@ -144,7 +143,6 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
     );
   }
 
-  // ✅ OPTION TEXT = BOLD + TEAL WHEN SELECTED
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
     return Padding(
@@ -189,24 +187,15 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
             const SizedBox(height: 4),
             const Text(
               "O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water.",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
-              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal, color: Colors.black),
             ),
             const Divider(height: 22),
             _gradientHeader("Observation"),
             const SizedBox(height: 6),
-
-            // ✅ OBSERVATION STILL BOLD
+            // Page1 generic observation
             const Text(
               "No ppt",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: primaryBlue,
-              ),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],
         ),
@@ -217,14 +206,10 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
   Widget _gradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue])
-              .createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
       child: Text(
         text,
-        style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18),
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }
@@ -234,25 +219,21 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          "Analysis of Group IV ",
+          "Analysis of Group IV",
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
               ),
         ),
         const SizedBox(height: 12),
-        _testCard(),
+        _testCardPage2(),
         const SizedBox(height: 16),
         ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue])
-                  .createShader(bounds),
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
           child: const Text(
             'Select the correct inference:',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold),
+            style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
         const SizedBox(height: 10),
@@ -261,6 +242,49 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
         _buildInferenceOption("Mn²⁺"),
         _buildInferenceOption("Zn²⁺"),
       ],
+    );
+  }
+
+  Widget _testCardPage2() {
+    String observation = "No ppt"; // default
+    if (selectedInference != null) {
+      switch (selectedInference) {
+        case "Ni²⁺":
+          observation = "Green ppt";
+          break;
+        case "Co²⁺":
+          observation = "Pink ppt";
+          break;
+        case "Mn²⁺":
+          observation = "White ppt, turns brown on standing";
+          break;
+        case "Zn²⁺":
+          observation = "White ppt, soluble in excess NH₄OH";
+          break;
+      }
+    }
+
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _gradientHeader("Test"),
+          const SizedBox(height: 4),
+          const Text(
+            "O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water.",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal, color: Colors.black),
+          ),
+          const Divider(height: 22),
+          _gradientHeader("Observation"),
+          const SizedBox(height: 6),
+          Text(
+            observation,
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+          ),
+        ]),
+      ),
     );
   }
 
@@ -277,8 +301,7 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
           },
           style: TextButton.styleFrom(
             foregroundColor: primaryBlue,
-            padding: const EdgeInsets.symmetric(
-                vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
           label: const Text('Previous', style: TextStyle(fontSize: 16)),
@@ -286,27 +309,24 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
         ElevatedButton.icon(
           onPressed: selectedInference != null
               ? () {
+                  // Save student answer
+                  studentAnswers['GroupIV_Cation'] = selectedInference!;
+                  // Redirect to corresponding CT page even if wrong
                   if (selectedInference == "Ni²⁺") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Ni2ConfirmedPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const Ni2ConfirmedPage()));
                   } else if (selectedInference == "Co²⁺") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Co2ConfirmedPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const Co2ConfirmedPage()));
                   } else if (selectedInference == "Mn²⁺") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Mn2ConfirmedPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const Mn2ConfirmedPage()));
                   } else if (selectedInference == "Zn²⁺") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => const Zn2ConfirmedPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (_) => const Zn2ConfirmedPage()));
                   }
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                selectedInference != null ? primaryBlue : Colors.grey.shade400,
+            backgroundColor: selectedInference != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(
-                vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
@@ -316,7 +336,6 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
     );
   }
 
-  // ✅ INFERENCE text = BOLD + TEAL ON CLICK
   Widget _buildInferenceOption(String text) {
     final bool selected = selectedInference == text;
     return Padding(
@@ -331,8 +350,9 @@ class _WetTestCPage1State extends State<WetTestCPage1> {
             color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-                color: selected ? accentTeal : Colors.grey.shade300,
-                width: 1.5),
+              color: selected ? accentTeal : Colors.grey.shade300,
+              width: 1.5,
+            ),
           ),
           child: Text(
             text,

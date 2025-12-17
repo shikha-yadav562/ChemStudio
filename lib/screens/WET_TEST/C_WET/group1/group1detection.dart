@@ -1,5 +1,6 @@
 // E:\flutter chemistry\wet\wet\lib\C\group1\group1detection.dart
 
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; 
 import 'group1analysis.dart'; 
@@ -37,7 +38,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
             procedure: 'O.S + Dil. HCl',
             observation: 'No White ppt', 
             options: ['Group-I is present', 'Group-I is absent'],
-            correct: 'Group-I is present',
+            correct: 'Group-I is absent',
         ),
     ];
 
@@ -69,25 +70,43 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
         setState(() {
             final testId = _tests[_index].id;
             // firstWhereOrNull is available via group1analysis.dart import
-            final savedAnswer = data.firstWhereOrNull(
-                (row) => row['question_id'] == testId)?['answer'];
+            final match = data.where((row) => row['question_id'] == testId);
+final savedAnswer = match.isNotEmpty ? match.first['student_answer'] : null;
+
 
             if (widget.restoredSelection == null) {
                 _selectedOption = savedAnswer;
             }
         });
     }
+    
+    Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+  setState(() => _selectedOption = selected);
 
-    Future<void> _saveAnswer(int id, String answer) async {
-        await _dbHelper.saveAnswer(_tableName, id, answer);
-    }
+  // 1️⃣ Save student answer
+  await _dbHelper.saveStudentAnswer(
+    _tableName,
+    test.id,
+    selected,
+  );
+
+  // 2️⃣ Save correct answer (ALWAYS)
+  await _dbHelper.saveCorrectAnswer(
+    _tableName,
+    test.id,
+    test.correct,
+  );
+}
+
+    
 
     // Navigate forward (NEXT)
     void _next() async {
         final selectedBefore = _selectedOption;
 
-        if (_selectedOption == 'Group I is present') {
+        if (_selectedOption == 'Group-I is present') {
             // Navigate to the Group I Analysis page
+             await _dbHelper.markGroupPresent(1);
             await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -191,10 +210,10 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
                                                     return Padding(
                                                         padding: const EdgeInsets.symmetric(vertical: 4),
                                                         child: InkWell(
-                                                            onTap: () async {
-                                                                setState(() => _selectedOption = opt);
-                                                                await _saveAnswer(test.id, opt);
-                                                            },
+                                                           onTap: () async {
+  await _onOptionSelected(test, opt);
+},
+
                                                             borderRadius: BorderRadius.circular(8),
                                                             child: AnimatedContainer(
                                                                 duration: const Duration(milliseconds: 200),

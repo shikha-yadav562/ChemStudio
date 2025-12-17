@@ -1,5 +1,7 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_al3plus.dart
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/final_result.dart';
 import 'package:flutter/material.dart';
 // FIX: Import the collection package for the 'firstWhereOrNull' method.
 import 'package:collection/collection.dart';
@@ -78,26 +80,34 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
   Future<void> _loadSavedAnswer() async {
     final data = await _dbHelper.getAnswers(_tableName);
     setState(() {
-        // 'data' is a List, which now correctly uses firstWhereOrNull due to the import.
-        final savedAnswer = data.firstWhereOrNull(
-            (row) => row['question_id'] == _test.id)?['answer'];
-        _selectedOption = savedAnswer;
+      final savedAnswer = data.firstWhereOrNull(
+          (row) => row['question_id'] == _test.id)?['answer'];
+      _selectedOption = savedAnswer;
     });
   }
 
   Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+    await _dbHelper.saveStudentAnswer(_tableName, id, answer);
+    await _dbHelper.saveCorrectAnswer(_tableName, id, _test.correct);
+    await _dbHelper.markGroupPresent(3); // Group III marked as present
   }
 
-  // *** Navigation Logic ***
-  void _next() {
-    // Navigate to the next appropriate screen (Group 4 Detection, matching the template).
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WetTestCPage1(), 
-      ),
-    );
+  void _next() async {
+    // Get all present groups to decide next screen
+    final presentGroups = await _dbHelper.getPresentGroups();
+    if (presentGroups.contains(4)) {
+      // If Group IV is done, go to final result
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const FinalResultScreen()),
+      );
+    } else {
+      // Otherwise, go to Group IV Detection
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const WetTestCPage1()),
+      );
+    }
   }
 
   void _prev() {

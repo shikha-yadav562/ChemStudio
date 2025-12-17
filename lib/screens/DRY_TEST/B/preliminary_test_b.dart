@@ -35,11 +35,29 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
     ),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _index = widget.initialIndex;
+@override
+void initState() {
+  super.initState();
+  _index = widget.initialIndex;
+
+  // Load saved answers
+  _loadSavedAnswers();
+
+  // Save correct answers
+  for (var test in _tests) {
+    _dbHelper.saveCorrectAnswer('SaltB_PreliminaryTest', test.id, test.correct);
   }
+}
+
+Future<void> _loadSavedAnswers() async {
+  final data = await _dbHelper.getAnswers('SaltB_PreliminaryTest');
+  setState(() {
+    for (var row in data) {
+      _answers[row['question_id']] = row['answer'];
+    }
+  });
+}
+
 
   Future<void> _printPreliminaryAnswers() async {
     final answers = await _dbHelper.getAnswers('SaltB_PreliminaryTest');
@@ -131,13 +149,18 @@ class _PreliminaryTestBScreenState extends State<PreliminaryTestBScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
                         onTap: () async {
-                          setState(() => _answers[test.id] = opt);
-                          await _dbHelper.saveAnswer(
-                            'SaltB_PreliminaryTest',
-                            test.id,
-                            opt,
-                          );
-                        },
+  setState(() => _answers[test.id] = opt);
+
+  // Save student answer
+  await _dbHelper.saveStudentAnswer(
+    'SaltB_PreliminaryTest',
+    test.id,
+    opt,
+  );
+
+  
+},
+
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),

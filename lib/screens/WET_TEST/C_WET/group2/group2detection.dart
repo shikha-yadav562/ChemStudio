@@ -1,5 +1,6 @@
 // E:\flutter chemistry\wet\wet\lib\C\group2\group2detection.dart
 
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; 
 import 'group2analysis.dart'; // Target for successful detection (Group II present)
@@ -73,37 +74,43 @@ Future<void> _loadSavedAnswers() async {
             
             // --- FIX: USE EXTENSION OVERRIDE HERE ---
             final savedAnswer = IterableExtension(data).firstWhereOrNull( 
-                (row) => row['question_id'] == testId)?['answer'];
+                (row) => row['question_id'] == testId)?['student_answer']as String?;
             // ----------------------------------------
             
             _selectedOption = savedAnswer;
         });
     }
     Future<void> _saveAnswer(int id, String answer) async {
-        await _dbHelper.saveAnswer(_tableName, id, answer);
-    }
+  // Save student answer
+  await _dbHelper.saveStudentAnswer(_tableName, id, answer);
+
+  // Save correct answer from the test object
+  final correctAnswer = _tests[_index].correct;
+  await _dbHelper.saveCorrectAnswer(_tableName, id, correctAnswer);
+}
+
 
     // Navigate forward (NEXT)
     void _next() async {
-        if (_selectedOption == 'Group II is present') {
-            // Group II Present -> Group II Analysis
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupTwoAnalysisScreen(), 
-                ),
-            );
-        } else {
-            // Group II Absent -> Group 3 Detection
-             await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
-                ),
-            );
-        }
-    }
-    
+  if (_selectedOption == 'Group-II is present') {
+    await _dbHelper.markGroupPresent(2);
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupTwoAnalysisScreen(),
+      ),
+    );
+  } else {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupThreeDetectionScreen(),
+      ),
+    );
+  }
+}
+
     void _prev() {
         Navigator.pop(context, _selectedOption);
     }

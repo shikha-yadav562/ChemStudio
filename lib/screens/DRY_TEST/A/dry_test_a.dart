@@ -1,4 +1,5 @@
 import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/correct_answers.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/WET_TEST/A_WET/a_intro.dart';
 import '../../welcome_screen.dart';
@@ -43,20 +44,28 @@ class _DryTestAScreenState extends State<DryTestAScreen>
 
     _loadSavedAnswers(); // ✅ only load, don’t clear
 
+    // Save correct answers for Dry Test
+  for (var test in _tests) {
+    dbHelper.saveCorrectAnswer('SaltA_DryTest', test.id, test.correct);
+  }
+
     // ✅ Print preliminary data when screen opens
     print("🧪 Preliminary Answers Received: ${widget.preliminaryAnswers}");
   }
 
   Future<void> _loadSavedAnswers() async {
-    final data = await dbHelper.getAnswers(tableName);
-    if (data.isNotEmpty) {
-      setState(() {
-        for (var row in data) {
-          _answers[row['question_id']] = row['answer'];
+  final data = await dbHelper.getAnswers(tableName);
+  if (data.isNotEmpty) {
+    setState(() {
+      for (var row in data) {
+        if (row['student_answer'] != null) {
+          _answers[row['question_id']] = row['student_answer'];
         }
-      });
-    }
+      }
+    });
   }
+}
+
 
   static List<TestItem> _generateTests() {
     return [
@@ -95,10 +104,15 @@ class _DryTestAScreenState extends State<DryTestAScreen>
       ),
     ];
   }
+Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
+  // Save student's selected answer
+  await dbHelper.saveStudentAnswer(tableName, test.id, selectedAnswer);
 
-  Future<void> _saveAnswer(int questionId, String answer) async {
-    await dbHelper.saveAnswer(tableName, questionId, answer);
-  }
+  // Save correct answer
+  //await dbHelper.saveCorrectAnswer(tableName, test.id, test.correct);
+}
+
+
 
   void _next() async {
     if (_index < _tests.length - 1) {
@@ -220,7 +234,7 @@ class _DryTestAScreenState extends State<DryTestAScreen>
                               setState(() {
                                 _answers[test.id] = opt;
                               });
-                              _saveAnswer(test.id, opt);
+                              _saveAnswer(test, opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
@@ -497,17 +511,17 @@ class _DryTestAScreenState extends State<DryTestAScreen>
 }
 
 // ------------------------------------------------------------
-// ✅ Corrected Result Screen name (SaltAResultScreen)
+// ✅ Corrected Result Screen: SaltAResultScreen
 class SaltAResultScreen extends StatefulWidget {
   final Map<int, String> userAnswers;
   final List<TestItem> tests;
-  final Map<int, String> preliminaryAnswers; // ✅ Added
+  final Map<int, String> preliminaryAnswers;
 
   const SaltAResultScreen({
     super.key,
     required this.userAnswers,
     required this.tests,
-    required this.preliminaryAnswers, // ✅ Added
+    required this.preliminaryAnswers,
   });
 
   @override
@@ -518,21 +532,21 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _fadeCtrl;
 
-  @override
-  void initState() {
-    super.initState();
-    _fadeCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _fadeCtrl.forward();
-  }
+  Map<int, String> dryCorrect = {};
+  Map<int, String> prelimCorrect = {};
 
-  @override
-  void dispose() {
-    _fadeCtrl.dispose();
-    super.dispose();
-  }
+@override
+void initState() {
+  super.initState();
+  _fadeCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 500),
+  );
+  _fadeCtrl.forward();
+
+  dryCorrect = correctAnswers['SaltA_DryTest'] ?? {};
+  prelimCorrect = correctAnswers['SaltA_PreliminaryTest'] ?? {};
+}
 
   @override
   Widget build(BuildContext context) {
@@ -574,8 +588,10 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
                 child: ListView(
                   children: [
                     ...widget.tests.map((test) {
-                      final ans =
-                          widget.userAnswers[test.id] ?? 'No answer selected';
+                      final ans = widget.userAnswers[test.id] ?? 'No answer selected';
+                      final correctAns = dryCorrect[test.id] ?? 'Not found';
+                      final isCorrect = ans == correctAns;
+
                       return Container(
                         margin: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
@@ -600,13 +616,10 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
                             ],
                           ),
                           child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            leading: const Icon(
-                              Icons.assignment_turned_in_rounded,
-                              color: accentTeal,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            leading: Icon(
+                              isCorrect ? Icons.check_circle : Icons.cancel,
+                              color: isCorrect ? Colors.green : Colors.red,
                               size: 28,
                             ),
                             title: Text(
@@ -619,7 +632,7 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
                             subtitle: Padding(
                               padding: const EdgeInsets.only(top: 6),
                               child: Text(
-                                ans,
+                                'Your Answer: $ans\nCorrect Answer: $correctAns',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 15,
@@ -630,7 +643,7 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
                           ),
                         ),
                       );
-                    }),
+                    }).toList(),
 
                     const SizedBox(height: 30),
 
@@ -651,6 +664,9 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
                       )
                     else
                       ...widget.preliminaryAnswers.entries.map((entry) {
+                        final correctAns = prelimCorrect[entry.key] ?? 'Not found';
+                        final isCorrect = entry.value == correctAns;
+
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
@@ -675,13 +691,10 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
                               ],
                             ),
                             child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              leading: const Icon(
-                                Icons.science_rounded,
-                                color: accentTeal,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                              leading: Icon(
+                                isCorrect ? Icons.check_circle : Icons.cancel,
+                                color: isCorrect ? Colors.green : Colors.red,
                                 size: 28,
                               ),
                               title: Text(
@@ -694,7 +707,7 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
-                                  entry.value,
+                                  'Your Answer: ${entry.value}\nCorrect Answer: $correctAns',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
@@ -705,98 +718,99 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
                             ),
                           ),
                         );
-                      }),
+                      }).toList(),
                   ],
                 ),
               ),
+
               const SizedBox(height: 16),
 
-             Row(
-  children: [
-    // 🔙 PREVIOUS
-    Expanded(
-      child: SizedBox(
-        height: 50,
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => DryTestAScreen(
-                  preliminaryAnswers: widget.preliminaryAnswers,
-                ),
+              // ---------- Buttons ----------
+              Row(
+                children: [
+                  // 🔙 PREVIOUS
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DryTestAScreen(
+                                preliminaryAnswers: widget.preliminaryAnswers,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_back),
+                        label: const Text(
+                          "Previous",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[700],
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  // 🧪 START ANALYSIS
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const WetTestIntroCScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.science_rounded),
+                        label: const Text(
+                          "Start Analysis",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: accentTeal,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  // 🏠 HOME
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                          );
+                        },
+                        icon: const Icon(Icons.home_rounded),
+                        label: const Text(
+                          "Home",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryBlue,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
-          icon: const Icon(Icons.arrow_back),
-          label: const Text(
-            "Previous",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[700],
-            foregroundColor: Colors.white,
-          ),
-        ),
-      ),
-    ),
-
-    const SizedBox(width: 12),
-
-    // 🧪 START ANALYSIS
-    Expanded(
-      child: SizedBox(
-        height: 50,
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const WetTestIntroCScreen(),
-              ),
-            );
-          },
-          icon: const Icon(Icons.science_rounded),
-          label: const Text(
-            "Start Analysis",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: accentTeal,
-            foregroundColor: Colors.white,
-          ),
-        ),
-      ),
-    ),
-
-    const SizedBox(width: 12),
-
-    // 🏠 HOME
-    Expanded(
-      child: SizedBox(
-        height: 50,
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-            );
-          },
-          icon: const Icon(Icons.home_rounded),
-          label: const Text(
-            "Home",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryBlue,
-            foregroundColor: Colors.white,
-          ),
-        ),
-      ),
-    ),
-  ],
-)
-
             ],
           ),
         ),
@@ -804,6 +818,7 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
     );
   }
 }
+
 
 // ---------- Model ----------
 class TestItem {

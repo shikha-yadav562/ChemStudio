@@ -4,6 +4,7 @@ import '0CT.dart';
 // Import Group1 detection screen
 import '../group1/group1detection.dart'; 
 import '../c_intro.dart';
+import 'package:ChemStudio/DB/database_helper.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -41,22 +42,7 @@ class WetTestItem {
   });
 }
 
-// Placeholder for DatabaseHelper (assuming it works the same way)
-class DatabaseHelper {
-  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
-  DatabaseHelper._privateConstructor();
 
-  // Dummy methods to satisfy the code structure
-  Future<void> saveAnswer(String table, int id, String answer) async {
-    // Implement DB saving in real app
-    return;
-  }
-
-  Future<List<Map<String, dynamic>>> getAnswers(String table) async {
-    // Implement DB retrieval in real app
-    return [];
-  }
-}
 
 class WetTestCGroupZeroScreen extends StatefulWidget {
   const WetTestCGroupZeroScreen({super.key});
@@ -107,14 +93,16 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
     final data = await _dbHelper.getAnswers(_tableName);
     setState(() {
       for (var row in data) {
-        _answers[row['question_id']] = row['answer'];
+        _answers[row['question_id']] = row['student_answer'] as String;
       }
     });
   }
 
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
-  }
+ Future<void> _saveAnswer(int id, String answer, String correct) async {
+  await _dbHelper.saveStudentAnswer(_tableName, id, answer);
+  await _dbHelper.saveCorrectAnswer(_tableName, id, correct);
+}
+
 
   // --- NAVIGATION LOGIC IMPLEMENTING SCENARIOS 1 & 2 ---
   void _next() async {
@@ -122,8 +110,9 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
     final selectedOption = _answers[test.id]; // Get the selected option
 
     if (selectedOption == null) {
-      // Optional: Show a Snackbar if no option is selected
-      // ScaffoldMessenger.of(context).showSnackBar(...);
+      ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please select an option before proceeding')),
+    );
       return; 
     }
 
@@ -237,9 +226,10 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
                             onTap: () async {
-                              setState(() => _answers[test.id] = opt);
-                              await _saveAnswer(test.id, opt);
-                            },
+  setState(() => _answers[test.id] = opt);
+  await _saveAnswer(test.id, opt, test.correct);
+},
+
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
