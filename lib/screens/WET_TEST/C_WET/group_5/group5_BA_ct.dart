@@ -1,19 +1,177 @@
+// group5_ct_ba.dart
+import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/WetTestCFinalResultScreen.dart';
 import 'package:flutter/material.dart';
+import '../group0/group0analysis.dart';
 import '../group_6/group6_detection.dart';
 import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class group5_BA_ct extends StatefulWidget {
-  const group5_BA_ct({super.key});
+class Group5CTBaScreen extends StatefulWidget {
+  const Group5CTBaScreen({super.key});
 
   @override
-  State<group5_BA_ct> createState() => _group5_BA_ctState();
+  State<Group5CTBaScreen> createState() => _Group5CTBaScreenState();
 }
 
-class _group5_BA_ctState extends State<group5_BA_ct> {
-  String? selectedOption;
+class _Group5CTBaScreenState extends State<Group5CTBaScreen>
+    with SingleTickerProviderStateMixin {
+  
+  String? _selectedOption; 
+  bool get _isSelected => _selectedOption != null;
+
+  late final AnimationController _animController;
+  late final Animation<double> _fadeSlide;
+
+  final _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltC_WetTest';
+
+  late final WetTestItem _test = WetTestItem(
+    id: 10, // Sequential ID
+    title: 'C.T for Ba²⁺',
+    procedure: 'Above acetate solution + dil. H₂SO₄', 
+    observation: 'White ppt',
+    options: ['Ba²⁺ confirmed'],
+    correct: 'Ba²⁺ confirmed', 
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _loadSavedAnswer();
+    _animController.forward();
+  }
+
+  Future<void> _loadSavedAnswer() async {
+    final studentAnswer = await _dbHelper.getStudentAnswer(_tableName, _test.id);
+    if (studentAnswer != null) {
+      setState(() {
+        _selectedOption = studentAnswer;
+      });
+    }
+  }
+
+  // ✅ Just select, don't navigate or save yet
+  void _onOptionTapped(String option) {
+    setState(() {
+      _selectedOption = option;
+    });
+  }
+
+  // ✅ Handle everything only when Next is clicked
+  Future<void> _handleNext() async {
+    if (_selectedOption == null) return;
+
+    // 1️⃣ Save CT answer
+    await _dbHelper.saveStudentAnswer(_tableName, _test.id, _selectedOption!);
+
+    // 2️⃣ Mark Group V as present
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 5,
+      status: GroupStatus.present,
+    );
+
+    // 3️⃣ Count present groups
+    final studentGroups = await _dbHelper.getStudentGroupDecisions('C');
+    final presentCount = studentGroups.values
+        .where((status) => status == GroupStatus.present)
+        .length;
+
+    // 4️⃣ Navigate accordingly
+    if (!mounted) return;
+    
+    if (presentCount >= 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const WetTestCFinalResultScreen(salt: 'C')),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const Group6Detection()),
+      );
+    }
+  }
+
+  void _prev() {
+    if (Navigator.canPop(context)) Navigator.pop(context);
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildGradientHeader(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+    );
+  }
+
+  Widget _buildSolutionCard() {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildGradientHeader('Solution'),
+            const SizedBox(height: 8),
+            Text(
+              'Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests',
+              style: TextStyle(
+                fontSize: 14,
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTestCard(String procedure, String observation) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildGradientHeader('Test'),
+            const SizedBox(height: 4),
+            Text(procedure, style: const TextStyle(fontSize: 14)),
+            const Divider(height: 24),
+            _buildGradientHeader('Observation'),
+            const SizedBox(height: 8),
+            Text(
+              observation,
+              style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,234 +182,106 @@ class _group5_BA_ctState extends State<group5_BA_ct> {
         elevation: 2,
         centerTitle: true,
         leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: primaryBlue),
-    onPressed: () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
-        (route) => false, // This clears the navigation stack
-      );
-    },
-  ),
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () => Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const WetTestIntroCScreen()),
+            (route) => false,
+          ),
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue])
-                  .createShader(bounds),
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
           child: const Text(
             'Salt C : Wet Test',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              "C.T For Ba²⁺ ",
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: primaryBlue,
-                    fontWeight: FontWeight.bold,
+      body: FadeTransition(
+        opacity: _fadeSlide,
+        child: SlideTransition(
+          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+              .animate(_fadeSlide),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(_test.title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      _buildSolutionCard(),
+                      const SizedBox(height: 12),
+                      _buildTestCard(_test.procedure, _test.observation),
+                      const SizedBox(height: 24),
+                      _buildGradientHeader('Select the correct inference:'),
+                      const SizedBox(height: 10),
+                      ..._test.options.map((opt) {
+                        final selectedHere = _selectedOption == opt;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: InkWell(
+                            onTap: () => _onOptionTapped(opt),
+                            borderRadius: BorderRadius.circular(8),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: selectedHere
+                                    ? accentTeal.withOpacity(0.1)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Text(
+                                opt,
+                                style: TextStyle(
+                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
+                                  color: selectedHere ? accentTeal : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
                   ),
-            ),
-            const SizedBox(height: 12),
-            _solutionCard(),
-            const SizedBox(height: 12),
-            _testCard(),
-            const SizedBox(height: 12),
-            _buildOption("Ba²⁺ confirmed"),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        color: Colors.transparent,
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-        child: _buildNavigationBar(),
-      ),
-    );
-  }
-
-  // ---------------- SOLUTION CARD ----------------
-  Widget _solutionCard() {
-    return Card(
-      elevation: 4,
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GradientText(
-              "Solution",
-              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 6),
-
-            // ✅ Blue + Bold
-            Text(
-              "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: primaryBlue,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ---------------- TEST CARD ----------------
-  Widget _testCard() {
-    return Card(
-      elevation: 4,
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GradientText(
-              "Test",
-              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 6),
-
-            // ✅ BLACK normal text
-            Text(
-              "Above acetate solution + dil. H₂SO₄",
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.black,
-                fontWeight: FontWeight.normal,
-              ),
-            ),
-            Divider(height: 22),
-
-            GradientText(
-              "Observation",
-              gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 6),
-
-            // ✅ Blue + Bold
-            Text(
-              "White ppt",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: primaryBlue,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ---------------- NAVIGATION ----------------
-  Widget _buildNavigationBar() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        TextButton.icon(
-          onPressed: () => Navigator.pop(context),
-          style: TextButton.styleFrom(
-            foregroundColor: primaryBlue,
-            padding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          ),
-          icon: const Icon(Icons.arrow_back, size: 20),
-          label: const Text('Previous', style: TextStyle(fontSize: 16)),
-        ),
-
-        ElevatedButton.icon(
-          onPressed: selectedOption != null
-              ? () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const Group6Detection()));
-                }
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: selectedOption != null
-                ? primaryBlue
-                : Colors.grey.shade400,
-            foregroundColor: Colors.white,
-            padding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            shape: const StadiumBorder(),
-          ),
-          icon: const Icon(Icons.arrow_forward, size: 20),
-          label: const Text('Next', style: TextStyle(fontSize: 16)),
-        ),
-      ],
-    );
-  }
-
-  // ---------------- OPTION ----------------
-  Widget _buildOption(String text) {
-    final bool selected = selectedOption == text;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: InkWell(
-        onTap: () => setState(() => selectedOption = text),
-        borderRadius: BorderRadius.circular(8),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: selected ? accentTeal : Colors.grey.shade300,
-              width: 1.5,
-            ),
-          ),
-          child: Text(
-            text,
-            style: TextStyle(
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              color: selected ? accentTeal : Colors.black,
-              fontSize: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _prev,
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Previous'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _isSelected ? _handleNext : null,
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text('Next'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-// ---------------- GRADIENT TEXT ----------------
-class GradientText extends StatelessWidget {
-  final String text;
-  final TextStyle style;
-  final Gradient gradient;
-
-  const GradientText(this.text,
-      {required this.style, required this.gradient, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      shaderCallback: (bounds) =>
-          gradient.createShader(
-              Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
-      child: Text(text, style: style.copyWith(color: Colors.white)),
     );
   }
 }

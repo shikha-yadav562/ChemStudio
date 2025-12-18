@@ -16,14 +16,35 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
   bool isLoading = true;
   Map<int, GroupStatus> studentGroups = {};
 
-  // ✅ Ion mapping with their groups
+  // ✅ UPDATED: Ion mapping with Groups 0-6
   final List<Map<String, dynamic>> ctTests = [
+    // Group 0
     {'ion': 'NH4+', 'group': 0, 'questionId': 2, 'title': 'NH₄⁺ Confirmatory Test'},
+    
+    // Group 1
     {'ion': 'Pb2+', 'group': 1, 'questionId': 5, 'title': 'Pb²⁺ Confirmatory Test'},
+    
+    // Group 2
     {'ion': 'Cu2+', 'group': 2, 'questionId': 7, 'title': 'Cu²⁺ Confirmatory Test'},
     {'ion': 'As3+', 'group': 2, 'questionId': 8, 'title': 'As³⁺ Confirmatory Test'},
+    
+    // Group 3
     {'ion': 'Fe3+', 'group': 3, 'questionId': 11, 'title': 'Fe³⁺ Confirmatory Test'},
     {'ion': 'Al3+', 'group': 3, 'questionId': 12, 'title': 'Al³⁺ Confirmatory Test'},
+    
+    // Group 4
+    {'ion': 'Ni2+', 'group': 4, 'questionId': 15, 'title': 'Ni²⁺ Confirmatory Test'},
+    {'ion': 'Co2+', 'group': 4, 'questionId': 16, 'title': 'Co²⁺ Confirmatory Test'},
+    {'ion': 'Mn2+', 'group': 4, 'questionId': 17, 'title': 'Mn²⁺ Confirmatory Test'},
+    {'ion': 'Zn2+', 'group': 4, 'questionId': 18, 'title': 'Zn²⁺ Confirmatory Test'},
+    
+    // Group 5
+    {'ion': 'Ba2+', 'group': 5, 'questionId': 20, 'title': 'Ba²⁺ Confirmatory Test'},
+    {'ion': 'Ca2+', 'group': 5, 'questionId': 21, 'title': 'Ca²⁺ Confirmatory Test'},
+    {'ion': 'Sr2+', 'group': 5, 'questionId': 22, 'title': 'Sr²⁺ Confirmatory Test'},
+    
+    // Group 6
+    {'ion': 'Mg2+', 'group': 6, 'questionId': 24, 'title': 'Mg²⁺ Confirmatory Test'},
   ];
 
   @override
@@ -37,8 +58,7 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
     setState(() => isLoading = false);
   }
 
-  // ----------------------------
-  // ✅ ENHANCED: Group comparison with detailed logging
+  // ✅ Group comparison with detailed logging
   Future<bool> isGroupFullyCorrect(int groupNumber) async {
     final studentStatus = studentGroups[groupNumber];
     final correctStatus = wetTestGroups[groupNumber];
@@ -91,20 +111,20 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
     return true;
   }
 
+  // ✅ UPDATED: Group names for Groups 0-6
   String getGroupName(int groupNumber) {
     const groupNames = {
       0: 'Group 0 (NH₄⁺)',
       1: 'Group I (Pb²⁺)',
       2: 'Group II (Cu²⁺/As³⁺)',
       3: 'Group III (Fe³⁺/Al³⁺)',
-      4: 'Group IV',
-      5: 'Group V (Ca²⁺/Ba²⁺)',
-      6: 'Group VI',
+      4: 'Group IV (Ni²⁺/Co²⁺/Mn²⁺/Zn²⁺)',
+      5: 'Group V (Ba²⁺/Ca²⁺/Sr²⁺)',
+      6: 'Group VI (Mg²⁺)',
     };
     return groupNames[groupNumber] ?? 'Group $groupNumber';
   }
 
-  // ----------------------------
   // CT COMPARISON
   Future<bool> isCTCorrect({
     required int group,
@@ -126,7 +146,7 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
     final correctCT = wetTestCTAnswers[ion];
 
     if (studentAnswer == null || correctCT == null) {
-      print('DEBUG: studentAnswer=$studentAnswer, correctCT=$correctCT for ion=$ion'); // DEBUG
+      print('DEBUG: studentAnswer=$studentAnswer, correctCT=$correctCT for ion=$ion');
       return false;
     }
 
@@ -134,21 +154,22 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
     final studentClean = studentAnswer.trim().toLowerCase();
     final correctClean = correctCT.correctOption.trim().toLowerCase();
     
-    print('DEBUG Group $group ($ion): Student="$studentClean" vs Correct="$correctClean"'); // DEBUG
+    print('DEBUG Group $group ($ion): Student="$studentClean" vs Correct="$correctClean"');
     
     return studentClean == correctClean;
   }
 
-  // ✅ FIXED: Calculate score based on BOTH group status AND CT
+  // ✅ Calculate score based on BOTH group status AND CT
   Future<int> _calculateScore() async {
     int score = 0;
     
     // Score for correct group identification + CT (10 points each)
-    for (int i = 0; i < wetTestGroups.length; i++) {
-      if (await isGroupFullyCorrect(i)) {
-        score += 10;
-      }
-    }
+   for (final group in wetTestGroups.keys) {
+  if (await isGroupFullyCorrect(group)) {
+    score += 10;
+  }
+}
+
     
     return score;
   }
@@ -170,7 +191,6 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ----------------------------
           // SCORE CARD
           FutureBuilder<int>(
             future: _calculateScore(),
@@ -214,8 +234,7 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
 
           const SizedBox(height: 24),
 
-          // ----------------------------
-          // ✅ FIXED: GROUP RESULT SECTION (checks both status and CT)
+          // GROUP RESULT SECTION
           const Text(
             'Group Analysis Result',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -276,7 +295,6 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
 
           const SizedBox(height: 24),
 
-          // ----------------------------
           // CONFIRMATORY TEST DETAIL SECTION
           const Text(
             'Confirmatory Test Details',
@@ -363,7 +381,6 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
 
           const SizedBox(height: 24),
 
-          // ----------------------------
           // ACTION BUTTONS
           ElevatedButton.icon(
             onPressed: () {

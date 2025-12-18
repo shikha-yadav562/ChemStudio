@@ -1,10 +1,10 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'group4_analysis.dart';
 import '../group_5/group5_detection.dart';
-import '../c_intro.dart'; 
+import '../c_intro.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group0/group0analysis.dart';
 
-// --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
@@ -17,20 +17,22 @@ class Group4DetectionScreen extends StatefulWidget {
 
 class _Group4DetectionScreenState extends State<Group4DetectionScreen>
     with SingleTickerProviderStateMixin {
-  String? selectedOption;
+  String? _selectedOption;
 
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
-  // Group IV Content
+  final _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltC_WetTest';
+
   late final WetTestItem _test = WetTestItem(
-    id: 10,
+    id: 13, // Unique ID for Group 4 Detection
     title: 'Group IV Detection',
     procedure:
         'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water.',
-    observation: 'No ppt',
-    options: ['Group-IV Present', 'Group-IV Absent'],
-    correct: 'Group-IV Absent',
+    observation: 'Black ppt or Buff/flesh/pink ppt or white ppt',
+    options: ['Group-IV is present', 'Group-IV is Absent'],
+    correct: 'Group-IV is present',
   );
 
   @override
@@ -41,27 +43,50 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
       duration: const Duration(milliseconds: 450),
     );
     _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _loadSavedAnswers();
     _animController.forward();
   }
 
-  // Navigation logic for Next button
-  void _next() {
-    if (selectedOption == "Group-IV Present") {
-      Navigator.push(
+  Future<void> _loadSavedAnswers() async {
+    final data = await _dbHelper.getAnswers(_tableName);
+    setState(() {
+      final testId = _test.id;
+      final match = data.where((row) => row['question_id'] == testId);
+      final savedAnswer = match.isNotEmpty ? match.first['student_answer'] : null;
+      _selectedOption = savedAnswer;
+    });
+  }
+
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() {
+      _selectedOption = selected;
+    });
+
+    await _dbHelper.saveStudentAnswer(
+      _tableName,
+      test.id,
+      selected,
+    );
+  }
+
+  void _next() async {
+    if (_selectedOption == 'Group-IV is present') {
+      await Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const group4_analysis()),
+        MaterialPageRoute(builder: (_) => const Group4AnalysisScreen()),
       );
-    } else if (selectedOption == "Group-IV Absent") {
-      Navigator.push(
+    } else if (_selectedOption == 'Group-IV is Absent') {
+      await Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const Group5DetectionScreen()),
       );
     }
   }
 
-  // Navigation logic for Bottom Back button
   void _prev() {
-    Navigator.pop(context);
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -70,14 +95,15 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
     super.dispose();
   }
 
-  // ---------------- UI Helpers ----------------
-  Widget _gradientHeader(String text) {
+  Widget _buildGradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        style: const TextStyle(
+            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }
@@ -87,25 +113,23 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _gradientHeader("Test"),
+            _buildGradientHeader('Test'),
             const SizedBox(height: 4),
-            Text(
-              test.procedure,
-              style: const TextStyle(fontSize: 15, color: Colors.black),
-            ),
-            const Divider(height: 22),
-            _gradientHeader("Observation"),
-            const SizedBox(height: 6),
+            Text(test.procedure, style: const TextStyle(fontSize: 14)),
+            const Divider(height: 24),
+            _buildGradientHeader('Observation'),
+            const SizedBox(height: 8),
             Text(
               test.observation,
+              textAlign: TextAlign.start,
               style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
                 color: primaryBlue,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
             ),
           ],
@@ -114,40 +138,10 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
     );
   }
 
-  Widget _buildOption(String text) {
-    final bool selected = selectedOption == text;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: InkWell(
-        onTap: () => setState(() => selectedOption = text),
-        borderRadius: BorderRadius.circular(8),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: selected ? accentTeal : Colors.grey.shade300,
-              width: 1.5,
-            ),
-          ),
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              color: selected ? accentTeal : Colors.black,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ---------------- Build ----------------
   @override
   Widget build(BuildContext context) {
+    final test = _test;
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -157,72 +151,117 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: primaryBlue),
           onPressed: () {
-            // Updated to go back to Intro Page and clear the stack
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), 
+              MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()),
               (route) => false,
             );
           },
         ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
           child: const Text(
             'Salt C : Wet Test',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-              .animate(_fadeSlide),
+          position:
+              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+                  .animate(_fadeSlide),
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  _test.title,
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineSmall
-                      ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold),
-                ),
+                Text(test.title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                _buildTestCard(_test),
-                const SizedBox(height: 16),
-                _gradientHeader('Select the correct inference:'),
-                const SizedBox(height: 10),
-                ..._test.options.map(_buildOption).toList(),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      _buildTestCard(test),
+                      const SizedBox(height: 24),
+                      _buildGradientHeader('Select the correct inference:'),
+                      const SizedBox(height: 10),
+                      ...test.options.map((opt) {
+                        final selectedHere = _selectedOption == opt;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: InkWell(
+                            onTap: () async {
+                              await _onOptionSelected(test, opt);
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: selectedHere
+                                    ? accentTeal.withOpacity(0.1)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.grey.shade300,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Text(
+                                opt,
+                                style: TextStyle(
+                                  fontWeight: selectedHere
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _prev,
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Previous'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _selectedOption != null ? _next : null,
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text('Next'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TextButton.icon(
-              onPressed: _prev, // Standard back button to previous step
-              icon: const Icon(Icons.arrow_back),
-              label: const Text('Previous'),
-            ),
-            ElevatedButton.icon(
-              onPressed: selectedOption != null ? _next : null,
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text('Next'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: selectedOption != null ? primaryBlue : Colors.grey.shade400,
-                foregroundColor: Colors.white,
-                shape: const StadiumBorder(),
-              ),
-            ),
-          ],
         ),
       ),
     );

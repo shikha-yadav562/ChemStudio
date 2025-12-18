@@ -1,6 +1,6 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3detection.dart
 import 'package:ChemStudio/DB/database_helper.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4_detection.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group0/group0analysis.dart';
  // DatabaseHelper, WetTestItem, etc.
@@ -98,7 +98,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
       await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => const WetTestCPage1(), 
+          builder: (_) => const Group4DetectionScreen(), 
         ),
       );
     }

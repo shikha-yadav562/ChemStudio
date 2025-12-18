@@ -1,51 +1,40 @@
+// group6_analysis.dart - CORRECTED VERSION (Only Mg²⁺)
 import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_6/group6_ct_MG.dart';
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // For DatabaseHelper, WetTestItem, etc.
-import 'group6_ct_MG.dart'; // Next confirmation/test page for Group VI
-import '../c_intro.dart'; 
+import '../group0/group0analysis.dart';
+import '../c_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// Extension to safely get first element or null
-extension IterableExtension<T> on Iterable<T> {
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
-}
-
-class Group6Analysis extends StatefulWidget {
-  const Group6Analysis({super.key});
+class Group6AnalysisScreen extends StatefulWidget {
+  const Group6AnalysisScreen({super.key});
 
   @override
-  State<Group6Analysis> createState() => _Group6AnalysisState();
+  State<Group6AnalysisScreen> createState() => _Group6AnalysisScreenState();
 }
 
-class _Group6AnalysisState extends State<Group6Analysis>
+class _Group6AnalysisScreenState extends State<Group6AnalysisScreen>
     with SingleTickerProviderStateMixin {
-  
-  final int _index = 0; 
-  String? _selectedOption; 
-  
+  final int _index = 0;
+  String? _selectedOption;
+
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltC_WetTest';
 
-  // Content for Wet Test - Group VI Analysis
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 11, // Sequential ID for Group VI Analysis
+      id: 13, // ✅ Same ID as detection
       title: 'Analysis of Group VI',
       procedure: 'Group VI white ppt + dil. HCl',
       observation: 'Clear solution is obtained',
-      options: ['Mg²⁺ present'],
-      correct: 'no correct answer ',
+      options: ['Mg²⁺ present'], // ✅ Only Mg²⁺ option
+      correct: 'Mg²⁺ present',
     ),
   ];
 
@@ -56,31 +45,44 @@ class _Group6AnalysisState extends State<Group6Analysis>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide =
-        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _loadSavedAnswers();
     _animController.forward();
   }
 
   Future<void> _loadSavedAnswers() async {
     final data = await _dbHelper.getAnswers(_tableName);
+
+    final testId = _tests[_index].id;
+    String? savedAnswer;
+
+    for (final row in data) {
+      if (row['question_id'] == testId) {
+        savedAnswer = row['student_answer'] as String?;
+        break;
+      }
+    }
+
     setState(() {
-      final testId = _tests[_index].id;
-      final savedAnswer = data.firstWhereOrNull(
-          (row) => row['question_id'] == testId)?['answer'];
       _selectedOption = savedAnswer;
     });
   }
 
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveStudentAnswer(_tableName, id, answer);
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() => _selectedOption = selected);
+
+    // ✅ ONLY save student answer - nothing else!
+    await _dbHelper.saveStudentAnswer(_tableName, test.id, selected);
   }
 
-  void _next() async {
+  void _next() {
+    if (_selectedOption == null) return;
+
+    // Only one option - go to Mg CT screen
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const group6_ct_MG(), // Next page for Mg²⁺ confirmation
+        builder: (_) => const Group6CTMgScreen(),
       ),
     );
   }
@@ -100,7 +102,7 @@ class _Group6AnalysisState extends State<Group6Analysis>
   @override
   Widget build(BuildContext context) {
     final test = _tests[_index];
-    
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -162,7 +164,7 @@ class _Group6AnalysisState extends State<Group6Analysis>
                           child: InkWell(
                             onTap: () async {
                               setState(() => _selectedOption = opt);
-                              await _saveAnswer(test.id, opt);
+                              await _onOptionSelected(test, opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
@@ -261,7 +263,7 @@ class _Group6AnalysisState extends State<Group6Analysis>
             Text(
               test.observation,
               textAlign: TextAlign.start,
-              style: const TextStyle(
+              style: TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,

@@ -19,7 +19,11 @@ const Map<int, GroupStatus> wetTestGroups = {
   1: GroupStatus.absent,
   2: GroupStatus.absent,
   3: GroupStatus.present,
+  4: GroupStatus.absent,   
+  5: GroupStatus.present,  
+  6: GroupStatus.absent, 
 };
+
 
 // -------------------- Confirmatory Test Answers --------------------
 const Map<String, ConfirmatoryTest> wetTestCTAnswers = {
@@ -58,8 +62,6 @@ const Map<String, ConfirmatoryTest> wetTestCTAnswers = {
     observation: "White gelatinous ppt (Soluble in excess NaOH)",
     correctOption: "Al³⁺ confirmed",
   ),
-  // TODO: Add these when Groups 4-6 are implemented:
-  /*
   "Ni2+": ConfirmatoryTest(
     ion: "Ni2+",
     observation: "Light green ppt",
@@ -100,5 +102,4 @@ const Map<String, ConfirmatoryTest> wetTestCTAnswers = {
     observation: "No rose red ppt with titan yellow",
     correctOption: "Mg²⁺ confirmed",
   ),
-  */
 };
