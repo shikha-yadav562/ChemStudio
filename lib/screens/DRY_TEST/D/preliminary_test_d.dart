@@ -22,6 +22,10 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
   void initState() {
     super.initState();
     _index = widget.startIndex;
+     // Save correct answers in DB for comparison
+  for (var test in _tests) {
+    _dbHelper.saveCorrectAnswer('SaltA_PreliminaryTest', test.id, test.correct);
+  }
   }
 
   final List<TestItem> _tests = [
@@ -41,18 +45,21 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     ),
   ];
 
-  Future<void> _next() async {
-    if (_index < _tests.length - 1) {
-      setState(() => _index++);
-    } else {
-      // Save all preliminary answers before moving
-      for (var entry in _answers.entries) {
-        await _dbHelper.saveAnswer(
-          'SaltD_PreliminaryTest',
-          entry.key,
-          entry.value,
-        );
-      }
+ Future<void> _next() async {
+  if (_index < _tests.length - 1) {
+    setState(() => _index++);
+  } else {
+    // Save all preliminary answers and correct answers before moving
+    for (var test in _tests) {
+      final selectedAnswer = _answers[test.id] ?? '';
+      await _dbHelper.saveStudentAnswer(
+        'SaltD_PreliminaryTest',
+        test.id,
+        selectedAnswer,
+      );
+      
+    }
+
 
       Navigator.pushReplacement(
         context,
@@ -131,7 +138,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                       child: InkWell(
                         onTap: () async {
                           setState(() => _answers[test.id] = opt);
-                          await _dbHelper.saveAnswer(
+                          await _dbHelper.saveStudentAnswer(
                             'SaltD_PreliminaryTest',
                             test.id,
                             opt,

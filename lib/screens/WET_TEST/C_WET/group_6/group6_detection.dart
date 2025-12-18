@@ -1,3 +1,4 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../group_6/group6_analysis.dart';
 import '../c_intro.dart';
@@ -75,7 +76,7 @@ class _Group6DetectionState extends State<Group6Detection>
   }
 
   Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+    await _dbHelper.saveStudentAnswer(_tableName, id, answer);
   }
 
   void _next() async {

@@ -1,113 +1,118 @@
 // E:\flutter chemistry\wet\wet\lib\C\group2\group2analysis.dart
 
+import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/WetTestCFinalResultScreen.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/wet_test_answers.dart' hide GroupStatus;
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
-// Import the next screen: Confirmation Test for Cu2+
+import '../group0/group0analysis.dart'; // WetTestItem, DatabaseHelper
 import 'group2ct_cu2plus.dart'; 
-import 'group2ct_as3plus.dart' hide IterableExtension;
+import 'group2ct_as3plus.dart';
 import '../c_intro.dart';
-
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class WetTestCGroupTwoAnalysisScreen extends StatefulWidget {
-    const WetTestCGroupTwoAnalysisScreen({super.key});
+  const WetTestCGroupTwoAnalysisScreen({super.key});
 
-    @override
-    State<WetTestCGroupTwoAnalysisScreen> createState() => 
-        _WetTestCGroupTwoAnalysisScreenState();
+  @override
+  State<WetTestCGroupTwoAnalysisScreen> createState() =>
+      _WetTestCGroupTwoAnalysisScreenState();
 }
-class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysisScreen>
+
+class _WetTestCGroupTwoAnalysisScreenState
+    extends State<WetTestCGroupTwoAnalysisScreen>
     with SingleTickerProviderStateMixin {
-    
-    final int _index = 0; 
-    String? _selectedOption; 
-    
-    late final AnimationController _animController;
-    late final Animation<double> _fadeSlide;
+  final int _index = 0;
+  String? _selectedOption;
 
-    final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+  late final AnimationController _animController;
+  late final Animation<double> _fadeSlide;
 
-    // *** CORRECTED: This is the content for ANALYSIS ***
-    late final List<WetTestItem> _tests = [
-        WetTestItem(
-            id: 6, // Sequential ID
-            title: 'Analysis of Group II',
-            procedure: 'O.S + dil. HCL + H₂S gas or water',
-            observation: 'No Black ppt',
-            options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
-            correct: 'Cu²⁺ may be present', 
+  final _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltC_WetTest';
+
+  late final List<WetTestItem> _tests = [
+    WetTestItem(
+      id: 6, // Sequential ID
+      title: 'Analysis of Group II',
+      procedure: 'O.S + dil. HCL + H₂S gas or water',
+      observation: 'Black ppt',
+      options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
+      correct: 'Cu²⁺ may be present',
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _loadSavedAnswers();
+    _animController.forward();
+  }
+
+  Future<void> _loadSavedAnswers() async {
+    // Load saved answers for persistence across sessions
+    final data = await _dbHelper.getAnswers(_tableName);
+
+    final testId = _tests[_index].id;
+    String? savedAnswer;
+
+    for (final row in data) {
+      if (row['question_id'] == testId) {
+        savedAnswer = row['student_answer'] as String?;
+        break;
+      }
+    }
+
+    setState(() {
+      _selectedOption = savedAnswer;
+    });
+  }
+
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() => _selectedOption = selected);
+
+    // ✅ ONLY save student answer - nothing else!
+    await _dbHelper.saveStudentAnswer(_tableName, test.id, selected);
+}
+  void _next() {
+    if (_selectedOption == null) return;
+
+    if (_selectedOption == 'Cu²⁺ may be present') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestCGroupTwoCTCuScreen(),
         ),
-    ];
-
-    @override
-    void initState() {
-        super.initState();
-        _animController = AnimationController(
-            vsync: this,
-            duration: const Duration(milliseconds: 450),
-        );
-        _fadeSlide =
-            CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-        _loadSavedAnswers();
-        _animController.forward();
+      );
+    } else if (_selectedOption == 'As³⁺ may be present') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestCGroupTwoCTAsScreen(),
+        ),
+      );
     }
-
-    Future<void> _loadSavedAnswers() async {
-        final data = await _dbHelper.getAnswers(_tableName);
-        setState(() {
-            final testId = _tests[_index].id;
-            // Assuming firstWhereOrNull is available (e.g., from group0analysis.dart or globally)
-            final savedAnswer = data.firstWhereOrNull( 
-                (row) => row['question_id'] == testId)?['answer'];
-            _selectedOption = savedAnswer;
-        });
+  }
+void _prev() {
+    // Navigate back to the Group II Detection screen (WetTestCGroupOneDetectionScreen)
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
     }
+  }
 
-    Future<void> _saveAnswer(int id, String answer) async {
-        await _dbHelper.saveAnswer(_tableName, id, answer);
-    }
-
-void _next() async {
-        if (_selectedOption == 'Cu²⁺ may be present') {
-            // Navigate to Copper Confirmation Test
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupTwoCTCuScreen(), 
-                ),
-            );
-        } else if (_selectedOption == 'As³⁺ may be present') {
-            // Navigate to Arsenic Confirmation Test
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    // Navigate to the correct screen for As³⁺ confirmation
-                    builder: (_) => const WetTestCGroupTwoCTAsScreen(), 
-                ),
-            );
-        } else {
-            // Optional: Handle case where no option is selected, though the button should be disabled.
-            // If the button is enabled without selection, we can show a prompt.
-        }
-    }
-    
-    void _prev() {
-        // Navigate back to the Group II Detection screen
-        if (Navigator.canPop(context)) {
-            Navigator.pop(context);
-        }
-    }
-
-    @override
-    void dispose() {
-        _animController.dispose();
-        super.dispose();
-    }
-
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
     @override
     Widget build(BuildContext context) {
         final test = _tests[_index];
@@ -173,9 +178,10 @@ void _next() async {
                                                     padding: const EdgeInsets.symmetric(vertical: 4),
                                                     child: InkWell(
                                                         onTap: () async {
-                                                            setState(() => _selectedOption = opt);
-                                                            await _saveAnswer(test.id, opt);
-                                                        },
+        setState(() => _selectedOption = opt);
+        // ✅ Call the proper function
+        await _onOptionSelected(test, opt);
+      },
                                                         borderRadius: BorderRadius.circular(8),
                                                         child: AnimatedContainer(
                                                             duration: const Duration(milliseconds: 200),

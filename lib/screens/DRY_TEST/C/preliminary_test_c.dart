@@ -22,6 +22,10 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
   void initState() {
     super.initState();
     _index = widget.startIndex;
+     // Save correct answers in DB for comparison
+  for (var test in _tests) {
+    _dbHelper.saveCorrectAnswer('SaltC_PreliminaryTest', test.id, test.correct);
+  }
   }
 
   final List<TestItem> _tests = [
@@ -29,8 +33,14 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
       id: 1,
       title: "1. Preliminary Test – Colour",
       observation: "Dark Brown",
-      options: ["Fe³⁺", "Cu²⁺", "Mn²⁺", "Co²⁺"],
-      correct: "Fe³⁺",
+     options: [
+     "Fe³⁺ may be present",
+     "Cu²⁺ may be present",
+     "Mn²⁺ may be present",
+     "Co²⁺ may be present",
+],
+correct: "Fe³⁺ may be present",
+
     ),
     TestItem(
       id: 2,
@@ -125,13 +135,19 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
                         onTap: () async {
-                          setState(() => _answers[test.id] = opt);
-                          await _dbHelper.saveAnswer(
-                            'SaltC_PreliminaryTest',
-                            test.id,
-                            opt,
-                          );
-                        },
+  setState(() => _answers[test.id] = opt);
+
+  // Save student answer
+  await _dbHelper.saveStudentAnswer(
+    'SaltC_PreliminaryTest',
+    test.id,
+    opt,
+  );
+
+  // Save correct answer
+ 
+},
+
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),

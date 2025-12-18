@@ -1,3 +1,5 @@
+import 'package:ChemStudio/DB/database_helper.dart';
+
 import '../group_6/group6_detection.dart'; // Real Group 6 file
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group0/group0analysis.dart';
@@ -67,7 +69,7 @@ class _saltD_Group5DetectionScreenState extends State<saltD_Group5DetectionScree
   }
 
   Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+    await _dbHelper.saveStudentAnswer(_tableName, id, answer);
   }
 
   // *** Corrected Navigation Logic ***

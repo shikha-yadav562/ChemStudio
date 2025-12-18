@@ -1,3 +1,4 @@
+import 'package:ChemStudio/screens/WET_TEST/C_WET/correct_answers.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../../welcome_screen.dart';
@@ -22,7 +23,7 @@ class _DryTestBScreenState extends State<DryTestBScreen>
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
   late final List<TestItem> _tests = _generateTests();
-  final _dbHelper = DatabaseHelper.instance;
+  final dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltB_DryTest';
 
   @override
@@ -33,21 +34,29 @@ class _DryTestBScreenState extends State<DryTestBScreen>
       duration: const Duration(milliseconds: 450),
     );
     _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-    _loadSavedAnswers();
     _animController.forward();
+    _loadSavedAnswers();
+    
+    // Save correct answers for Dry Test
+  for (var test in _tests) {
+    dbHelper.saveCorrectAnswer('SaltA_DryTest', test.id, test.correct);
   }
 
-  Future<void> _loadSavedAnswers() async {
-    final data = await _dbHelper.getAnswers(_tableName);
+    // ✅ Print preliminary data when screen opens
+    print("🧪 Preliminary Answers Received: ${widget.preliminaryAnswers}");
+  }
+
+    Future<void> _loadSavedAnswers() async {
+  final data = await dbHelper.getAnswers(_tableName);
+  if (data.isNotEmpty) {
     setState(() {
       for (var row in data) {
-        _answers[row['question_id']] = row['answer'];
+        if (row['student_answer'] != null) {
+          _answers[row['question_id']] = row['student_answer'];
+        }
       }
     });
   }
-
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
   static List<TestItem> _generateTests() {
@@ -73,19 +82,26 @@ class _DryTestBScreenState extends State<DryTestBScreen>
         title: '3. Flame Test',
         procedure: 'Dip a clean wire in salt + HCl and place in oxidising flame.',
         observation: 'Bluish White Flame observed',
-        options: ['Ca2+ may be present', 'Ba2+ may be present', 'Cu2+ may be present', 'Fe3+ may be present'],
-        correct: 'Fe3+ may be present',
+        options: ['Ca2+ may be present', 'Ba2+ may be present', 'Cu2+ may be present', 'Pb2+ may be present'],
+        correct: 'Pb2+ may be present',
       ),
     ];
   }
 
-  void _next() {
+  
+ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
+  await dbHelper.saveStudentAnswer(_tableName, test.id, selectedAnswer);
+  await dbHelper.saveCorrectAnswer(_tableName, test.id, test.correct);
+}
+
+  void _next() async{
     if (_index < _tests.length - 1) {
       setState(() {
         _index++;
         _animController.forward(from: 0);
       });
     } else {
+      await Future.delayed(const Duration(milliseconds: 200));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -183,7 +199,7 @@ class _DryTestBScreenState extends State<DryTestBScreen>
                           child: InkWell(
                             onTap: () async {
                               setState(() => _answers[test.id] = opt);
-                              await _saveAnswer(test.id, opt);
+                              await _saveAnswer(test, opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
@@ -413,7 +429,7 @@ class _DryTestBScreenState extends State<DryTestBScreen>
 
 // ------------------------ RESULT SCREEN ------------------------
 
-class SaltBResultScreen extends StatelessWidget {
+class SaltBResultScreen extends StatefulWidget {
   final Map<int, String> userAnswers;
   final List<TestItem> tests;
   final Map<int, String> preliminaryAnswers;
@@ -424,7 +440,32 @@ class SaltBResultScreen extends StatelessWidget {
     required this.tests,
     required this.preliminaryAnswers,
   });
+    @override
+  State<SaltBResultScreen> createState() => _SaltBResultScreenState();
+}
 
+class _SaltBResultScreenState extends State<SaltBResultScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _fadeCtrl;
+
+Map<int, String> dryCorrect = {};
+Map<int, String> prelimCorrect = {};
+
+@override
+void initState() {
+  super.initState();
+  _fadeCtrl = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 500),
+  );
+  _fadeCtrl.forward();
+
+  dryCorrect = correctAnswers['SaltB_DryTest'] ?? {};
+  prelimCorrect = correctAnswers['SaltB_PreliminaryTest'] ?? {};
+}
+
+
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -434,77 +475,47 @@ class SaltBResultScreen extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         title: ShaderMask(
-          shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          shaderCallback: (bounds) => const LinearGradient(
+            colors: [accentTeal, primaryBlue],
+          ).createShader(bounds),
           child: const Text(
-            'Salt B : Test Summary',
+            'Salt B: Test Summary',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text('Dry Test Answers:',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView(
-                children: [
-                  ...tests.map((test) {
-                    final ans = userAnswers[test.id] ?? 'No answer selected';
-                    return Container(
-                      margin: const EdgeInsets.symmetric(vertical: 10),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                            colors: [accentTeal, primaryBlue],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Container(
-                        margin: const EdgeInsets.all(2.5),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: ListTile(
-                          leading: const Icon(Icons.assignment_turned_in_rounded,
-                              color: accentTeal, size: 28),
-                          title: Text(test.title,
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600, fontSize: 16)),
-                          subtitle: Padding(
-                            padding: const EdgeInsets.only(top: 6),
-                            child: Text(ans,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: primaryBlue)),
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  const SizedBox(height: 16),
-                  const Text('Preliminary Test Answers:',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 12),
-                  if (preliminaryAnswers.isEmpty)
-                    const Text('No preliminary test data found.',
-                        style: TextStyle(color: Colors.grey, fontSize: 16))
-                  else
-                    ...preliminaryAnswers.entries.map((entry) {
+      body: FadeTransition(
+        opacity: _fadeCtrl,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Dry Test Answers:',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+
+              // ---------- Dry Test Answers ----------
+              Expanded(
+                child: ListView(
+                  children: [
+                    ...widget.tests.map((test) {
+                      final ans =
+                          widget.userAnswers[test.id] ?? 'No answer selected';
                       return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        margin: const EdgeInsets.symmetric(vertical: 10),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                              colors: [accentTeal, primaryBlue],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight),
+                            colors: [accentTeal, primaryBlue],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           borderRadius: BorderRadius.circular(16),
                         ),
                         child: Container(
@@ -512,130 +523,219 @@ class SaltBResultScreen extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
                           ),
                           child: ListTile(
-                            leading: const Icon(Icons.science_rounded,
-                                color: accentTeal, size: 28),
-                            title: Text('Preliminary Test Q${entry.key}',
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600, fontSize: 16)),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
+                            leading: const Icon(
+                              Icons.assignment_turned_in_rounded,
+                              color: accentTeal,
+                              size: 28,
+                            ),
+                            title: Text(
+                              test.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
                             subtitle: Padding(
                               padding: const EdgeInsets.only(top: 6),
-                              child: Text(entry.value,
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 15,
-                                      color: primaryBlue)),
+                              child: Text(
+                                ans,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: primaryBlue,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       );
-                    }).toList(),
+                    }),
 
-                  const SizedBox(height: 20),
+                    const SizedBox(height: 30),
 
-                  // -------- BUTTON GRID --------
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => DryTestBScreen(
-                                    preliminaryAnswers: preliminaryAnswers,
+                    // ---------- Preliminary Test Answers ----------
+                    const Text(
+                      'Preliminary Test Answers:',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    if (widget.preliminaryAnswers.isEmpty)
+                      const Text(
+                        'No preliminary test data found.',
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      )
+                    else
+                      ...widget.preliminaryAnswers.entries.map((entry) {
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [accentTeal, primaryBlue],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Container(
+                            margin: const EdgeInsets.all(2.5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                              leading: const Icon(
+                                Icons.science_rounded,
+                                color: accentTeal,
+                                size: 28,
+                              ),
+                              title: Text(
+                                'Preliminary Test Q${entry.key}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  entry.value,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: primaryBlue,
                                   ),
                                 ),
-                              );
-                            },
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
-                            label: const Text(
-                              "Previous",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30)),
-                              backgroundColor: primaryBlue,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const WetTestIntroCScreen(),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.science, color: Colors.white),
-                            label: const Text(
-                              "Start Analysis",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30)),
-                              backgroundColor: primaryBlue,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const WelcomeScreen()),
-                              );
-                            },
-                            icon: const Icon(Icons.home, color: Colors.white),
-                            label: const Text(
-                              "Home",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30)),
-                              backgroundColor: primaryBlue,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+                        );
+                      }),
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+
+             Row(
+  children: [
+    // 🔙 PREVIOUS
+    Expanded(
+      child: SizedBox(
+        height: 50,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => DryTestBScreen(
+                  preliminaryAnswers: widget.preliminaryAnswers,
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.arrow_back),
+          label: const Text(
+            "Previous",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.grey[700],
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ),
+    ),
+
+    const SizedBox(width: 12),
+
+    // 🧪 START ANALYSIS
+    Expanded(
+      child: SizedBox(
+        height: 50,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const WetTestIntroCScreen(),
+              ),
+            );
+          },
+          icon: const Icon(Icons.science_rounded),
+          label: const Text(
+            "Start Analysis",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: accentTeal,
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ),
+    ),
+
+    const SizedBox(width: 12),
+
+    // 🏠 HOME
+    Expanded(
+      child: SizedBox(
+        height: 50,
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+            );
+          },
+          icon: const Icon(Icons.home_rounded),
+          label: const Text(
+            "Home",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryBlue,
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ),
+    ),
+  ],
+)
+
+            ],
+          ),
         ),
       ),
     );
   }
-}
-
-// ------------------------ MODELS ------------------------
+}// ------------------------ MODELS ------------------------
 
 class TestItem {
   final int id;

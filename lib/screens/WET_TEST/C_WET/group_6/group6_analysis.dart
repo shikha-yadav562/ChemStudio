@@ -1,3 +1,4 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // For DatabaseHelper, WetTestItem, etc.
 import 'group6_ct_MG.dart'; // Next confirmation/test page for Group VI
@@ -72,7 +73,7 @@ class _Group6AnalysisState extends State<Group6Analysis>
   }
 
   Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+    await _dbHelper.saveStudentAnswer(_tableName, id, answer);
   }
 
   void _next() async {
