@@ -8,6 +8,9 @@ import 'screens/splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+   // 🔴 TEMPORARY – RUN ONCE
+  //await DatabaseHelper.instance.resetDatabase();
+
   // ✅ Use FFI only for desktop (Windows/Linux/Mac)
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
@@ -15,7 +18,7 @@ void main() async {
   }
 
   // ✅ Initialize database before app runs
-  await DatabaseHelper.instance.database;
+ await DatabaseHelper.instance.database;
 
   // ⚠️ Optional: Uncomment below to clear all data every time app starts
   // await DatabaseHelper.instance.clearAllAnswers();

@@ -1,314 +1,299 @@
 // E:\flutter chemistry\wet\wet\lib\C\group2\group2detection.dart
 
-import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; 
-import 'group2analysis.dart'; // Target for successful detection (Group II present)
-// FIX: Removed the incorrect 'hide IterableExtension' combinator.
-// This resolves both the 'WetTestCGroupThreeDetectionScreen isn't a class'
-// and the 'library doesn't export a member with the hidden name' errors.
-import '../group3/group3detection.dart'; 
+import 'package:ChemStudio/DB/database_helper.dart';
+import '../group0/group0analysis.dart';
+import 'group2analysis.dart'; // ✅ FIXED: Import correct analysis screen
+import '../group3/group3detection.dart';
 import '../c_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// Re-defining for local usage (safest way to ensure availability)
-extension IterableExtension<T> on Iterable<T> {
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
-}
-
 class WetTestCGroupTwoDetectionScreen extends StatefulWidget {
-    const WetTestCGroupTwoDetectionScreen({super.key});
+  const WetTestCGroupTwoDetectionScreen({super.key});
 
-    @override
-    State<WetTestCGroupTwoDetectionScreen> createState() =>
-        _WetTestCGroupTwoDetectionScreenState();
+  @override
+  State<WetTestCGroupTwoDetectionScreen> createState() =>
+      _WetTestCGroupTwoDetectionScreenState();
 }
 
-class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetectionScreen>
+class _WetTestCGroupTwoDetectionScreenState
+    extends State<WetTestCGroupTwoDetectionScreen>
     with SingleTickerProviderStateMixin {
-    int _index = 0; 
-    String? _selectedOption; 
-    late final AnimationController _animController;
-    late final Animation<double> _fadeSlide;
 
-    final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+  int _index = 0;
+  String? _selectedOption;
 
-    // Content for Group II Detection
-    late final List<WetTestItem> _tests = [
-        WetTestItem(
-            id: 4, 
-            title: 'Group II Detection',
-            procedure: 'O.S + Dil. HCl + H₂S gas or water',
-            observation: 'No Black ppt', 
-            options: ['Group-II is present', 'Group-II is absent'],
-            correct: 'Group-II is present',
-        ),
-    ];
+  late final AnimationController _animController;
+  late final Animation<double> _fadeSlide;
 
-    @override
-    void initState() {
-        super.initState();
-        _animController = AnimationController(
-            vsync: this,
-            duration: const Duration(milliseconds: 450),
-        );
-        _fadeSlide =
-            CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-        _loadSavedAnswers();
-        _animController.forward();
-    }
+  final _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltC_WetTest';
 
-Future<void> _loadSavedAnswers() async {
-        final data = await _dbHelper.getAnswers(_tableName);
-        setState(() {
-            final testId = _tests[_index].id;
-            
-            // --- FIX: USE EXTENSION OVERRIDE HERE ---
-            final savedAnswer = IterableExtension(data).firstWhereOrNull( 
-                (row) => row['question_id'] == testId)?['student_answer']as String?;
-            // ----------------------------------------
-            
-            _selectedOption = savedAnswer;
-        });
-    }
-    Future<void> _saveAnswer(int id, String answer) async {
-  // Save student answer
-  await _dbHelper.saveStudentAnswer(_tableName, id, answer);
+  late final List<WetTestItem> _tests = [
+    WetTestItem(
+      id: 6, // ✅ FIXED: Changed from 4 to 6 (correct sequential ID)
+      title: 'Group II Detection',
+      procedure: 'O.S + Dil. HCl + H₂S gas / water',
+      observation: 'No black ppt',
+      options: ['Group-II is present', 'Group-II is absent'],
+      correct: 'Group-II is absent',
+    ),
+  ];
 
-  // Save correct answer from the test object
-  final correctAnswer = _tests[_index].correct;
-  await _dbHelper.saveCorrectAnswer(_tableName, id, correctAnswer);
-}
+  @override
+  void initState() {
+    super.initState();
 
-
-    // Navigate forward (NEXT)
-    void _next() async {
-  if (_selectedOption == 'Group-II is present') {
-    await _dbHelper.markGroupPresent(2);
-
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WetTestCGroupTwoAnalysisScreen(),
-      ),
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
     );
-  } else {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WetTestCGroupThreeDetectionScreen(),
+
+    _fadeSlide =
+        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+
+    _loadSavedAnswer();
+    _animController.forward();
+  }
+
+  Future<void> _loadSavedAnswer() async {
+    final saved =
+        await _dbHelper.getStudentAnswer(_tableName, _tests[_index].id);
+    if (saved != null) {
+      setState(() {
+        _selectedOption = saved;
+      });
+    }
+  }
+
+  /// Save ONLY detection answer
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() => _selectedOption = selected);
+
+    await _dbHelper.saveStudentAnswer(
+      _tableName,
+      test.id,
+      selected,
+    );
+  }
+
+  /// ✅ FIXED: Navigation corrected
+  void _next() {
+    if (_selectedOption == 'Group-II is present') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestCGroupTwoAnalysisScreen(), // ✅ FIXED: Was GroupThreeAnalysis
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestCGroupThreeDetectionScreen(),
+        ),
+      );
+    }
+  }
+
+  void _prev() {
+    Navigator.pop(context, _selectedOption);
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final test = _tests[_index];
+
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 2,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()),
+              (route) => false,
+            );
+          },
+        ),
+        title: ShaderMask(
+          shaderCallback: (bounds) =>
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
+          child: const Text(
+            'Salt C : Wet Test',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
+          ),
+        ),
+      ),
+      body: FadeTransition(
+        opacity: _fadeSlide,
+        child: SlideTransition(
+          position:
+              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+                  .animate(_fadeSlide),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(test.title,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      _buildTestCard(test),
+                      const SizedBox(height: 24),
+                      _buildInferenceHeader(),
+                      const SizedBox(height: 10),
+                      ...test.options.map((opt) {
+                        final selectedHere = _selectedOption == opt;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: InkWell(
+                            onTap: () async {
+                              await _onOptionSelected(test, opt);
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: selectedHere
+                                    ? accentTeal.withOpacity(0.1)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.grey.shade300,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Text(
+                                opt,
+                                style: TextStyle(
+                                  fontWeight: selectedHere
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _prev,
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Previous'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _selectedOption != null ? _next : null,
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text('Next'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
-}
 
-    void _prev() {
-        Navigator.pop(context, _selectedOption);
-    }
+  Widget _buildInferenceHeader() {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
+      child: const Text(
+        'Select the correct inference:',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
 
-    @override
-    void dispose() {
-        _animController.dispose();
-        super.dispose();
-    }
-
-    @override
-    Widget build(BuildContext context) {
-        final test = _tests[_index];
-
-        return Scaffold(
-            backgroundColor: Colors.grey[50],
-            appBar: AppBar(
-                backgroundColor: Colors.white,
-                elevation: 2,
-                centerTitle: true,
-                leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: primaryBlue),
-    onPressed: () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
-        (route) => false, // This clears the navigation stack
-      );
-    },
-  ),
-                title: ShaderMask(
-                    shaderCallback: (bounds) =>
-                        const LinearGradient(colors: [accentTeal, primaryBlue])
-                            .createShader(bounds),
-                    child: const Text(
-                        'Salt C : Wet Test',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 22,
-                        ),
-                    ),
-                ),
+  Widget _buildTestCard(WetTestItem test) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _gradientHeader('Test'),
+            const SizedBox(height: 4),
+            Text(test.procedure, style: const TextStyle(fontSize: 14)),
+            const Divider(height: 24),
+            _gradientHeader('Observation'),
+            const SizedBox(height: 8),
+            Text(
+              test.observation,
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
-            body: FadeTransition(
-                opacity: _fadeSlide,
-                child: SlideTransition(
-                    position:
-                        Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-                            .animate(_fadeSlide),
-                    child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                                Text(test.title,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .headlineSmall
-                                        ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 12),
-                                Expanded(
-                                    child: ListView(
-                                        children: [
-                                            _buildTestCard(test), // Card with Test and Observation
-                                            const SizedBox(height: 24),
-                                            _buildInferenceHeader(),
-                                            const SizedBox(height: 10),
-                                            // Options
-                                            ...test.options.map((opt) {
-                                                final selectedHere = _selectedOption == opt;
-                                                return Padding(
-                                                    padding: const EdgeInsets.symmetric(vertical: 4),
-                                                    child: InkWell(
-                                                        onTap: () async {
-                                                            setState(() => _selectedOption = opt);
-                                                            await _saveAnswer(test.id, opt);
-                                                        },
-                                                        borderRadius: BorderRadius.circular(8),
-                                                        child: AnimatedContainer(
-                                                            duration: const Duration(milliseconds: 200),
-                                                            padding: const EdgeInsets.all(12),
-                                                            decoration: BoxDecoration(
-                                                                color: selectedHere
-                                                                    ? accentTeal.withOpacity(0.1)
-                                                                    : Colors.white,
-                                                                borderRadius: BorderRadius.circular(8),
-                                                                border: Border.all(
-                                                                    color: selectedHere
-                                                                        ? accentTeal
-                                                                        : Colors.grey.shade300,
-                                                                    width: 1.5,
-                                                                ),
-                                                            ),
-                                                            child: Text(
-                                                                opt,
-                                                                style: TextStyle(
-                                                                    fontWeight: selectedHere
-                                                                        ? FontWeight.bold
-                                                                        : FontWeight.normal,
-                                                                    color: selectedHere
-                                                                        ? accentTeal
-                                                                        : Colors.black87,
-                                                                ),
-                                                            ),
-                                                        ),
-                                                    ),
-                                                );
-                                            }).toList(),
-                                        ],
-                                    ),
-                                ),
-                                // Navigation Buttons (Prev/Next)
-                                Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                        TextButton.icon(
-                                            onPressed: _prev,
-                                            icon: const Icon(Icons.arrow_back),
-                                            label: const Text('Previous'),
-                                        ),
-                                        ElevatedButton.icon(
-                                            onPressed: _selectedOption != null ? _next : null,
-                                            icon: const Icon(Icons.arrow_forward),
-                                            label: const Text('Next'),
-                                            style: ElevatedButton.styleFrom(
-                                                backgroundColor: primaryBlue,
-                                                foregroundColor: Colors.white,
-                                                padding: const EdgeInsets.symmetric(
-                                                    horizontal: 20, vertical: 12),
-                                            ),
-                                        ),
-                                    ],
-                                ),
-                            ],
-                        ),
-                    ),
-                ),
-            ),
-        );
-    }
+          ],
+        ),
+      ),
+    );
+  }
 
-    Widget _buildInferenceHeader() {
-        return ShaderMask(
-            shaderCallback: (bounds) =>
-                const LinearGradient(colors: [accentTeal, primaryBlue])
-                    .createShader(bounds),
-            child: const Text(
-                'Select the correct inference:',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                ),
-            ),
-        );
-    }
-
-    Widget _buildTestCard(WetTestItem test) {
-        return Card(
-            elevation: 4,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                        _gradientHeader('Test'),
-                        const SizedBox(height: 4),
-                        Text(test.procedure, style: const TextStyle(fontSize: 14)),
-                        const Divider(height: 24),
-                        _gradientHeader('Observation'),
-                        const SizedBox(height: 8),
-                        Text(
-                            test.observation,
-                            textAlign: TextAlign.start,
-                            style: TextStyle(
-                                color: primaryBlue,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                            ),
-                        ),
-                    ],
-                ),
-            ),
-        );
-    }
-
-    Widget _gradientHeader(String text) {
-        return ShaderMask(
-            shaderCallback: (bounds) =>
-                const LinearGradient(colors: [accentTeal, primaryBlue])
-                    .createShader(bounds),
-            child: Text(
-                text,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-        );
-    }
+  Widget _gradientHeader(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+    );
+  }
 }

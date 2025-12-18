@@ -3,9 +3,8 @@
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/screens/WET_TEST/A_WET/group0/group0analysis.dart' hide DatabaseHelper;
 import 'package:ChemStudio/screens/WET_TEST/A_WET/group1/group1analysis.dart';
-import 'package:ChemStudio/screens/WET_TEST/A_WET/group1/group1ct_pb2plus.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group1/group1ct_pb2plus.dart';
 import 'package:flutter/material.dart';
-import 'group1ct_pb2plus.dart';
 import '../c_intro.dart'; 
 
 // --- Theme Constants (Must match existing design) ---
@@ -76,34 +75,23 @@ class _WetTestCGroupOneAnalysisScreenState extends State<WetTestCGroupOneAnalysi
     });
   }
 
-  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+Future<void> _onOptionSelected(WetTestItem test, String selected) async {
   setState(() => _selectedOption = selected);
 
-  // 1️⃣ Save student answer
-  await _dbHelper.saveStudentAnswer(
-    _tableName,
-    test.id,
-    selected,
-  );
-
-  // 2️⃣ Save correct answer
-  await _dbHelper.saveCorrectAnswer(
-    _tableName,
-    test.id,
-    test.correct,
-  );
+  // Only save student answer - NO correct answer saving here
+  await _dbHelper.saveStudentAnswer(_tableName, test.id, selected);
 }
 
 
-  void _next() async {
-    // Navigate to the Confirmation Test for the detected ion (Pb²⁺).
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WetTestCGroupOneCTPbScreen(),
-      ),
-    );
-  }
+ void _next() async {
+  // Navigate to the Confirmation Test for the detected ion (Pb²⁺).
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const WetTestCGroupOneCTScreen(), // ✅ CORRECT CLASS NAME
+    ),
+  );
+}
 
   void _prev() {
     // Navigate back to the Group II Detection screen (WetTestCGroupOneDetectionScreen)
