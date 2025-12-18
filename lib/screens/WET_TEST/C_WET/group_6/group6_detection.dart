@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../group_6/group6_analysis.dart';
 import '../c_intro.dart';
+import '../result_c_page.dart';
 import '../group0/group0analysis.dart';
 
 // --- Theme Constants ---
@@ -78,16 +79,22 @@ class _Group6DetectionState extends State<Group6Detection>
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
+// --- UPDATED NAVIGATION LOGIC ---
   void _next() async {
     if (_selectedOption == 'Group-VI present') {
       await Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const Group6Analysis()),
       );
+    } 
+    // Fixed the string check to match 'Group-VI absent' exactly as defined in the list
+    else if (_selectedOption == 'Group-VI absent') {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ResultCScreen()),
+      );
     }
-    // ❌ ABSENT → DO NOTHING (BUTTON IS DISABLED ANYWAY)
   }
-
   void _prev() {
     Navigator.pop(context, _selectedOption);
   }
@@ -221,22 +228,19 @@ class _Group6DetectionState extends State<Group6Detection>
                         label: const Text('Previous'),
                       ),
                       ElevatedButton.icon(
-                        // 🔒 FREEZE BUTTON WHEN ABSENT
-                        onPressed: (_selectedOption == 'Group-VI present')
-                            ? _next
-                            : null,
-                        icon: const Icon(Icons.arrow_forward),
-                        label: const Text('Next'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              (_selectedOption == 'Group-VI present')
-                                  ? primaryBlue
-                                  : Colors.grey.shade400,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                        ),
-                      ),
+  // Enabled if any option is selected
+  onPressed: (_selectedOption != null) ? _next : null,
+  icon: const Icon(Icons.arrow_forward),
+  label: const Text('Next'),
+  style: ElevatedButton.styleFrom(
+    backgroundColor: (_selectedOption != null)
+        ? primaryBlue
+        : Colors.grey.shade400,
+    foregroundColor: Colors.white,
+    padding: const EdgeInsets.symmetric(
+        horizontal: 20, vertical: 12),
+  ),
+),
                     ],
                   ),
                 ],
