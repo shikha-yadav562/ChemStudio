@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../group_5/group5detection_firstanalysis.dart';
+import '../group_5/group5_detection.dart';
 import '../d_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
@@ -106,7 +106,7 @@ class _saltNi2ConfirmedPageState extends State<saltDNi2ConfirmedPage> {
               ? () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const saltDGroupVPage()),
+                    MaterialPageRoute(builder: (_) => const saltD_Group5DetectionScreen()),
                   );
                 }
               : null,

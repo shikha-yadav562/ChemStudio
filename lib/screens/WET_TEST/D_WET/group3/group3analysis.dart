@@ -47,7 +47,7 @@ class _WetTestDGroupThreeAnalysisScreenState extends State<WetTestDGroupThreeAna
         observation: 'reddish-brown ppt',
         // Using plain ASCII for options (Fe3+, Al3+)
         options: ['Fe³⁺ may be present', 'Al³⁺ may be present'],
-        correct: 'Fe³⁺ may be present', // Assumed for initial data saving
+        correct: 'nothing present', // Assumed for initial data saving
     );
 
     @override

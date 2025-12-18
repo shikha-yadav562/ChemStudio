@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import '../group_6/group6detection_analysis.dart';
+import '../group_6/group6_detection.dart';
 import '../d_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltDctCApage extends StatefulWidget {
-  const saltDctCApage({super.key});
+class saltD_ct_CApage extends StatefulWidget {
+  const saltD_ct_CApage({super.key});
 
   @override
-  State<saltDctCApage> createState() => _saltDctCApageState();
+  State<saltD_ct_CApage> createState() => _saltD_ct_CApageState();
 }
 
-class _saltDctCApageState extends State<saltDctCApage> {
+class _saltD_ct_CApageState extends State<saltD_ct_CApage> {
   String? selectedOption;
 
   @override
@@ -189,7 +189,7 @@ class _saltDctCApageState extends State<saltDctCApage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const saltDdetectiongroup6Page()),
+                        builder: (_) => const saltD_Group6Detection()),
                   );
                 }
               : null,

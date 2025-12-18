@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'group5analysis_BA_SR_CA.dart';
-import '../c_intro.dart';
+import '../d_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -33,7 +33,7 @@ class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
     if (selectedOption != null) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const Analysis_BA_SR_CA()),
+        MaterialPageRoute(builder: (_) => const saltD_Analysis_BA_SR_CA()),
       );
     }
   }
@@ -134,7 +134,7 @@ class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
             // FIX: Navigate back to Intro and clear navigation history
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), 
+              MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), 
               (route) => false,
             );
           },
@@ -142,8 +142,8 @@ class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: const Text(
-            'Salt C: Wet Test',
+          child: Text(
+            'Salt D: Wet Test',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),

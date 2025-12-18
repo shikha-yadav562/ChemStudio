@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../group_5/group5detection_firstanalysis.dart';
+import '../group_5/group5_detection.dart';
 import '../d_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
@@ -24,19 +24,28 @@ class _saltDCo2ConfirmedPageState extends State<saltDCo2ConfirmedPage> {
         elevation: 2,
         centerTitle: true,
         leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: primaryBlue),
-    onPressed: () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
-        (route) => false, // This clears the navigation stack
-      );
-    },
-  ),
-        title: Text(
-          'Salt D : Wet Test',
-          style: TextStyle(
-              color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 22),
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const WetTestIntroDScreen()),
+              (route) => false,
+            );
+          },
+        ),
+        title: ShaderMask(
+          shaderCallback: (bounds) => const LinearGradient(
+            colors: [accentTeal, primaryBlue],
+          ).createShader(bounds),
+          child: const Text(
+            'Salt D : Wet Test',
+            style: TextStyle(
+              color: Colors.white, // Required for ShaderMask to show colors
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -100,7 +109,7 @@ class _saltDCo2ConfirmedPageState extends State<saltDCo2ConfirmedPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const saltDGroupVPage(),
+                      builder: (_) => const saltD_Group5DetectionScreen(),
                     ),
                   );
                 }
@@ -136,7 +145,7 @@ class _saltDCo2ConfirmedPageState extends State<saltDCo2ConfirmedPage> {
               "Use this solution for C.T.",
               style: TextStyle(
                 fontSize: 15,
-                fontWeight: FontWeight.bold, // same as observation
+                fontWeight: FontWeight.bold,
                 color: primaryBlue,
               ),
             ),
@@ -163,14 +172,12 @@ class _saltDCo2ConfirmedPageState extends State<saltDCo2ConfirmedPage> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.normal,
-                color: Colors.black, // test content black
+                color: Colors.black,
               ),
             ),
             const Divider(height: 22),
-
             _gradientHeader("Observation"),
             const SizedBox(height: 6),
-
             const Text(
               "Blue colour",
               style: TextStyle(

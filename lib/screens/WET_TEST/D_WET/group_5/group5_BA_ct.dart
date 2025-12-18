@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import '../group_6/group6detection_analysis.dart';
+import '../group_6/group6_detection.dart';
 import '../d_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltDctBApage extends StatefulWidget {
-  const saltDctBApage({super.key});
+class saltD_ct_BApage extends StatefulWidget {
+  const saltD_ct_BApage({super.key});
 
   @override
-  State<saltDctBApage> createState() => _saltDctBApageState();
+  State<saltD_ct_BApage> createState() => _saltD_ct_BApageState();
 }
 
-class _saltDctBApageState extends State<saltDctBApage> {
+class _saltD_ct_BApageState extends State<saltD_ct_BApage> {
   String? selectedOption;
 
   @override
@@ -183,7 +183,7 @@ class _saltDctBApageState extends State<saltDctBApage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const saltDdetectiongroup6Page()));
+                          builder: (_) => const saltD_Group6Detection()));
                 }
               : null,
           style: ElevatedButton.styleFrom(

@@ -7,14 +7,14 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltDWetTestDGroupVPage2 extends StatefulWidget {
-  const saltDWetTestDGroupVPage2({super.key});
+class saltD_Analysis_BA_SR_CA extends StatefulWidget {
+  const saltD_Analysis_BA_SR_CA({super.key});
 
   @override
-  State<saltDWetTestDGroupVPage2> createState() => _saltDWetTestDGroupVPage2State();
+  State<saltD_Analysis_BA_SR_CA> createState() => _saltD_Analysis_BA_SR_CAState();
 }
 
-class _saltDWetTestDGroupVPage2State extends State<saltDWetTestDGroupVPage2> {
+class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
   String? selectedOption;
 
   @override
@@ -100,21 +100,21 @@ class _saltDWetTestDGroupVPage2State extends State<saltDWetTestDGroupVPage2> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltDctBApage()),
+            MaterialPageRoute(builder: (_) => const saltD_ct_BApage()),
           );
         };
       } else if (selectedOption == "Ca²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltDctCApage()),
+            MaterialPageRoute(builder: (_) => const saltD_ct_CApage()),
           );
         };
       } else if (selectedOption == "Sr²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltDctSRpage()),
+            MaterialPageRoute(builder: (_) => const saltD_ct_SRpage()),
           );
         };
       }

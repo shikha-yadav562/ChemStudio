@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'group4_analysis.dart';
 import '../group_5/group5_detection.dart';
-import '../c_intro.dart'; 
+import '../d_intro.dart';
+
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group0/group0analysis.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Group4DetectionScreen extends StatefulWidget {
-  const Group4DetectionScreen({super.key});
+class saltDGroup4DetectionScreen extends StatefulWidget {
+  const saltDGroup4DetectionScreen({super.key});
 
   @override
-  State<Group4DetectionScreen> createState() => _Group4DetectionScreenState();
+  State<saltDGroup4DetectionScreen> createState() => _saltDGroup4DetectionScreenState();
 }
 
-class _Group4DetectionScreenState extends State<Group4DetectionScreen>
+class _saltDGroup4DetectionScreenState extends State<saltDGroup4DetectionScreen>
     with SingleTickerProviderStateMixin {
   String? selectedOption;
 
@@ -28,9 +29,9 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
     title: 'Group IV Detection',
     procedure:
         'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water.',
-    observation: 'No ppt',
+    observation: 'White/Black/Flesh or Buff ppt',
     options: ['Group-IV Present', 'Group-IV Absent'],
-    correct: 'Group-IV Absent',
+    correct: 'Group-IV Present',
   );
 
   @override
@@ -49,12 +50,12 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
     if (selectedOption == "Group-IV Present") {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const group4_analysis()),
+        MaterialPageRoute(builder: (_) => const saltDgroup4_analysis()),
       );
     } else if (selectedOption == "Group-IV Absent") {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const Group5DetectionScreen()),
+        MaterialPageRoute(builder: (_) => const saltD_Group5DetectionScreen()),
       );
     }
   }
@@ -160,7 +161,7 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
             // Updated to go back to Intro Page and clear the stack
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), 
+              MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), 
               (route) => false,
             );
           },
@@ -168,8 +169,8 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt D : Wet Test',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
