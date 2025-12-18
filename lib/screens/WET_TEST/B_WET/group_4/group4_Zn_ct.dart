@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_5/new_1.dart';
+import '../group_5/group5_detection.dart';
+// 1. ADDED IMPORT for Intro Screen
+import '../b_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Ni2ConfirmedPage extends StatefulWidget {
-  const Ni2ConfirmedPage({super.key});
+class saltB_Zn2ConfirmedPage extends StatefulWidget {
+  const saltB_Zn2ConfirmedPage({super.key});
 
   @override
-  State<Ni2ConfirmedPage> createState() => _Ni2ConfirmedPageState();
+  State<saltB_Zn2ConfirmedPage> createState() => _saltB_Zn2ConfirmedPageState();
 }
 
-class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
+class _saltB_Zn2ConfirmedPageState extends State<saltB_Zn2ConfirmedPage> {
   String? selectedOption;
 
   @override
@@ -22,26 +24,31 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroBScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue])
-                  .createShader(bounds),
-          child: const Text(
-            'Salt C: Wet Test',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          child:Text(
+            'Salt B : Wet Test',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: _buildContent(),
       ),
-
       bottomNavigationBar: Container(
         color: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -55,7 +62,7 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          "C.T For Ni²⁺ ",
+          "C.T For Zn²⁺",
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
@@ -68,7 +75,7 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
         const SizedBox(height: 16),
         _gradientTitle("Select the correct inference:"),
         const SizedBox(height: 10),
-        _buildOption("Ni²⁺ confirmed"),
+        _buildOption("Zn²⁺ confirmed"),
       ],
     );
   }
@@ -84,62 +91,47 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
-          label: const Text(
-            'Previous',
-            style: TextStyle(fontSize: 16),
-          ),
+          label: const Text('Previous', style: TextStyle(fontSize: 16)),
         ),
-
         ElevatedButton.icon(
           onPressed: selectedOption != null
               ? () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const GroupVPage()),
+                    MaterialPageRoute(
+                      builder: (_) => const saltB_Group5DetectionScreen(),
+                    ),
                   );
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor:
-                selectedOption != null ? primaryBlue : Colors.grey.shade400,
+            backgroundColor: selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
-          label: const Text(
-            'Next',
-            style: TextStyle(fontSize: 16),
-          ),
+          label: const Text('Next', style: TextStyle(fontSize: 16)),
         ),
       ],
     );
   }
 
-  // ✅ SOLUTION (same style as Observation)
   Widget _solutionCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _GradientText("Solution"),
-            SizedBox(height: 6),
-            Text(
-              "Dissolve the black ppt of group IV in aquaregia "
-              "(conc. HCl + conc. HNO₃ in 3:1 proportion), "
-              "dilute with water. Use this solution for C.T.",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: primaryBlue,
-              ),
+            _gradientHeader("Solution"),
+            const SizedBox(height: 6),
+            const Text(
+              "Dissolve the white ppt in dilute HCl and remove H₂S gas by boiling. "
+              "Use this solution for C.T.",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],
         ),
@@ -147,38 +139,27 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
     );
   }
 
-  // ✅ TEST (black normal) + OBSERVATION (bold blue same as Solution)
   Widget _testCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _GradientText("Test"),
-            SizedBox(height: 6),
-            Text(
-              "Above solution + NaOH",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
-              ),
+            _gradientHeader("Test"),
+            const SizedBox(height: 6),
+            const Text(
+              "Above solution + NaOH.",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal, color: Colors.black),
             ),
-            Divider(height: 22),
-            _GradientText("Observation"),
-            SizedBox(height: 6),
-            Text(
-              "Light green ppt",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: primaryBlue,
-              ),
+            const Divider(height: 22),
+            _gradientHeader("Observation"),
+            const SizedBox(height: 6),
+            const Text(
+              "White ppt soluble in excess of NaOH, re-precipitated by passing H₂S gas.",
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],
         ),
@@ -189,20 +170,25 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
   Widget _gradientTitle(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue])
-              .createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
       child: Text(
         text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
-        ),
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }
 
-  // ✅ Option: teal + bold on click
+  Widget _gradientHeader(String text) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+    );
+  }
+
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
 
@@ -218,7 +204,7 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
             color: selected ? accentTeal.withOpacity(0.12) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: selected ? accentTeal : Colors.grey.shade400,
+              color: selected ? accentTeal : Colors.grey.shade300,
               width: 1.5,
             ),
           ),
@@ -230,29 +216,6 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
               fontSize: 15,
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ✅ Reusable gradient text widget (NO structure changed)
-class _GradientText extends StatelessWidget {
-  final String text;
-  const _GradientText(this.text);
-
-  @override
-  Widget build(BuildContext context) {
-    return ShaderMask(
-      shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue])
-              .createShader(bounds),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
         ),
       ),
     );

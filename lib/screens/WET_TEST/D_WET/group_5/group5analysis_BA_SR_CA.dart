@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'group5_BA_ct.dart';
 import 'group5_CA_ct.dart';
 import 'group5_SR_ct.dart';
+// 1. IMPORT for Salt D Intro Screen
 import '../d_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
@@ -25,21 +26,23 @@ class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC (Redirects to Intro D)
         leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: primaryBlue),
-    onPressed: () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
-        (route) => false, // This clears the navigation stack
-      );
-    },
-  ),
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroDScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: Text(
+          child: const Text(
             'Salt D : Wet Test',
             style: TextStyle(
               color: Colors.white,
@@ -171,8 +174,6 @@ class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ Blue + Bold
             Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests.",
               style: TextStyle(
@@ -204,8 +205,6 @@ class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ BLACK + NORMAL
             Text(
               "Above solution + K₂CrO₄",
               style: TextStyle(
@@ -214,17 +213,13 @@ class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
                 fontWeight: FontWeight.normal,
               ),
             ),
-
             Divider(height: 22),
-
             GradientText(
               "Observation",
               gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ Blue + Bold
             Text(
               "Yellow ppt",
               style: TextStyle(
@@ -264,8 +259,6 @@ class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
             text,
             style: TextStyle(
               fontSize: 15,
-
-              // ✅ This is FIXED now
               color: selected ? accentTeal : Colors.black,
               fontWeight:
                   selected ? FontWeight.bold : FontWeight.normal,
@@ -320,4 +313,4 @@ class GradientText extends StatelessWidget {
       ),
     );
   }
-} 
+}

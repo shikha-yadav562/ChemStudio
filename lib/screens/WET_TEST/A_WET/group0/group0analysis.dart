@@ -1,27 +1,12 @@
 import 'package:flutter/material.dart';
-// Import the NH4+ Confirmation Test page (0CT.dart)
 import '0CT.dart';
-// Import Group1 detection screen
 import '../group1/group1detection.dart'; 
+import '../a_intro.dart'; // Standard import for Salt A Intro
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// The placeholder now uses the actual Group 1 Detection screen,
-// which is defined in group1detection.dart.
-// Note: This helper widget might not be necessary if you only push the screen directly.
-class WetTestCGroupOneScreen extends StatelessWidget {
-  final String? restoredSelection;
-  const WetTestCGroupOneScreen({super.key, this.restoredSelection});
-  @override
-  Widget build(BuildContext context) {
-    // Return the Group 1 detection screen (allowing an injected restoredSelection)
-    // Assuming WetTestCGroupOneDetectionScreen is the main widget in group1detection.dart
-    return WetTestCGroupOneDetectionScreen(restoredSelection: restoredSelection);
-  }
-}
-
-// Re-defining the TestItem model to match the Wet Test structure
+// Re-defining the TestItem model to match your structure
 class WetTestItem {
   final int id;
   final String title;
@@ -40,33 +25,30 @@ class WetTestItem {
   });
 }
 
-// Placeholder for DatabaseHelper (assuming it works the same way)
+// Placeholder for DatabaseHelper matching your code
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
   DatabaseHelper._privateConstructor();
 
-  // Dummy methods to satisfy the code structure
   Future<void> saveAnswer(String table, int id, String answer) async {
-    // Implement DB saving in real app
     return;
   }
 
   Future<List<Map<String, dynamic>>> getAnswers(String table) async {
-    // Implement DB retrieval in real app
     return [];
   }
 }
 
-class WetTestCGroupZeroScreen extends StatefulWidget {
-  const WetTestCGroupZeroScreen({super.key});
+class WetTestAGroupZeroScreen extends StatefulWidget {
+  const WetTestAGroupZeroScreen({super.key});
 
   @override
-  State<WetTestCGroupZeroScreen> createState() => _WetTestCGroupZeroScreenState();
+  State<WetTestAGroupZeroScreen> createState() => _WetTestAGroupZeroScreenState();
 }
 
-class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
+class _WetTestAGroupZeroScreenState extends State<WetTestAGroupZeroScreen>
     with SingleTickerProviderStateMixin {
-  int _index = 0; // We only have one test for Group Zero
+  int _index = 0; 
   final Map<int, String> _answers = {};
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
@@ -74,7 +56,6 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
   final _dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltC_WetTest';
 
-  // Content for the Wet Test - Group Zero
   late final List<WetTestItem> _tests = [
     WetTestItem(
       id: 1,
@@ -95,14 +76,12 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide =
-        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _loadSavedAnswers();
     _animController.forward();
   }
 
   Future<void> _loadSavedAnswers() async {
-    // Load saved answers for persistence across sessions
     final data = await _dbHelper.getAnswers(_tableName);
     setState(() {
       for (var row in data) {
@@ -115,50 +94,27 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
-  // --- NAVIGATION LOGIC IMPLEMENTING SCENARIOS 1 & 2 ---
   void _next() async {
     final test = _tests[_index];
-    final selectedOption = _answers[test.id]; // Get the selected option
+    final selectedOption = _answers[test.id];
 
-    if (selectedOption == null) {
-      // Optional: Show a Snackbar if no option is selected
-      // ScaffoldMessenger.of(context).showSnackBar(...);
-      return; 
-    }
+    if (selectedOption == null) return; 
 
     if (selectedOption == 'Group Zero is present') {
-        // SCENARIO 1: Group 0 Analysis -> CT for NH4+ -> Group 1 Detection
-        
-        // 1. Push the CT page (WetTestCGroupZeroCTScreen).
-        // The CT page will handle navigation to Group 1 Detection when 'Next' is pressed there.
         await Navigator.push(
             context,
-            MaterialPageRoute(
-                // Use WetTestCGroupZeroCTScreen from 0CT.dart
-                builder: (_) => const WetTestCGroupZeroCTScreen(), 
-            ),
+            MaterialPageRoute(builder: (_) => const WetTestAGroupZeroCTScreen()),
         );
-
     } else if (selectedOption == 'Group Zero is absent') {
-        // SCENARIO 2: Group 0 Analysis -> Group 1 Detection
-        
-        // 1. Push the Group 1 Detection page directly.
         await Navigator.push(
             context,
-            MaterialPageRoute(
-                // Use WetTestCGroupOneDetectionScreen from group1detection.dart
-                builder: (_) => const WetTestCGroupOneDetectionScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const WetTestAGroupOneDetectionScreen()),
         );
     }
-    
-    // Refresh the screen state after the pushed screen returns
     setState(() {});
   }
-  // --- END NAVIGATION LOGIC ---
 
   void _prev() {
-    // Navigate back to the previous screen.
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -181,11 +137,22 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // ADDED: Navigation back to Intro A
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
+          child: Text(
             'Salt A : Wet Test',
             style: TextStyle(
               color: Colors.white,
@@ -198,9 +165,8 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-                  .animate(_fadeSlide),
+          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+              .animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -215,11 +181,10 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
                 Expanded(
                   child: ListView(
                     children: [
-                      _buildTestCard(test), // Card with Test and Observation
+                      _buildTestCard(test), 
                       const SizedBox(height: 24),
                       _buildInferenceHeader(),
                       const SizedBox(height: 10),
-                      // Options
                       ...test.options.map((opt) {
                         final selectedHere = selected == opt;
                         return Padding(
@@ -234,26 +199,18 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: selectedHere
-                                    ? accentTeal.withOpacity(0.1)
-                                    : Colors.white,
+                                color: selectedHere ? accentTeal.withOpacity(0.1) : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.grey.shade300,
+                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 opt,
                                 style: TextStyle(
-                                  fontWeight: selectedHere
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.black87,
+                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
+                                  color: selectedHere ? accentTeal : Colors.black87,
                                 ),
                               ),
                             ),
@@ -263,7 +220,6 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
                     ],
                   ),
                 ),
-                // Navigation Buttons (Prev/Next)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -279,8 +235,7 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                     ),
                   ],
@@ -310,7 +265,6 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
   }
 
   Widget _buildTestCard(WetTestItem test) {
-    // ... (rest of _buildTestCard implementation)
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -327,8 +281,7 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
             const SizedBox(height: 8),
             Text(
               test.observation,
-              textAlign: TextAlign.start,
-              style: TextStyle(
+              style: const TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -341,7 +294,6 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
   }
 
   Widget _gradientHeader(String text) {
-    // ... (rest of _gradientHeader implementation)
     return ShaderMask(
       shaderCallback: (bounds) =>
           const LinearGradient(colors: [accentTeal, primaryBlue])
@@ -353,4 +305,4 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
       ),
     );
   }
-}   
+}

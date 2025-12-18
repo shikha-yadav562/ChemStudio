@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_5/new_1.dart';
+import '../group_5/group5_detection.dart';
+// 1. ADDED IMPORT for Intro Screen
+import '../b_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Zn2ConfirmedPage extends StatefulWidget {
-  const Zn2ConfirmedPage({super.key});
+class saltB_Ni2ConfirmedPage extends StatefulWidget {
+  const saltB_Ni2ConfirmedPage({super.key});
 
   @override
-  State<Zn2ConfirmedPage> createState() => _Zn2ConfirmedPageState();
+  State<saltB_Ni2ConfirmedPage> createState() => _saltB_Ni2ConfirmedPageState();
 }
 
-class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
+class _saltB_Ni2ConfirmedPageState extends State<saltB_Ni2ConfirmedPage> {
   String? selectedOption;
 
   @override
@@ -22,19 +24,38 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroBScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
+          child:Text(
+            'Salt B : Wet Test',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
         child: _buildContent(),
       ),
+
       bottomNavigationBar: Container(
         color: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
@@ -48,7 +69,7 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          "C.T For Zn²⁺",
+          "C.T For Ni²⁺ ",
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
@@ -61,7 +82,7 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
         const SizedBox(height: 16),
         _gradientTitle("Select the correct inference:"),
         const SizedBox(height: 10),
-        _buildOption("Zn²⁺ confirmed"),
+        _buildOption("Ni²⁺ confirmed"),
       ],
     );
   }
@@ -77,27 +98,34 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
-          label: const Text('Previous', style: TextStyle(fontSize: 16)),
+          label: const Text(
+            'Previous',
+            style: TextStyle(fontSize: 16),
+          ),
         ),
+
         ElevatedButton.icon(
           onPressed: selectedOption != null
               ? () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => const GroupVPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const saltB_Group5DetectionScreen()),
                   );
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: selectedOption != null ? primaryBlue : Colors.grey.shade400,
+            backgroundColor:
+                selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
-          label: const Text('Next', style: TextStyle(fontSize: 16)),
+          label: const Text(
+            'Next',
+            style: TextStyle(fontSize: 16),
+          ),
         ),
       ],
     );
@@ -106,18 +134,25 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
   Widget _solutionCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _gradientHeader("Solution"),
-            const SizedBox(height: 6),
-            const Text(
-              "Dissolve the white ppt in dilute HCl and remove H₂S gas by boiling. "
-              "Use this solution for C.T.",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+            _GradientText("Solution"),
+            SizedBox(height: 6),
+            Text(
+              "Dissolve the black ppt of group IV in aquaregia "
+              "(conc. HCl + conc. HNO₃ in 3:1 proportion), "
+              "dilute with water. Use this solution for C.T.",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -128,24 +163,34 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
   Widget _testCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _gradientHeader("Test"),
-            const SizedBox(height: 6),
-            const Text(
-              "Above solution + NaOH.",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.normal, color: Colors.black),
+            _GradientText("Test"),
+            SizedBox(height: 6),
+            Text(
+              "Above solution + NaOH",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                color: Colors.black,
+              ),
             ),
-            const Divider(height: 22),
-            _gradientHeader("Observation"),
-            const SizedBox(height: 6),
-            const Text(
-              "White ppt soluble in excess of NaOH, re-precipitated by passing H₂S gas.",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+            Divider(height: 22),
+            _GradientText("Observation"),
+            SizedBox(height: 6),
+            Text(
+              "Light green ppt",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -156,21 +201,15 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
   Widget _gradientTitle(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-      ),
-    );
-  }
-
-  Widget _gradientHeader(String text) {
-    return ShaderMask(
-      shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-      child: Text(
-        text,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
       ),
     );
   }
@@ -190,7 +229,7 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
             color: selected ? accentTeal.withOpacity(0.12) : Colors.white,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: selected ? accentTeal : Colors.grey.shade300,
+              color: selected ? accentTeal : Colors.grey.shade400,
               width: 1.5,
             ),
           ),
@@ -202,6 +241,28 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
               fontSize: 15,
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GradientText extends StatelessWidget {
+  final String text;
+  const _GradientText(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
       ),
     );

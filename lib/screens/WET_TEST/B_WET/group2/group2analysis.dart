@@ -1,8 +1,6 @@
-// E:\flutter chemistry\wet\wet\lib\C\group2\group2analysis.dart
-
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
-// Import the next screen: Confirmation Test for Cu2+
+import '../b_intro.dart'; // Import for Salt A Intro
 import 'group2ct_cu2plus.dart'; 
 import 'group2ct_as3plus.dart' hide IterableExtension;
 
@@ -17,6 +15,7 @@ class WetTestCGroupTwoAnalysisScreen extends StatefulWidget {
     State<WetTestCGroupTwoAnalysisScreen> createState() => 
         _WetTestCGroupTwoAnalysisScreenState();
 }
+
 class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysisScreen>
     with SingleTickerProviderStateMixin {
     
@@ -29,13 +28,12 @@ class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysi
     final _dbHelper = DatabaseHelper.instance;
     final String _tableName = 'SaltC_WetTest';
 
-    // *** CORRECTED: This is the content for ANALYSIS ***
     late final List<WetTestItem> _tests = [
         WetTestItem(
-            id: 6, // Sequential ID
+            id: 6, 
             title: 'Analysis of Group II',
-            procedure: 'O.S + dil. HCL + H₂S gas or water',
-            observation: 'Black ppt',
+            procedure: 'O.S + dil. HCl + H₂S gas or water',
+            observation: 'Black or yellow ppt',
             options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
             correct: 'Cu²⁺ may be present', 
         ),
@@ -58,7 +56,6 @@ class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysi
         final data = await _dbHelper.getAnswers(_tableName);
         setState(() {
             final testId = _tests[_index].id;
-            // Assuming firstWhereOrNull is available (e.g., from group0analysis.dart or globally)
             final savedAnswer = data.firstWhereOrNull( 
                 (row) => row['question_id'] == testId)?['answer'];
             _selectedOption = savedAnswer;
@@ -69,35 +66,26 @@ class _WetTestCGroupTwoAnalysisScreenState extends State<WetTestCGroupTwoAnalysi
         await _dbHelper.saveAnswer(_tableName, id, answer);
     }
 
-void _next() async {
+    void _next() async {
         if (_selectedOption == 'Cu²⁺ may be present') {
-            // Navigate to Copper Confirmation Test
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupTwoCTCuScreen(), 
+                    builder: (_) => const WetTestBGroupTwoCTCuScreen(), 
                 ),
             );
         } else if (_selectedOption == 'As³⁺ may be present') {
-            // Navigate to Arsenic Confirmation Test
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    // Navigate to the correct screen for As³⁺ confirmation
-                    builder: (_) => const WetTestCGroupTwoCTAsScreen(), 
+                    builder: (_) => const WetTestBGroupTwoCTAsScreen(), 
                 ),
             );
-        } else {
-            // Optional: Handle case where no option is selected, though the button should be disabled.
-            // If the button is enabled without selection, we can show a prompt.
         }
     }
     
     void _prev() {
-        // Navigate back to the Group II Detection screen
-        if (Navigator.canPop(context)) {
-            Navigator.pop(context);
-        }
+        Navigator.pop(context);
     }
 
     @override
@@ -116,12 +104,23 @@ void _next() async {
                 backgroundColor: Colors.white,
                 elevation: 2,
                 centerTitle: true,
+                // ADDED: Navigation back to Intro A
+                leading: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+                    onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
+                            (route) => false,
+                        );
+                    },
+                ),
                 title: ShaderMask(
                     shaderCallback: (bounds) =>
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
-                    child: const Text(
-                        'Salt C : Wet Test',
+                    child: Text(
+                        'Salt B : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -150,11 +149,10 @@ void _next() async {
                                 Expanded(
                                     child: ListView(
                                         children: [
-                                            _buildTestCard(test), // Card with Test and Observation
+                                            _buildTestCard(test), 
                                             const SizedBox(height: 24),
                                             _buildInferenceHeader(),
                                             const SizedBox(height: 10),
-                                            // Options
                                             ...test.options.map((opt) {
                                                 final selectedHere = _selectedOption == opt;
                                                 return Padding(
@@ -198,7 +196,6 @@ void _next() async {
                                         ],
                                     ),
                                 ),
-                                // Navigation Buttons (Prev/Next)
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -262,7 +259,7 @@ void _next() async {
                         Text(
                             test.observation,
                             textAlign: TextAlign.start,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: primaryBlue,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,

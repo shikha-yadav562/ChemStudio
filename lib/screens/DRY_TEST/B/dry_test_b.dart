@@ -575,7 +575,7 @@ class SaltBResultScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) => const WetTestIntroCScreen(),
+                                  builder: (_) => const WetTestIntroBScreen(),
                                 ),
                               );
                             },

@@ -1,23 +1,21 @@
-// E:\flutter chemistry\wet\wet\lib\C\group1\group1ct_pb2plus.dart
-
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; 
-// Ensure this imports the detection screen
 import '../group2/group2detection.dart'; 
+import '../a_intro.dart'; // Standard import for Salt A Intro
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class WetTestCGroupOneCTPbScreen extends StatefulWidget {
-    const WetTestCGroupOneCTPbScreen({super.key});
+class WetTestAGroupOneCTPbScreen extends StatefulWidget {
+    const WetTestAGroupOneCTPbScreen({super.key});
 
     @override
-    State<WetTestCGroupOneCTPbScreen> createState() => 
-        _WetTestCGroupOneCTPbScreenState();
+    State<WetTestAGroupOneCTPbScreen> createState() => 
+        _WetTestAGroupOneCTPbScreenState();
 }
 
-class _WetTestCGroupOneCTPbScreenState extends State<WetTestCGroupOneCTPbScreen>
+class _WetTestAGroupOneCTPbScreenState extends State<WetTestAGroupOneCTPbScreen>
     with SingleTickerProviderStateMixin {
     
     final int _index = 0; 
@@ -69,17 +67,15 @@ class _WetTestCGroupOneCTPbScreenState extends State<WetTestCGroupOneCTPbScreen>
     }
 
     void _next() async {
-        // FIXED: Navigate to Group 2 Detection screen.
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) => const WetTestCGroupTwoDetectionScreen(), 
+                builder: (_) => const WetTestAGroupTwoDetectionScreen(), 
             ),
         );
     }
 
     void _prev() {
-        // Navigate back to the Group II Analysis screen
         if (Navigator.canPop(context)) {
             Navigator.pop(context);
         }
@@ -101,12 +97,23 @@ class _WetTestCGroupOneCTPbScreenState extends State<WetTestCGroupOneCTPbScreen>
                 backgroundColor: Colors.white,
                 elevation: 2,
                 centerTitle: true,
+                // ADDED: Navigation back to Intro A
+                leading: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+                    onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
+                            (route) => false,
+                        );
+                    },
+                ),
                 title: ShaderMask(
                     shaderCallback: (bounds) =>
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
-                    child: const Text(
-                        'Salt A : Wet Test',
+                    child: Text(
+                        'Salt A: Wet Test',
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -135,11 +142,10 @@ class _WetTestCGroupOneCTPbScreenState extends State<WetTestCGroupOneCTPbScreen>
                                 Expanded(
                                     child: ListView(
                                         children: [
-                                            _buildTestCard(test), // Card with Test and Observation
+                                            _buildTestCard(test), 
                                             const SizedBox(height: 24),
                                             _buildInferenceHeader(),
                                             const SizedBox(height: 10),
-                                            // Options (Only one, acts as a confirmation label)
                                             ...test.options.map((opt) {
                                                 final selectedHere = _selectedOption == opt;
                                                 return Padding(
@@ -183,7 +189,6 @@ class _WetTestCGroupOneCTPbScreenState extends State<WetTestCGroupOneCTPbScreen>
                                         ],
                                     ),
                                 ),
-                                // Navigation Buttons (Prev/Next)
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -247,7 +252,7 @@ class _WetTestCGroupOneCTPbScreenState extends State<WetTestCGroupOneCTPbScreen>
                         Text(
                             test.observation,
                             textAlign: TextAlign.start,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: primaryBlue,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
