@@ -1,0 +1,518 @@
+[1mdiff --git a/lib/DB/database_helper.dart b/lib/DB/database_helper.dart[m
+[1mindex c03b650..46ee591 100644[m
+[1m--- a/lib/DB/database_helper.dart[m
+[1m+++ b/lib/DB/database_helper.dart[m
+[36m@@ -1,11 +1,11 @@[m
+ import 'dart:io';[m
+[31m-import 'package:ChemStudio/models/group_status.dart';[m
+ import 'package:sqflite/sqflite.dart';[m
+ import 'package:path/path.dart';[m
+ [m
+[32m+[m
+ class DatabaseHelper {[m
+   static const _dbName = 'chemstudio.db';[m
+[31m-  static const _dbVersion = 2;[m
+[32m+[m[32m  static const _dbVersion = 1;[m
+ [m
+   static Database? _database;[m
+ [m
+[36m@@ -22,12 +22,7 @@[m [mclass DatabaseHelper {[m
+   Future<Database> _initDatabase() async {[m
+     final dbPath = await getDatabasesPath();[m
+     final path = join(dbPath, _dbName);[m
+[31m-    return await openDatabase([m
+[31m-      path,[m
+[31m-      version: _dbVersion,[m
+[31m-      onCreate: _onCreate,[m
+[31m-      onUpgrade: _onUpgrade,[m
+[31m-    );[m
+[32m+[m[32m    return await openDatabase(path, version: _dbVersion, onCreate: _onCreate);[m
+   }[m
+ [m
+   Future<void> _onCreate(Database db, int version) async {[m
+[36m@@ -40,204 +35,36 @@[m [mclass DatabaseHelper {[m
+       'SaltC_PreliminaryTest',[m
+       'SaltD_DryTest',[m
+       'SaltD_PreliminaryTest',[m
+[31m-      'SaltA_WetTest',[m
+[31m-      'SaltB_WetTest',[m
+[31m-      'SaltC_WetTest',[m
+[31m-      'SaltD_WetTest',[m
+     ];[m
+ [m
+     for (var table in tables) {[m
+       await db.execute('''[m
+         CREATE TABLE $table ([m
+[31m-          question_id INTEGER PRIMARY KEY,[m
+[31m-          student_answer TEXT,[m
+[31m-          correct_answer TEXT[m
+[32m+[m[32m          id INTEGER PRIMARY KEY AUTOINCREMENT,[m
+[32m+[m[32m          question_id INTEGER NOT NULL,[m
+[32m+[m[32m          answer TEXT NOT NULL[m
+         )[m
+       ''');[m
+     }[m
+[31m-[m
+[31m-    // Group decisions table[m
+[31m-    await db.execute('''[m
+[31m-      CREATE TABLE WetTestGroups ([m
+[31m-        salt TEXT NOT NULL,[m
+[31m-        group_number INTEGER NOT NULL,[m
+[31m-        student_status TEXT NOT NULL,[m
+[31m-        PRIMARY KEY (salt, group_number)[m
+[31m-      )[m
+[31m-    ''');[m
+[31m-  }[m
+[31m-[m
+[31m-  // Handle database upgrades[m
+[31m-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {[m
+[31m-    if (oldVersion < 2) {[m
+[31m-      final tables = [[m
+[31m-        'SaltA_DryTest',[m
+[31m-        'SaltA_PreliminaryTest',[m
+[31m-        'SaltB_DryTest',[m
+[31m-        'SaltB_PreliminaryTest',[m
+[31m-        'SaltC_DryTest',[m
+[31m-        'SaltC_PreliminaryTest',[m
+[31m-        'SaltD_DryTest',[m
+[31m-        'SaltD_PreliminaryTest',[m
+[31m-        'SaltA_WetTest',[m
+[31m-        'SaltB_WetTest',[m
+[31m-        'SaltC_WetTest',[m
+[31m-        'SaltD_WetTest',[m
+[31m-      ];[m
+[31m-[m
+[31m-      for (var table in tables) {[m
+[31m-        await db.execute('DROP TABLE IF EXISTS $table');[m
+[31m-      }[m
+[31m-[m
+[31m-      await _onCreate(db, newVersion);[m
+[31m-    }[m
+[31m-  }[m
+[31m-[m
+[31m-  // Save correct answer using UPDATE or INSERT[m
+[31m-  Future<void> saveCorrectAnswer(String tableName, int questionId, String correctAnswer) async {[m
+[31m-    final db = await database;[m
+[31m-    [m
+[31m-    final existing = await db.query([m
+[31m-      tableName,[m
+[31m-      where: 'question_id = ?',[m
+[31m-      whereArgs: [questionId],[m
+[31m-    );[m
+[31m-[m
+[31m-    if (existing.isEmpty) {[m
+[31m-      await db.insert([m
+[31m-        tableName,[m
+[31m-        {[m
+[31m-          'question_id': questionId,[m
+[31m-          'correct_answer': correctAnswer,[m
+[31m-        },[m
+[31m-      );[m
+[31m-    } else {[m
+[31m-      await db.update([m
+[31m-        tableName,[m
+[31m-        {'correct_answer': correctAnswer},[m
+[31m-        where: 'question_id = ?',[m
+[31m-        whereArgs: [questionId],[m
+[31m-      );[m
+[31m-    }[m
+[31m-  }[m
+[31m-[m
+[31m-  // Save student answer using UPDATE or INSERT[m
+[31m-  Future<void> saveStudentAnswer(String tableName, int questionId, String studentAnswer) async {[m
+[31m-    final db = await database;[m
+[31m-    [m
+[31m-    final existing = await db.query([m
+[31m-      tableName,[m
+[31m-      where: 'question_id = ?',[m
+[31m-      whereArgs: [questionId],[m
+[31m-    );[m
+[31m-[m
+[31m-    if (existing.isEmpty) {[m
+[31m-      await db.insert([m
+[31m-        tableName,[m
+[31m-        {[m
+[31m-          'question_id': questionId,[m
+[31m-          'student_answer': studentAnswer,[m
+[31m-        },[m
+[31m-      );[m
+[31m-    } else {[m
+[31m-      await db.update([m
+[31m-        tableName,[m
+[31m-        {'student_answer': studentAnswer},[m
+[31m-        where: 'question_id = ?',[m
+[31m-        whereArgs: [questionId],[m
+[31m-      );[m
+[31m-    }[m
+   }[m
+ [m
+[31m-  // Get student answer[m
+[31m-  Future<String?> getStudentAnswer(String tableName, int questionId) async {[m
+[32m+[m[32m  // Save answer[m
+[32m+[m[32m  Future<void> saveAnswer(String tableName, int questionId, String answer) async {[m
+     final db = await database;[m
+[31m-    final result = await db.query([m
+[31m-      tableName,[m
+[31m-      columns: ['student_answer'],[m
+[31m-      where: 'question_id = ?',[m
+[31m-      whereArgs: [questionId],[m
+[31m-    );[m
+[31m-    if (result.isNotEmpty) return result.first['student_answer'] as String?;[m
+[31m-    return null;[m
+[31m-  }[m
+[31m-[m
+[31m-  // Get correct answer[m
+[31m-  Future<String?> getCorrectAnswer(String tableName, int questionId) async {[m
+[31m-    final db = await database;[m
+[31m-    final result = await db.query([m
+[32m+[m[32m    await db.insert([m
+       tableName,[m
+[31m-      columns: ['correct_answer'],[m
+[31m-      where: 'question_id = ?',[m
+[31m-      whereArgs: [questionId],[m
+[32m+[m[32m      {'question_id': questionId, 'answer': answer},[m
+[32m+[m[32m      conflictAlgorithm: ConflictAlgorithm.replace,[m
+     );[m
+[31m-    if (result.isNotEmpty) return result.first['correct_answer'] as String?;[m
+[31m-    return null;[m
+   }[m
+ [m
+[31m-  // Get all answers (for review or final result)[m
+[32m+[m[32m  // Get answers[m
+   Future<List<Map<String, dynamic>>> getAnswers(String tableName) async {[m
+     final db = await database;[m
+     return await db.query(tableName);[m
+   }[m
+ [m
+[31m-  // ----------------------[m
+[31m-  // Wet Test Group Decision Logic[m
+[31m-[m
+[31m-  /// Save student's decision for a group[m
+[31m-  /// Converts GroupStatus enum to string for storage[m
+[31m-  Future<void> insertGroupDecision({[m
+[31m-    required String salt,[m
+[31m-    required int groupNumber,[m
+[31m-    required GroupStatus status,[m
+[31m-  }) async {[m
+[31m-    final db = await database;[m
+[31m-    await db.insert([m
+[31m-      'WetTestGroups',[m
+[31m-      {[m
+[31m-        'salt': salt,[m
+[31m-        'group_number': groupNumber,[m
+[31m-        'student_status': status.name, // Stores 'present' or 'absent'[m
+[31m-      },[m
+[31m-      conflictAlgorithm: ConflictAlgorithm.replace,[m
+[31m-    );[m
+[31m-  }[m
+[31m-[m
+[31m-  /// Read all group decisions for a salt[m
+[31m-  /// Converts string from database back to GroupStatus enum[m
+[31m-  Future<Map<int, GroupStatus>> getStudentGroupDecisions(String salt) async {[m
+[31m-    final db = await database;[m
+[31m-[m
+[31m-    final result = await db.query([m
+[31m-      'WetTestGroups',[m
+[31m-      where: 'salt = ?',[m
+[31m-      whereArgs: [salt],[m
+[31m-    );[m
+[31m-[m
+[31m-    Map<int, GroupStatus> groupStatuses = {};[m
+[31m-    [m
+[31m-    for (final row in result) {[m
+[31m-      final groupNumber = row['group_number'] as int;[m
+[31m-      final statusString = row['student_status'] as String;[m
+[31m-      [m
+[31m-      // Convert string back to enum[m
+[31m-      // Using byName which throws if not found, or use a safer approach:[m
+[31m-      GroupStatus status;[m
+[31m-      try {[m
+[31m-        status = GroupStatus.values.byName(statusString);[m
+[31m-      } catch (e) {[m
+[31m-        print('Warning: Invalid status "$statusString" for group $groupNumber, defaulting to absent');[m
+[31m-        status = GroupStatus.absent;[m
+[31m-      }[m
+[31m-      [m
+[31m-      groupStatuses[groupNumber] = status;[m
+[31m-    }[m
+[31m-[m
+[31m-    return groupStatuses;[m
+[31m-  }[m
+[31m-[m
+[31m-  // ----------------------[m
+[31m-  // Clear specific test table[m
+[32m+[m[32m  // Clear specific test[m
+   Future<void> clearTest(String tableName) async {[m
+     final db = await database;[m
+     await db.delete(tableName);[m
+[36m@@ -255,18 +82,14 @@[m [mclass DatabaseHelper {[m
+       'SaltC_PreliminaryTest',[m
+       'SaltD_DryTest',[m
+       'SaltD_PreliminaryTest',[m
+[31m-      'SaltA_WetTest',[m
+[31m-      'SaltB_WetTest',[m
+[31m-      'SaltC_WetTest',[m
+[31m-      'SaltD_WetTest',[m
+[31m-      'WetTestGroups',[m
+     ];[m
+     for (var table in tables) {[m
+       await db.delete(table);[m
+     }[m
+[32m+[m[32m    _database = null;[m
+   }[m
+ [m
+[31m-  // Reset database completely[m
+[32m+[m[32m  // Reset database[m
+   Future<void> resetDatabase() async {[m
+     final dbPath = await getDatabasesPath();[m
+     final path = join(dbPath, _dbName);[m
+[36m@@ -274,7 +97,6 @@[m [mclass DatabaseHelper {[m
+     _database = null;[m
+   }[m
+ [m
+[31m-  // ----------------------[m
+   // Export database[m
+   Future<void> exportDatabase() async {[m
+     try {[m
+[36m@@ -307,4 +129,4 @@[m [mclass DatabaseHelper {[m
+       print("❌ Error exporting database: $e");[m
+     }[m
+   }[m
+[31m-}[m
+\ No newline at end of file[m
+[32m+[m[32m}[m
+[1mdiff --git a/lib/main.dart b/lib/main.dart[m
+[1mindex 13c1820..12cd4b8 100644[m
+[1m--- a/lib/main.dart[m
+[1m+++ b/lib/main.dart[m
+[36m@@ -8,9 +8,6 @@[m [mimport 'screens/splash_screen.dart';[m
+ void main() async {[m
+   WidgetsFlutterBinding.ensureInitialized();[m
+ [m
+[31m-   // 🔴 TEMPORARY – RUN ONCE[m
+[31m-  //await DatabaseHelper.instance.resetDatabase();[m
+[31m-[m
+   // ✅ Use FFI only for desktop (Windows/Linux/Mac)[m
+   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {[m
+     sqfliteFfiInit();[m
+[36m@@ -18,7 +15,7 @@[m [mvoid main() async {[m
+   }[m
+ [m
+   // ✅ Initialize database before app runs[m
+[31m- await DatabaseHelper.instance.database;[m
+[32m+[m[32m  await DatabaseHelper.instance.database;[m
+ [m
+   // ⚠️ Optional: Uncomment below to clear all data every time app starts[m
+   // await DatabaseHelper.instance.clearAllAnswers();[m
+[1mdiff --git a/lib/models/group_status.dart b/lib/models/group_status.dart[m
+[1mdeleted file mode 100644[m
+[1mindex 2efcd47..0000000[m
+[1m--- a/lib/models/group_status.dart[m
+[1m+++ /dev/null[m
+[36m@@ -1,5 +0,0 @@[m
+[31m-//models/group_status.dart[m
+[31m-enum GroupStatus {[m
+[31m-  present,[m
+[31m-  absent,[m
+[31m-}[m
+[1mdiff --git a/lib/screens/DRY_TEST/A/dry_test_a.dart b/lib/screens/DRY_TEST/A/dry_test_a.dart[m
+[1mindex 384d771..3941932 100644[m
+[1m--- a/lib/screens/DRY_TEST/A/dry_test_a.dart[m
+[1m+++ b/lib/screens/DRY_TEST/A/dry_test_a.dart[m
+[36m@@ -1,5 +1,4 @@[m
+ import 'package:ChemStudio/DB/database_helper.dart';[m
+[31m-import 'package:ChemStudio/screens/WET_TEST/C_WET/correct_answers.dart';[m
+ import 'package:flutter/material.dart';[m
+ import 'package:ChemStudio/screens/WET_TEST/A_WET/a_intro.dart';[m
+ import '../../welcome_screen.dart';[m
+[36m@@ -44,28 +43,20 @@[m [mclass _DryTestAScreenState extends State<DryTestAScreen>[m
+ [m
+     _loadSavedAnswers(); // ✅ only load, don’t clear[m
+ [m
+[31m-    // Save correct answers for Dry Test[m
+[31m-  for (var test in _tests) {[m
+[31m-    dbHelper.saveCorrectAnswer('SaltA_DryTest', test.id, test.correct);[m
+[31m-  }[m
+[31m-[m
+     // ✅ Print preliminary data when screen opens[m
+     print("🧪 Preliminary Answers Received: ${widget.preliminaryAnswers}");[m
+   }[m
+ [m
+   Future<void> _loadSavedAnswers() async {[m
+[31m-  final data = await dbHelper.getAnswers(tableName);[m
+[31m-  if (data.isNotEmpty) {[m
+[31m-    setState(() {[m
+[31m-      for (var row in data) {[m
+[31m-        if (row['student_answer'] != null) {[m
+[31m-          _answers[row['question_id']] = row['student_answer'];[m
+[32m+[m[32m    final data = await dbHelper.getAnswers(tableName);[m
+[32m+[m[32m    if (data.isNotEmpty) {[m
+[32m+[m[32m      setState(() {[m
+[32m+[m[32m        for (var row in data) {[m
+[32m+[m[32m          _answers[row['question_id']] = row['answer'];[m
+         }[m
+[31m-      }[m
+[31m-    });[m
+[32m+[m[32m      });[m
+[32m+[m[32m    }[m
+   }[m
+[31m-}[m
+[31m-[m
+ [m
+   static List<TestItem> _generateTests() {[m
+     return [[m
+[36m@@ -104,15 +95,10 @@[m [mclass _DryTestAScreenState extends State<DryTestAScreen>[m
+       ),[m
+     ];[m
+   }[m
+[31m-Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {[m
+[31m-  // Save student's selected answer[m
+[31m-  await dbHelper.saveStudentAnswer(tableName, test.id, selectedAnswer);[m
+[31m-[m
+[31m-  // Save correct answer[m
+[31m-  //await dbHelper.saveCorrectAnswer(tableName, test.id, test.correct);[m
+[31m-}[m
+[31m-[m
+ [m
+[32m+[m[32m  Future<void> _saveAnswer(int questionId, String answer) async {[m
+[32m+[m[32m    await dbHelper.saveAnswer(tableName, questionId, answer);[m
+[32m+[m[32m  }[m
+ [m
+   void _next() async {[m
+     if (_index < _tests.length - 1) {[m
+[36m@@ -234,7 +220,7 @@[m [mFuture<void> _saveAnswer(TestItem test, String selectedAnswer) async {[m
+                               setState(() {[m
+                                 _answers[test.id] = opt;[m
+                               });[m
+[31m-                              _saveAnswer(test, opt);[m
+[32m+[m[32m                              _saveAnswer(test.id, opt);[m
+                             },[m
+                             borderRadius: BorderRadius.circular(8),[m
+                             child: AnimatedContainer([m
+[36m@@ -511,17 +497,17 @@[m [mFuture<void> _saveAnswer(TestItem test, String selectedAnswer) async {[m
+ }[m
+ [m
+ // ------------------------------------------------------------[m
+[31m-// ✅ Corrected Result Screen: SaltAResultScreen[m
+[32m+[m[32m// ✅ Corrected Result Screen name (SaltAResultScreen)[m
+ class SaltAResultScreen extends StatefulWidget {[m
+   final Map<int, String> userAnswers;[m
+   final List<TestItem> tests;[m
+[31m-  final Map<int, String> preliminaryAnswers;[m
+[32m+[m[32m  final Map<int, String> preliminaryAnswers; // ✅ Added[m
+ [m
+   const SaltAResultScreen({[m
+     super.key,[m
+     required this.userAnswers,[m
+     required this.tests,[m
+[31m-    required this.preliminaryAnswers,[m
+[32m+[m[32m    required this.preliminaryAnswers, // ✅ Added[m
+   });[m
+ [m
+   @override[m
+[36m@@ -532,21 +518,21 @@[m [mclass _SaltAResultScreenState extends State<SaltAResultScreen>[m
+     with SingleTickerProviderStateMixin {[m
+   late final AnimationController _fadeCtrl;[m
+ [m
+[31m-  Map<int, String> dryCorrect = {};[m
+[31m-  Map<int, String> prelimCorrect = {};[m
+[31m-[m
+[31m-@override[m
+[31m-void initState() {[m
+[31m-  super.initState();[m
+[31m-  _fadeCtrl = AnimationController([m
+[31m-    vsync: this,[m
+[31m-    duration: const Duration(milliseconds: 500),[m
+[31m-  );[m
+[31m-  _fadeCtrl.forward();[m
+[32m+[m[32m  @override[m
+[32m+[m[32m  void initState() {[m
+[32m+[m[32m    super.initState();[m
+[32m+[m[32m    _fadeCtrl = AnimationController([m
+[32m+[m[32m      vsync: this,[m
+[32m+[m[32m      duration: const Duration(milliseconds: 600),[m
+[32m+[m[32m    );[m
+[32m+[m[32m    _fadeCtrl.forward();[m
+[32m+[m[32m  }[m
+ [m
+[31m-  dryCorrect = correctAnswers['SaltA_DryTest'] ?? {};[m
+[31m-  prelimCorrect = correctAnswers['SaltA_PreliminaryTest'] ?? {};[m
+[31m-}[m
+[32m+[m[32m  @override[m
+[32m+[m[32m  void dispose() {[m
+[32m+[m[32m    _fadeCtrl.dispose();[m
+[32m+[m[32m    super.dispose();[m
+[32m+[m[32m  }[m
+ [m
+   @override[m
+   Widget build(BuildContext context) {[m
+[36m@@ -588,10 +574,8 @@[m [mvoid initState() {[m
+                 child: ListView([m
+                   children: [[m
+                     ...widget.tests.map((test) {[m
+[31m-                      final ans = widget.userAnswers[test.id] ?? 'No answer selected';[m
+[31m-                      final correctAns = dryCorrect[test.id] ?? 'Not found';[m
+[31m-                      final isCorrect = ans == correctAns;[m
+[31m-[m
+[32m+[m[32m                      final ans =[m
+[32m+[m[32m                          widget.userAnswers[test.id] ?? 'No answer selected';[m
+                       return Container([m
+                         margin: const EdgeInsets.symmetric(vertical: 10),[m
+                         decoration: BoxDecoration([m
+[36m@@ -616,10 +600,13 @@[m [mvoid initState() {[m
+                             ],[m
+                           ),[m
+                           child: ListTile([m
+[31m-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),[m
+[31m-                            leading: Icon([m
+[31m-                              isCorrect ? Icons.check_circle : Icons.cancel,[m
+[31m-                              color: isCorrect ? Colors.green : Colors.red,[m
+[32m+[m[32m                            contentPadding: const EdgeInsets.symmetric([m
+[32m+[m[32m                              horizontal: 16,[m
+[32m+[m[32m                              vertical: 10,[m
+[32m+[m[32m                            ),[m
+[32m+[m[32m                            leading: const Icon([m
+[32m+[m[32m                              Icons.assignment_turned_in_rounded,[m
+[32m+[m[32m                              color: accentTeal,[m
+                               size: 28,[m
+                             ),[m
+                             title: Text([m
+[36m@@ -632,7 +619,7 @@[m [mvoid initState() {[m
+                             subtitle: Padding([m
+                               padding: const EdgeInsets.only(top: 6),[m
+                               child: Text([m
+[31m-                                'Your Answer: $ans\nCorrect Answer: $correctAns',[m
+[32m+[m[32m                                ans,[m
+                                 style: const TextStyle([m
+                                   fontWeight: FontWeight.bold,[m
+                                   fontSize: 15,[m
+[36m@@ -643,7 +630,7 @@[m [mvoid initState() {[m
+                           ),[m
+                         ),[m
+                       );[m
+[31m-                    }).toList(),[m
+[32m+[m[32m                    }),[m
+ [m
+                     const SizedBox(height: 30),[m
+ [m
+[36m@@ -664,9 +651,6 @@[m [mvoid initState() {[m
+                       )[m
+                     else[m
+                       ...widget.preliminaryAnswers.entries.map((entry) {[m
+[31m-                        final correctAns = prelimCorrect[entry.key] ?? 'Not found';[m
+[31m-                        final isCorrect = entry.value == correctAns;[m
+[31m-[m
+                         return Container([m
+                           margin: const EdgeInsets.symmetric(vertical: 10),[m
+                           decoration: BoxDecoration([m
+[36m@@ -691,10 +675,13 @@[m [mvoid initState() {[m
+                               ],[m
+                             ),[m
+                             child: ListTile([m
+[31m-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),[m
+[31m-                              leading: Icon([m
+[31m-                                isCorrect ? Icons.check_circle : Icons.cancel,[m
+[31m-                                color: isCorrect ? Colors.green : Colors.red,[m
+[32m+[m[32m                              contentPadding: const EdgeInsets.symmetric([m
+[32m+[m[32m                                horizontal: 16,[m
+[32m+[m[32m                                ver

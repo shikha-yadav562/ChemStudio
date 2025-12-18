@@ -58,22 +58,5 @@ const Map<String, Map<int, String>> correctAnswers = {
     2: 'NH4+ Absent',
     3: 'Cu2+ may be present',
   },
-  // -------------------------------
-  // Wet Tests
- /* 'SaltA_WetTest': {
-    1: 'Positive',
-    2: 'Negative',
-  },
-  'SaltB_WetTest': {
-    1: 'Positive',
-    2: 'Positive',
-  },*/
-  'SaltC_WetTest': {
-    1: 'Negative',
-    2: 'Positive',
-  },
- /* 'SaltD_WetTest': {
-    1: 'Positive',
-    2: 'Negative',
-  },*/
+
 };

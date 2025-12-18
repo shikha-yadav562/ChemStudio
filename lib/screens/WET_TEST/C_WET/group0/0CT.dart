@@ -1,7 +1,8 @@
-import 'package:ChemStudio/screens/WET_TEST/C_WET/final_result.dart';
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group1/group1detection.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/WetTestCFinalResultScreen.dart';
 import 'package:flutter/material.dart';
 import 'group0analysis.dart'; 
-import '../group1/group1detection.dart'; 
 import '../c_intro.dart';
 import 'package:ChemStudio/DB/database_helper.dart'; 
 
@@ -21,7 +22,8 @@ class _WetTestCGroupZeroCTScreenState extends State<WetTestCGroupZeroCTScreen>
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
-  bool _isSelected = false;
+  String? _selectedOption;
+  bool get _isSelected => _selectedOption != null;
 
   final WetTestItem _test = WetTestItem(
     id: 2,
@@ -31,6 +33,8 @@ class _WetTestCGroupZeroCTScreenState extends State<WetTestCGroupZeroCTScreen>
     options: ['NH₄⁺ Confirmed'],
     correct: 'NH₄⁺ Confirmed',
   );
+
+
 
   final _dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltC_WetTest';
@@ -45,7 +49,6 @@ class _WetTestCGroupZeroCTScreenState extends State<WetTestCGroupZeroCTScreen>
     _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
 
     _loadSavedAnswer();
-
     _animController.forward();
   }
 
@@ -53,39 +56,52 @@ class _WetTestCGroupZeroCTScreenState extends State<WetTestCGroupZeroCTScreen>
     final studentAnswer = await _dbHelper.getStudentAnswer(_tableName, _test.id);
     if (studentAnswer != null) {
       setState(() {
-        _isSelected = true;
+        _selectedOption = studentAnswer;
       });
     }
   }
 
-  // Handle option tap: save answer + mark group + navigate
-  Future<void> _onOptionSelected() async {
-    setState(() => _isSelected = true);
+  // ✅ FIXED: Just select, don't navigate
+  void _onOptionTapped(String option) {
+    setState(() {
+      _selectedOption = option;
+    });
+  }
 
-    // Save student answer
-    await _dbHelper.saveStudentAnswer(_tableName, _test.id, _test.correct);
+  // ✅ FIXED: Handle navigation only when Next is clicked
+  Future<void> _handleNext() async {
+    if (_selectedOption == null) return;
 
-    // Save correct answer
-    await _dbHelper.saveCorrectAnswer(_tableName, _test.id, _test.correct);
+    // 1️⃣ Save CT answer
+    await _dbHelper.saveStudentAnswer(_tableName, _test.id, _selectedOption!);
 
-   // Mark group 1 as present
-await _dbHelper.markGroupPresent(1);
+    // 2️⃣ Mark Group 0 as PRESENT
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 0,
+      status: GroupStatus.present,
+    );
 
-// Get all present groups
-final presentGroups = await _dbHelper.getPresentGroups();
+    // 3️⃣ Check how many groups are PRESENT
+    final groups = await _dbHelper.getStudentGroupDecisions('C');
+    final presentCount = groups.values
+        .where((status) => status == GroupStatus.present)
+        .length;
 
-
-    if (presentGroups.length >= 2) {
-      // Two groups detected → Final Result
+    // 4️⃣ Navigate based on count
+    if (presentCount >= 2) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const FinalResultScreen()),
+        MaterialPageRoute(
+          builder: (_) => const WetTestCFinalResultScreen(salt: 'C'),
+        ),
       );
     } else {
-      // Only one group detected → continue to Group 1 Detection
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const WetTestCGroupOneDetectionScreen()),
+        MaterialPageRoute(
+          builder: (_) => const WetTestCGroupOneDetectionScreen(),
+        ),
       );
     }
   }
@@ -155,30 +171,30 @@ final presentGroups = await _dbHelper.getPresentGroups();
                       _buildInferenceHeader(),
                       const SizedBox(height: 10),
                       ..._test.options.map((opt) {
+                        final selectedHere = _selectedOption == opt;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
-                            onTap: _onOptionSelected,
+                            onTap: () => _onOptionTapped(opt), // ✅ Just select
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: _isSelected
+                                color: selectedHere
                                     ? accentTeal.withOpacity(0.1)
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: _isSelected ? accentTeal : Colors.grey.shade300,
+                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 opt,
                                 style: TextStyle(
-                                  fontWeight:
-                                      _isSelected ? FontWeight.bold : FontWeight.normal,
-                                  color: _isSelected ? primaryBlue : Colors.black87,
+                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
+                                  color: selectedHere ? primaryBlue : Colors.black87,
                                 ),
                               ),
                             ),
@@ -197,7 +213,7 @@ final presentGroups = await _dbHelper.getPresentGroups();
                       label: const Text('Previous'),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _isSelected ? _onOptionSelected : null,
+                      onPressed: _isSelected ? _handleNext : null, // ✅ Call _handleNext
                       icon: const Icon(Icons.arrow_forward),
                       label: const Text('Next'),
                       style: ElevatedButton.styleFrom(

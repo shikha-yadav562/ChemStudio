@@ -1,56 +1,43 @@
 // group2ct_cu2plus.dart
-
 import 'package:ChemStudio/DB/database_helper.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/final_result.dart';
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/WetTestCFinalResultScreen.dart';
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
+import '../group0/group0analysis.dart';
 import '../group3/group3detection.dart';
 import '../c_intro.dart';
 
-// --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
-
-// FIX: Keeping the extension here to support _loadSavedAnswer() unless it's defined in group0analysis.dart
-extension IterableExtension<T> on Iterable<T> {
- T? firstWhereOrNull(bool Function(T element) test) {
- for (var element in this) {
-if (test(element)) return element;
- }
- return null;
-}
-}
 
 class WetTestCGroupTwoCTCuScreen extends StatefulWidget {
   const WetTestCGroupTwoCTCuScreen({super.key});
 
   @override
-  State<WetTestCGroupTwoCTCuScreen> createState() => 
+  State<WetTestCGroupTwoCTCuScreen> createState() =>
       _WetTestCGroupTwoCTCuScreenState();
 }
 
-class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
+class _WetTestCGroupTwoCTCuScreenState
+    extends State<WetTestCGroupTwoCTCuScreen>
     with SingleTickerProviderStateMixin {
   
   String? _selectedOption; 
-  
+  bool get _isSelected => _selectedOption != null;
+
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltC_WetTest';
 
-  static const String SOLUTION_PREPARATION = 
-    'Dissolve the black ppt of group II in aquaregia (conc. HCl + conc. HNO₃ in 3:1 proportion), dilute with water. Use this solution for C.T of Cu²⁺';
-
-  // Content for the Cu2+ Confirmation Test
   late final WetTestItem _test = WetTestItem(
-      id: 7, 
-      title: 'C.T for Cu²⁺',
-      procedure: 'Above Solution + KI', 
-      observation: 'White ppt in brown coloured solution',
-      options: ['Cu²⁺ confirmed'],
-      correct: 'Cu²⁺ confirmed', 
+    id: 7,
+    title: 'C.T for Cu²⁺',
+    procedure: 'Above Solution + KI', 
+    observation: 'White ppt in brown coloured solution',
+    options: ['Cu²⁺ confirmed'],
+    correct: 'Cu²⁺ confirmed', 
   );
 
   @override
@@ -60,65 +47,65 @@ class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide =
-        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _loadSavedAnswer();
     _animController.forward();
   }
 
- Future<void> _loadSavedAnswer() async {
-  final studentAnswer = await _dbHelper.getStudentAnswer(_tableName, _test.id);
-  if (studentAnswer != null) {
+  Future<void> _loadSavedAnswer() async {
+    final studentAnswer = await _dbHelper.getStudentAnswer(_tableName, _test.id);
+    if (studentAnswer != null) {
+      setState(() {
+        _selectedOption = studentAnswer;
+      });
+    }
+  }
+
+  // ✅ FIXED: Just select, don't navigate or save yet
+  void _onOptionTapped(String option) {
     setState(() {
-      _selectedOption = studentAnswer;
+      _selectedOption = option;
     });
   }
-}
 
-Future<void> _onOptionSelected(String option) async {
-  setState(() => _selectedOption = option);
+  // ✅ FIXED: Handle everything only when Next is clicked
+  Future<void> _handleNext() async {
+    if (_selectedOption == null) return;
 
-  // Save student answer
-  await _dbHelper.saveStudentAnswer(_tableName, _test.id, option);
+    // 1️⃣ Save CT answer
+    await _dbHelper.saveStudentAnswer(_tableName, _test.id, _selectedOption!);
 
-  // Save correct answer
-  await _dbHelper.saveCorrectAnswer(_tableName, _test.id, _test.correct);
-
-  // Mark group 2 as present
-  await _dbHelper.markGroupPresent(2);
-
-  // Get all present groups
-  final presentGroups = await _dbHelper.getPresentGroups();
-
-  if (presentGroups.length >= 2) {
-    // Two groups detected → Final Result
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const FinalResultScreen()),
+    // 2️⃣ Mark Group II as present
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 2,
+      status: GroupStatus.present,
     );
-  } else {
-    // Only one group → continue to Group 3 Detection
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const WetTestCGroupThreeDetectionScreen()),
-    );
-  }
-}
 
-void _next() async {
-  // FIX 2: Navigate to the imported Group 3 Detection screen.
-  Navigator.push(
-   context,
-   MaterialPageRoute(
-    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
-   ),
-  );
- }
-  void _prev() {
-    // Navigate back to the Group II Analysis screen
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
+    // 3️⃣ Count present groups
+    final studentGroups = await _dbHelper.getStudentGroupDecisions('C');
+    final presentCount = studentGroups.values
+        .where((status) => status == GroupStatus.present)
+        .length;
+
+    // 4️⃣ Navigate accordingly
+    if (!mounted) return;
+    
+    if (presentCount >= 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const WetTestCFinalResultScreen(salt: 'C')),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const WetTestCGroupThreeDetectionScreen()),
+      );
     }
+  }
+
+  void _prev() {
+    if (Navigator.canPop(context)) Navigator.pop(context);
   }
 
   @override
@@ -127,54 +114,18 @@ void _next() async {
     super.dispose();
   }
 
-  // Helper method to build the preparation/solution box
-  Widget _buildSolutionBox(String content) {
-    // FIX: Use a standard Card with no custom color or side border to match _buildTestCard
-    return Card(
-      elevation: 4, // Same shadow as Test/Observation card
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), // Same border radius
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Uses the same gradient header as 'Test' and 'Observation'
-            _buildGradientHeader('Solution'), 
-            const SizedBox(height: 8),
-            Text(
-              content,
-              // Uses the same bold, primary blue color styling as the Observation text
-              style: const TextStyle(
-                fontSize: 14,
-                color: primaryBlue,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildGradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue])
-              .createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
       child: Text(
         text,
-        style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }
 
-  // Uses the WetTestItem's procedure field for the Test step
-  Widget _buildTestCard(String testProcedure, String observation) {
-    // This Card is the one being copied
+  Widget _buildTestCard(String procedure, String observation) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -185,18 +136,13 @@ void _next() async {
           children: [
             _buildGradientHeader('Test'),
             const SizedBox(height: 4),
-            Text(testProcedure, style: const TextStyle(fontSize: 14)),
+            Text(procedure, style: const TextStyle(fontSize: 14)),
             const Divider(height: 24),
             _buildGradientHeader('Observation'),
             const SizedBox(height: 8),
             Text(
               observation,
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                color: primaryBlue,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ],
         ),
@@ -213,35 +159,27 @@ void _next() async {
         elevation: 2,
         centerTitle: true,
         leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: primaryBlue),
-    onPressed: () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroCScreen()), // Replace with your actual class name in c_intro.dart
-        (route) => false, // This clears the navigation stack
-      );
-    },
-  ),
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () => Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const WetTestIntroCScreen()),
+            (route) => false,
+          ),
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue])
-                  .createShader(bounds),
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
           child: const Text(
             'Salt C : Wet Test',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-                  .animate(_fadeSlide),
+          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+              .animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -256,26 +194,16 @@ void _next() async {
                 Expanded(
                   child: ListView(
                     children: [
-                      // Solution/Preparation Box (Now visually consistent with the card below)
-                      _buildSolutionBox(SOLUTION_PREPARATION),
-                      
-                      // Test and Observation Card.
-                      _buildTestCard(_test.procedure, _test.observation), 
-
+                      _buildTestCard(_test.procedure, _test.observation),
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
-                      
-                      // Options (Only one for confirmation)
                       ..._test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
-                            onTap: () async {
-                              setState(() => _selectedOption = opt);
-                              await  _onOptionSelected(opt);
-                            },
+                            onTap: () => _onOptionTapped(opt), // ✅ FIXED: Just select
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -286,21 +214,15 @@ void _next() async {
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.grey.shade300,
+                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 opt,
                                 style: TextStyle(
-                                  fontWeight: selectedHere
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.black87,
+                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
+                                  color: selectedHere ? primaryBlue : Colors.black87,
                                 ),
                               ),
                             ),
@@ -310,7 +232,6 @@ void _next() async {
                     ],
                   ),
                 ),
-                // Navigation Buttons (Prev/Next)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -320,14 +241,13 @@ void _next() async {
                       label: const Text('Previous'),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _selectedOption != null ? _next : null,
+                      onPressed: _isSelected ? _handleNext : null, // ✅ FIXED: Call _handleNext
                       icon: const Icon(Icons.arrow_forward),
                       label: const Text('Next'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                     ),
                   ],

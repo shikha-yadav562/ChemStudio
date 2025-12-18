@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/correct_answers.dart';
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class DatabaseHelper {
   static const _dbName = 'chemstudio.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   static Database? _database;
 
@@ -22,10 +22,14 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, _dbName);
-    return await openDatabase(path, version: _dbVersion, onCreate: _onCreate);
+    return await openDatabase(
+      path,
+      version: _dbVersion,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
+    );
   }
 
-  // Create all tables
   Future<void> _onCreate(Database db, int version) async {
     final tables = [
       'SaltA_DryTest',
@@ -36,7 +40,6 @@ class DatabaseHelper {
       'SaltC_PreliminaryTest',
       'SaltD_DryTest',
       'SaltD_PreliminaryTest',
-      // Wet Tests
       'SaltA_WetTest',
       'SaltB_WetTest',
       'SaltC_WetTest',
@@ -46,42 +49,104 @@ class DatabaseHelper {
     for (var table in tables) {
       await db.execute('''
         CREATE TABLE $table (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          question_id INTEGER NOT NULL,
+          question_id INTEGER PRIMARY KEY,
           student_answer TEXT,
           correct_answer TEXT
         )
       ''');
     }
 
-    // Table to track present groups for Wet Test
+    // Group decisions table
     await db.execute('''
       CREATE TABLE WetTestGroups (
-        group_id INTEGER PRIMARY KEY,
-        is_present INTEGER DEFAULT 0
+        salt TEXT NOT NULL,
+        group_number INTEGER NOT NULL,
+        student_status TEXT NOT NULL,
+        PRIMARY KEY (salt, group_number)
       )
     ''');
   }
 
-  // ----------------------
-  // Save correct answer
-  Future<void> saveCorrectAnswer(String tableName, int questionId, String correctAnswer) async {
-    final db = await database;
-    await db.insert(
-      tableName,
-      {'question_id': questionId, 'correct_answer': correctAnswer},
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+  // Handle database upgrades
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      final tables = [
+        'SaltA_DryTest',
+        'SaltA_PreliminaryTest',
+        'SaltB_DryTest',
+        'SaltB_PreliminaryTest',
+        'SaltC_DryTest',
+        'SaltC_PreliminaryTest',
+        'SaltD_DryTest',
+        'SaltD_PreliminaryTest',
+        'SaltA_WetTest',
+        'SaltB_WetTest',
+        'SaltC_WetTest',
+        'SaltD_WetTest',
+      ];
+
+      for (var table in tables) {
+        await db.execute('DROP TABLE IF EXISTS $table');
+      }
+
+      await _onCreate(db, newVersion);
+    }
   }
 
-  // Save student answer
+  // Save correct answer using UPDATE or INSERT
+  Future<void> saveCorrectAnswer(String tableName, int questionId, String correctAnswer) async {
+    final db = await database;
+    
+    final existing = await db.query(
+      tableName,
+      where: 'question_id = ?',
+      whereArgs: [questionId],
+    );
+
+    if (existing.isEmpty) {
+      await db.insert(
+        tableName,
+        {
+          'question_id': questionId,
+          'correct_answer': correctAnswer,
+        },
+      );
+    } else {
+      await db.update(
+        tableName,
+        {'correct_answer': correctAnswer},
+        where: 'question_id = ?',
+        whereArgs: [questionId],
+      );
+    }
+  }
+
+  // Save student answer using UPDATE or INSERT
   Future<void> saveStudentAnswer(String tableName, int questionId, String studentAnswer) async {
     final db = await database;
-    await db.insert(
+    
+    final existing = await db.query(
       tableName,
-      {'question_id': questionId, 'student_answer': studentAnswer},
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      where: 'question_id = ?',
+      whereArgs: [questionId],
     );
+
+    if (existing.isEmpty) {
+      await db.insert(
+        tableName,
+        {
+          'question_id': questionId,
+          'student_answer': studentAnswer,
+        },
+      );
+    } else {
+      await db.update(
+        tableName,
+        {'student_answer': studentAnswer},
+        where: 'question_id = ?',
+        whereArgs: [questionId],
+      );
+    }
   }
 
   // Get student answer
@@ -117,28 +182,58 @@ class DatabaseHelper {
   }
 
   // ----------------------
-  // New methods for Group tracking
+  // Wet Test Group Decision Logic
 
-  // Mark a group as present
-  Future<void> markGroupPresent(int groupNumber) async {
+  /// Save student's decision for a group
+  /// Converts GroupStatus enum to string for storage
+  Future<void> insertGroupDecision({
+    required String salt,
+    required int groupNumber,
+    required GroupStatus status,
+  }) async {
     final db = await database;
     await db.insert(
       'WetTestGroups',
-      {'group_id': groupNumber, 'is_present': 1},
+      {
+        'salt': salt,
+        'group_number': groupNumber,
+        'student_status': status.name, // Stores 'present' or 'absent'
+      },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
-  // Get all present groups
-  Future<List<int>> getPresentGroups() async {
+  /// Read all group decisions for a salt
+  /// Converts string from database back to GroupStatus enum
+  Future<Map<int, GroupStatus>> getStudentGroupDecisions(String salt) async {
     final db = await database;
+
     final result = await db.query(
       'WetTestGroups',
-      columns: ['group_id'],
-      where: 'is_present = ?',
-      whereArgs: [1],
+      where: 'salt = ?',
+      whereArgs: [salt],
     );
-    return result.map((row) => row['group_id'] as int).toList();
+
+    Map<int, GroupStatus> groupStatuses = {};
+    
+    for (final row in result) {
+      final groupNumber = row['group_number'] as int;
+      final statusString = row['student_status'] as String;
+      
+      // Convert string back to enum
+      // Using byName which throws if not found, or use a safer approach:
+      GroupStatus status;
+      try {
+        status = GroupStatus.values.byName(statusString);
+      } catch (e) {
+        print('Warning: Invalid status "$statusString" for group $groupNumber, defaulting to absent');
+        status = GroupStatus.absent;
+      }
+      
+      groupStatuses[groupNumber] = status;
+    }
+
+    return groupStatuses;
   }
 
   // ----------------------
@@ -148,7 +243,7 @@ class DatabaseHelper {
     await db.delete(tableName);
   }
 
-  // Clear all tables
+  // Clear all answers
   Future<void> clearAllAnswers() async {
     final db = await database;
     final tables = [
@@ -169,7 +264,6 @@ class DatabaseHelper {
     for (var table in tables) {
       await db.delete(table);
     }
-    _database = null;
   }
 
   // Reset database completely
@@ -212,34 +306,5 @@ class DatabaseHelper {
     } catch (e) {
       print("❌ Error exporting database: $e");
     }
-  }
-}
-
-// ------------------------
-// Extension to prefill correct answers
-extension DatabaseHelperCorrectAnswers on DatabaseHelper {
-  Future<void> prefillCorrectAnswers() async {
-    final db = await database;
-
-    for (var tableEntry in correctAnswers.entries) {
-      final tableName = tableEntry.key;
-      final questions = tableEntry.value;
-
-      for (var qEntry in questions.entries) {
-        final questionId = qEntry.key;
-        final answer = qEntry.value;
-
-        await db.insert(
-          tableName,
-          {
-            'question_id': questionId,
-            'correct_answer': answer,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-    }
-
-    print('✅ Correct answers prefilled in database');
   }
 }
