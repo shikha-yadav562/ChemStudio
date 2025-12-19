@@ -84,7 +84,7 @@ void _next() async {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const Group5AnalysisScreen(),
+        builder: (_) => const Group5AnalysisPart1(),
       ),
     );
   } else if (_selectedOption == 'Group-V is Absent') {

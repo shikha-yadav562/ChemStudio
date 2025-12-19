@@ -7,7 +7,15 @@ const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestCScreen extends StatefulWidget {
   final int startIndex;
-  const PreliminaryTestCScreen({super.key, this.startIndex = 0});
+  final bool isReviewMode;
+  final Map<int, String>? preliminaryAnswers;
+
+  const PreliminaryTestCScreen({
+    super.key,
+    this.startIndex = 0,
+    this.isReviewMode = false,
+    this.preliminaryAnswers,
+  });
 
   @override
   State<PreliminaryTestCScreen> createState() => _PreliminaryTestCScreenState();
@@ -22,10 +30,10 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
   void initState() {
     super.initState();
     _index = widget.startIndex;
-     // Save correct answers in DB for comparison
-  for (var test in _tests) {
-    _dbHelper.saveCorrectAnswer('SaltC_PreliminaryTest', test.id, test.correct);
-  }
+
+    if (widget.isReviewMode && widget.preliminaryAnswers != null) {
+      _answers.addAll(widget.preliminaryAnswers!);
+    }
   }
 
   final List<TestItem> _tests = [
@@ -33,14 +41,13 @@ class _PreliminaryTestCScreenState extends State<PreliminaryTestCScreen> {
       id: 1,
       title: "1. Preliminary Test – Colour",
       observation: "Dark Brown",
-     options: [
-     "Fe³⁺ may be present",
-     "Cu²⁺ may be present",
-     "Mn²⁺ may be present",
-     "Co²⁺ may be present",
-],
-correct: "Fe³⁺ may be present",
-
+      options: [
+        "Fe³⁺ may be present",
+        "Cu²⁺ may be present",
+        "Mn²⁺ may be present",
+        "Co²⁺ may be present",
+      ],
+      correct: "Fe³⁺ may be present",
     ),
     TestItem(
       id: 2,
@@ -55,7 +62,7 @@ correct: "Fe³⁺ may be present",
     final answers = await _dbHelper.getAnswers('SaltC_PreliminaryTest');
     print('📘 --- Preliminary Test Answers from Database ---');
     for (var row in answers) {
-      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+      print('Question ID: ${row['question_id']} | Answer: ${row['student_answer']}');
     }
     print('----------------------------------------------');
   }
@@ -64,13 +71,25 @@ correct: "Fe³⁺ may be present",
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
-      await _printPreliminaryAnswers();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => DryTestCScreen(preliminaryAnswers: _answers),
-        ),
-      );
+      if (widget.isReviewMode) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DryTestCScreen(
+              preliminaryAnswers: _answers,
+              isReviewMode: true,
+            ),
+          ),
+        );
+      } else {
+        await _printPreliminaryAnswers();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DryTestCScreen(preliminaryAnswers: _answers),
+          ),
+        );
+      }
     }
   }
 
@@ -92,9 +111,13 @@ correct: "Fe³⁺ may be present",
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: const Text(
-            "Salt C: Preliminary Test",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+          child: Text(
+            widget.isReviewMode ? "Salt C: Review Mode" : "Salt C: Preliminary Test",
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
@@ -118,7 +141,8 @@ correct: "Fe³⁺ may be present",
                   const SizedBox(height: 24),
                   ShaderMask(
                     shaderCallback: (bounds) =>
-                        const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+                        const LinearGradient(colors: [accentTeal, primaryBlue])
+                            .createShader(bounds),
                     child: const Text(
                       'Based on the observation, select the correct inference:',
                       style: TextStyle(
@@ -131,39 +155,95 @@ correct: "Fe³⁺ may be present",
                   const SizedBox(height: 10),
                   ...test.options.map((opt) {
                     final selectedHere = selected == opt;
+                    final bool isCorrect = opt == test.correct;
+
+                    Color borderColor;
+                    Color backgroundColor;
+                    Color textColor;
+
+                    if (widget.isReviewMode) {
+                      if (selectedHere && isCorrect) {
+                        borderColor = Colors.green;
+                        backgroundColor = Colors.green.withOpacity(0.1);
+                        textColor = Colors.green;
+                      } else if (selectedHere && !isCorrect) {
+                        borderColor = Colors.red;
+                        backgroundColor = Colors.red.withOpacity(0.1);
+                        textColor = Colors.red;
+                      } else if (!selectedHere && isCorrect) {
+                        borderColor = Colors.green;
+                        backgroundColor = Colors.green.withOpacity(0.05);
+                        textColor = Colors.green.shade700;
+                      } else {
+                        borderColor = Colors.grey.shade300;
+                        backgroundColor = Colors.white;
+                        textColor = Colors.black87;
+                      }
+                    } else {
+                      if (selectedHere) {
+                        borderColor = accentTeal;
+                        backgroundColor = accentTeal.withOpacity(0.1);
+                        textColor = accentTeal;
+                      } else {
+                        borderColor = Colors.grey.shade300;
+                        backgroundColor = Colors.white;
+                        textColor = Colors.black87;
+                      }
+                    }
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
-                        onTap: () async {
-  setState(() => _answers[test.id] = opt);
+                        onTap: widget.isReviewMode
+                            ? null
+                            : () async {
+                                setState(() => _answers[test.id] = opt);
 
-  // Save student answer
-  await _dbHelper.saveStudentAnswer(
-    'SaltC_PreliminaryTest',
-    test.id,
-    opt,
-  );
-
-  // Save correct answer
- 
-},
-
+                                await _dbHelper.saveStudentAnswer(
+                                  'SaltC_PreliminaryTest',
+                                  test.id,
+                                  opt,
+                                );
+                              },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: selectedHere ? accentTeal.withOpacity(0.1) : Colors.white,
+                            color: backgroundColor,
                             border: Border.all(
-                                color: selectedHere ? accentTeal : Colors.grey.shade300, width: 1.5),
+                              color: borderColor,
+                              width: widget.isReviewMode && isCorrect ? 2.5 : 1.5,
+                            ),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
-                            opt,
-                            style: TextStyle(
-                              fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
-                              color: selectedHere ? accentTeal : Colors.black87,
-                            ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  opt,
+                                  style: TextStyle(
+                                    fontWeight: (selectedHere ||
+                                            (widget.isReviewMode && isCorrect))
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: textColor,
+                                  ),
+                                ),
+                              ),
+                              if (widget.isReviewMode && selectedHere)
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 20,
+                                ),
+                              if (widget.isReviewMode && !selectedHere && isCorrect)
+                                Icon(
+                                  Icons.check_circle_outline,
+                                  color: Colors.green,
+                                  size: 20,
+                                ),
+                            ],
                           ),
                         ),
                       ),
@@ -173,25 +253,30 @@ correct: "Fe³⁺ may be present",
               ),
             ),
             Row(
-              mainAxisAlignment:
-                  (_index == 0) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: (_index == 0 && !widget.isReviewMode)
+                  ? MainAxisAlignment.end
+                  : MainAxisAlignment.spaceBetween,
               children: [
-                if (_index > 0)
+                if (_index > 0 || widget.isReviewMode)
                   TextButton.icon(
-                    onPressed: _prev,
+                    onPressed: _index > 0 ? _prev : null,
                     icon: const Icon(Icons.arrow_back),
                     label: const Text("Previous"),
                   ),
                 ElevatedButton.icon(
-                  onPressed: selected != null ? _next : null,
+                  onPressed:
+                      widget.isReviewMode ? _next : (selected != null ? _next : null),
                   icon: Icon(_index == _tests.length - 1
                       ? Icons.check_circle_outline
                       : Icons.arrow_forward),
-                  label: Text(_index == _tests.length - 1 ? "Proceed to Dry Test" : "Next"),
+                  label: Text(_index == _tests.length - 1
+                      ? "Proceed to Dry Test"
+                      : "Next"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                 ),
               ],
@@ -212,11 +297,16 @@ correct: "Fe³⁺ may be present",
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(colors: [accentTeal, primaryBlue])
-                  .createShader(bounds),
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [accentTeal, primaryBlue],
+              ).createShader(bounds),
               child: const Text(
                 "Observation:",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -254,7 +344,11 @@ correct: "Fe³⁺ may be present",
           end: Alignment.bottomRight,
         ),
         boxShadow: [
-          BoxShadow(color: Colors.brown.withOpacity(0.4), blurRadius: 8, spreadRadius: 2),
+          BoxShadow(
+            color: Colors.brown.withOpacity(0.4),
+            blurRadius: 8,
+            spreadRadius: 2,
+          ),
         ],
       ),
       child: const Center(
