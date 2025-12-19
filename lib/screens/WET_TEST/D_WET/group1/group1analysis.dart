@@ -1,9 +1,11 @@
 // E:\flutter chemistry\wet\wet\lib\C\group1\group1analysis.dart
 
+import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group0/group0analysis.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group1/group1ct_pb2plus.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // For DatabaseHelper, WetTestItem, etc.
-import 'group1ct_pb2plus.dart';
-import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart'; 
 
 // --- Theme Constants (Must match existing design) ---
 const Color primaryBlue = Color(0xFF004C91);
@@ -12,14 +14,7 @@ const Color accentTeal = Color(0xFF00A6A6);
 // FIX: Re-defining the extension method here. 
 // NOTE: To prevent future name collisions, ensure this extension is NOT defined 
 // in group1detection.dart, group2detection.dart, or group1ct_pb2plus.dart.
-extension IterableExtension<T> on Iterable<T> {
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
-}
+
 
 
 class WetTestDGroupOneAnalysisScreen extends StatefulWidget {
@@ -75,27 +70,31 @@ class _WetTestDGroupOneAnalysisScreenState extends State<WetTestDGroupOneAnalysi
       final testId = _tests[_index].id;
       // .firstWhereOrNull is now available
       final savedAnswer = data.firstWhereOrNull(
-          (row) => row['question_id'] == testId)?['answer'];
+          (row) => row['question_id'] == testId)?['student_answer'];
       _selectedOption = savedAnswer;
     });
   }
 
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
-  }
+Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+  setState(() => _selectedOption = selected);
 
-  void _next() async {
-    // Navigate to the Confirmation Test for the detected ion (Pb²⁺).
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const WetTestDGroupOneCTPbScreen(),
-      ),
-    );
-  }
+  // Only save student answer - NO correct answer saving here
+  await _dbHelper.saveStudentAnswer(_tableName, test.id, selected);
+}
+
+
+ void _next() async {
+  // Navigate to the Confirmation Test for the detected ion (Pb²⁺).
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const WetTestDGroupOneCTScreen(), // ✅ CORRECT CLASS NAME
+    ),
+  );
+}
 
   void _prev() {
-    // Navigate back to the Group II Detection screen (WetTestDGroupOneDetectionScreen)
+    // Navigate back to the Group II Detection screen (WetTestCGroupOneDetectionScreen)
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
     }
@@ -172,9 +171,9 @@ class _WetTestDGroupOneAnalysisScreenState extends State<WetTestDGroupOneAnalysi
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
                             onTap: () async {
-                              setState(() => _selectedOption = opt);
-                              await _saveAnswer(test.id, opt);
-                            },
+  await _onOptionSelected(test, opt);
+},
+
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),

@@ -24,7 +24,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     _index = widget.startIndex;
      // Save correct answers in DB for comparison
   for (var test in _tests) {
-    _dbHelper.saveCorrectAnswer('SaltA_PreliminaryTest', test.id, test.correct);
+    _dbHelper.saveCorrectAnswer('SaltD_PreliminaryTest', test.id, test.correct);
   }
   }
 
