@@ -29,7 +29,7 @@ class _Group6AnalysisScreenState extends State<Group6AnalysisScreen>
 
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 13, // ✅ Same ID as detection
+      id: 26, // ✅ Same ID as detection
       title: 'Analysis of Group VI',
       procedure: 'Group VI white ppt + dil. HCl',
       observation: 'Clear solution is obtained',

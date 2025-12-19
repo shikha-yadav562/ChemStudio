@@ -32,7 +32,7 @@ class _WetTestCGroupTwoCTCuScreenState
   final String _tableName = 'SaltC_WetTest';
 
   late final WetTestItem _test = WetTestItem(
-    id: 7,
+    id: 8,
     title: 'C.T for Cu²⁺',
     procedure: 'Above Solution + KI', 
     observation: 'White ppt in brown coloured solution',

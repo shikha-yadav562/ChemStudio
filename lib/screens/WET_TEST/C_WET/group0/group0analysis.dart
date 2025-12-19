@@ -1,3 +1,4 @@
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '0CT.dart';
@@ -93,31 +94,37 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
     );
   }
 
-  void _next() {
-    if (_selectedOption == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an option')),
-      );
-      return;
-    }
-
-    if (_selectedOption == 'Group Zero is present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCGroupZeroCTScreen(),
-        ),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCGroupOneDetectionScreen(),
-        ),
-      );
-    }
+void _next() async {  // ✅ Add async
+  if (_selectedOption == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please select an option')),
+    );
+    return;
   }
 
+  if (_selectedOption == 'Group Zero is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupZeroCTScreen(),
+      ),
+    );
+  } else {
+    // ✅ Mark Group 0 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 0,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupOneDetectionScreen(),
+      ),
+    );
+  }
+}
   @override
   void dispose() {
     _animController.dispose();

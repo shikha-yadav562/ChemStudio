@@ -30,7 +30,7 @@ class _Group5CTCaScreenState extends State<Group5CTCaScreen>
   final String _tableName = 'SaltC_WetTest';
 
   late final WetTestItem _test = WetTestItem(
-    id: 11, // Sequential ID
+    id: 23, // Sequential ID
     title: 'C.T for Ca²⁺',
     procedure: 'Above acetate solution + (NH₄)₂C₂O₄', 
     observation: 'White ppt',

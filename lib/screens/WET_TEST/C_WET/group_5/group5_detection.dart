@@ -1,4 +1,5 @@
 // group5_detection.dart
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group_5/group5_analysis_part1.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
@@ -31,7 +32,7 @@ class _Group5DetectionScreenState extends State<Group5DetectionScreen>
 
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 9, // Sequential ID for Group 5 Detection
+      id: 20, // Sequential ID for Group 5 Detection
       title: 'Group V Detection',
       procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl(equal) + NH₄OH (till alkaline to litmus) + (NH₄)₂CO₃',
       observation: 'White ppt',
@@ -77,24 +78,31 @@ class _Group5DetectionScreenState extends State<Group5DetectionScreen>
     );
   }
 
-  /// Navigation logic
-  void _next() {
-    if (_selectedOption == 'Group-V is present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const Group5AnalysisScreen(),
-        ),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const Group6Detection(),
-        ),
-      );
-    }
+// Replace the _next() method:
+void _next() async {
+  if (_selectedOption == 'Group-V is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const Group5AnalysisScreen(),
+      ),
+    );
+  } else if (_selectedOption == 'Group-V is Absent') {
+    // ✅ ADD THIS: Mark Group 5 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 5,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const Group6Detection(),
+      ),
+    );
   }
+}
 
   void _prev() {
     Navigator.pop(context, _selectedOption);

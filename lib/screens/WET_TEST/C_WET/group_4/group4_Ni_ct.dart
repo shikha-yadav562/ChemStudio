@@ -29,7 +29,7 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage>
   final String _tableName = 'SaltC_WetTest';
 
   final WetTestItem _test = WetTestItem(
-    id: 15, // Unique ID for Ni²⁺ CT
+    id: 16, // Unique ID for Ni²⁺ CT
     title: 'C.T For Ni²⁺',
     procedure: 'Above solution + NaOH',
     observation: 'Light green ppt',

@@ -29,7 +29,7 @@ class _Mn2ConfirmedPageState extends State<Mn2ConfirmedPage>
   final String _tableName = 'SaltC_WetTest';
 
   final WetTestItem _test = WetTestItem(
-    id: 17, // Unique ID for Mn²⁺ CT
+    id: 18, // Unique ID for Mn²⁺ CT
     title: 'C.T For Mn²⁺',
     procedure: 'Above solution + PbO₂ + conc. HNO₃ boil, cool, allow to settle',
     observation: 'Pink or violet colour',

@@ -35,7 +35,7 @@ class _WetTestCGroupTwoCTAsScreenState
       'Dissolve the yellow ppt of Group 2 in conc. HNO₃ and use this solution for C.T of As³⁺';
 
   late final WetTestItem _test = WetTestItem(
-    id: 8,
+    id: 9,
     title: 'C.T for As³⁺',
     procedure: 'Above Solution + ammonium molybdate solution + heat', 
     observation: 'Yellow ppt',

@@ -29,7 +29,7 @@ class _Group6CTMgScreenState extends State<Group6CTMgScreen>
   final String _tableName = 'SaltC_WetTest';
 
   late final WetTestItem _test = WetTestItem(
-    id: 14, // ✅ Sequential ID (only CT for Group 6)
+    id: 27, // ✅ Sequential ID (only CT for Group 6)
     title: 'C.T for Mg²⁺',
     procedure: 'Previous solution + Titan yellow solution', // ✅ Your original procedure
     observation: 'Rose red ppt', // ✅ Your original observation

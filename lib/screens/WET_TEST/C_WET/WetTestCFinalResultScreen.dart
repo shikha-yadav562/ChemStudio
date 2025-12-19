@@ -17,36 +17,35 @@ class _WetTestCFinalResultScreenState extends State<WetTestCFinalResultScreen> {
   Map<int, GroupStatus> studentGroups = {};
 
   // ✅ UPDATED: Ion mapping with Groups 0-6
-  final List<Map<String, dynamic>> ctTests = [
-    // Group 0
-    {'ion': 'NH4+', 'group': 0, 'questionId': 2, 'title': 'NH₄⁺ Confirmatory Test'},
-    
-    // Group 1
-    {'ion': 'Pb2+', 'group': 1, 'questionId': 5, 'title': 'Pb²⁺ Confirmatory Test'},
-    
-    // Group 2
-    {'ion': 'Cu2+', 'group': 2, 'questionId': 7, 'title': 'Cu²⁺ Confirmatory Test'},
-    {'ion': 'As3+', 'group': 2, 'questionId': 8, 'title': 'As³⁺ Confirmatory Test'},
-    
-    // Group 3
-    {'ion': 'Fe3+', 'group': 3, 'questionId': 11, 'title': 'Fe³⁺ Confirmatory Test'},
-    {'ion': 'Al3+', 'group': 3, 'questionId': 12, 'title': 'Al³⁺ Confirmatory Test'},
-    
-    // Group 4
-    {'ion': 'Ni2+', 'group': 4, 'questionId': 15, 'title': 'Ni²⁺ Confirmatory Test'},
-    {'ion': 'Co2+', 'group': 4, 'questionId': 16, 'title': 'Co²⁺ Confirmatory Test'},
-    {'ion': 'Mn2+', 'group': 4, 'questionId': 17, 'title': 'Mn²⁺ Confirmatory Test'},
-    {'ion': 'Zn2+', 'group': 4, 'questionId': 18, 'title': 'Zn²⁺ Confirmatory Test'},
-    
-    // Group 5
-    {'ion': 'Ba2+', 'group': 5, 'questionId': 20, 'title': 'Ba²⁺ Confirmatory Test'},
-    {'ion': 'Ca2+', 'group': 5, 'questionId': 21, 'title': 'Ca²⁺ Confirmatory Test'},
-    {'ion': 'Sr2+', 'group': 5, 'questionId': 22, 'title': 'Sr²⁺ Confirmatory Test'},
-    
-    // Group 6
-    {'ion': 'Mg2+', 'group': 6, 'questionId': 24, 'title': 'Mg²⁺ Confirmatory Test'},
-  ];
-
+ final List<Map<String, dynamic>> ctTests = [
+  // Group 0
+  {'ion': 'NH4+', 'group': 0, 'questionId': 2, 'title': 'NH₄⁺ Confirmatory Test'},
+  
+  // Group 1
+  {'ion': 'Pb2+', 'group': 1, 'questionId': 5, 'title': 'Pb²⁺ Confirmatory Test'},
+  
+  // Group 2
+  {'ion': 'Cu2+', 'group': 2, 'questionId': 8, 'title': 'Cu²⁺ Confirmatory Test'}, // ✅ Changed 7→8
+  {'ion': 'As3+', 'group': 2, 'questionId': 9, 'title': 'As³⁺ Confirmatory Test'}, // ✅ Changed 8→9
+  
+  // Group 3
+  {'ion': 'Fe3+', 'group': 3, 'questionId': 12, 'title': 'Fe³⁺ Confirmatory Test'}, // ✅ Changed 11→12
+  {'ion': 'Al3+', 'group': 3, 'questionId': 13, 'title': 'Al³⁺ Confirmatory Test'}, // ✅ Changed 12→13
+  
+  // Group 4
+  {'ion': 'Ni2+', 'group': 4, 'questionId': 16, 'title': 'Ni²⁺ Confirmatory Test'}, // ✅ Changed 15→16
+  {'ion': 'Co2+', 'group': 4, 'questionId': 17, 'title': 'Co²⁺ Confirmatory Test'}, // ✅ Changed 16→17
+  {'ion': 'Mn2+', 'group': 4, 'questionId': 18, 'title': 'Mn²⁺ Confirmatory Test'}, // ✅ Changed 17→18
+  {'ion': 'Zn2+', 'group': 4, 'questionId': 19, 'title': 'Zn²⁺ Confirmatory Test'}, // ✅ Changed 18→19
+  
+  // Group 5
+  {'ion': 'Ba2+', 'group': 5, 'questionId': 22, 'title': 'Ba²⁺ Confirmatory Test'}, // ✅ Changed 20→22
+  {'ion': 'Ca2+', 'group': 5, 'questionId': 23, 'title': 'Ca²⁺ Confirmatory Test'}, // ✅ Changed 21→23
+  {'ion': 'Sr2+', 'group': 5, 'questionId': 24, 'title': 'Sr²⁺ Confirmatory Test'}, // ✅ Changed 22→24
+  
+  // Group 6
+  {'ion': 'Mg2+', 'group': 6, 'questionId': 27, 'title': 'Mg²⁺ Confirmatory Test'}, // ✅ Changed 24→27
+];
   @override
   void initState() {
     super.initState();

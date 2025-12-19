@@ -30,7 +30,7 @@ class _Group5CTBaScreenState extends State<Group5CTBaScreen>
   final String _tableName = 'SaltC_WetTest';
 
   late final WetTestItem _test = WetTestItem(
-    id: 10, // Sequential ID
+    id: 22, // Sequential ID
     title: 'C.T for Ba²⁺',
     procedure: 'Above acetate solution + dil. H₂SO₄', 
     observation: 'White ppt',
@@ -67,40 +67,51 @@ class _Group5CTBaScreenState extends State<Group5CTBaScreen>
   }
 
   // ✅ Handle everything only when Next is clicked
-  Future<void> _handleNext() async {
-    if (_selectedOption == null) return;
+Future<void> _handleNext() async {
+  if (_selectedOption == null) return;
 
-    // 1️⃣ Save CT answer
-    await _dbHelper.saveStudentAnswer(_tableName, _test.id, _selectedOption!);
+  print('🔵 GROUP 5 CT BA - Starting _handleNext()');
+  
+  // 1️⃣ Save CT answer
+  await _dbHelper.saveStudentAnswer(_tableName, _test.id, _selectedOption!);
+  print('✅ Saved CT answer: $_selectedOption for question ID: ${_test.id}');
 
-    // 2️⃣ Mark Group V as present
-    await _dbHelper.insertGroupDecision(
-      salt: 'C',
-      groupNumber: 5,
-      status: GroupStatus.present,
+  // 2️⃣ Mark Group V as present
+  await _dbHelper.insertGroupDecision(
+    salt: 'C',
+    groupNumber: 5,
+    status: GroupStatus.present,
+  );
+  print('✅ Marked Group 5 as PRESENT');
+
+  // 3️⃣ Count present groups
+  final studentGroups = await _dbHelper.getStudentGroupDecisions('C');
+  print('📊 All groups from DB: $studentGroups');
+  
+  final presentCount = studentGroups.values
+      .where((status) => status == GroupStatus.present)
+      .length;
+  
+  print('🔢 Present count: $presentCount');
+  print('🎯 Checking: presentCount ($presentCount) >= 2? ${presentCount >= 2}');
+
+  // 4️⃣ Navigate accordingly
+  if (!mounted) return;
+  
+  if (presentCount >= 2) {
+    print('✅ NAVIGATING TO RESULT SCREEN');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const WetTestCFinalResultScreen(salt: 'C')),
     );
-
-    // 3️⃣ Count present groups
-    final studentGroups = await _dbHelper.getStudentGroupDecisions('C');
-    final presentCount = studentGroups.values
-        .where((status) => status == GroupStatus.present)
-        .length;
-
-    // 4️⃣ Navigate accordingly
-    if (!mounted) return;
-    
-    if (presentCount >= 2) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const WetTestCFinalResultScreen(salt: 'C')),
-      );
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => const Group6Detection()),
-      );
-    }
+  } else {
+    print('⚠️ NAVIGATING TO GROUP 6 DETECTION');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const Group6Detection()),
+    );
   }
+}
 
   void _prev() {
     if (Navigator.canPop(context)) Navigator.pop(context);

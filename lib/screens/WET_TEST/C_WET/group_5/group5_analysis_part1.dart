@@ -1,8 +1,6 @@
 // group5_analysis.dart
 import 'package:ChemStudio/DB/database_helper.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_5/group5_BA_ct.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_5/group5_CA_ct.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_5/group5_SR_ct.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_5/group5analysis_BA_SR_CA.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart';
 import '../c_intro.dart';
@@ -31,7 +29,7 @@ class _Group5AnalysisScreenState extends State<Group5AnalysisScreen>
 
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 9, // Same ID as detection
+      id: 21, // Same ID as detection
       title: 'Analysis of Group V',
       procedure: 'Above solution + K₂CrO₄',
       observation: 'Yellow ppt',
@@ -78,32 +76,16 @@ class _Group5AnalysisScreenState extends State<Group5AnalysisScreen>
   }
 
   void _next() {
-    if (_selectedOption == null) return;
+  if (_selectedOption == null) return;
 
-    if (_selectedOption == 'Ba²⁺ may be present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const Group5CTBaScreen (),
-        ),
-      );
-    } else if (_selectedOption == 'Ca²⁺ may be present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const  Group5CTCaScreen (),
-        ),
-      );
-    } else if (_selectedOption == 'Sr²⁺ may be present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const Group5CTSrScreen (),
-        ),
-      );
-    }
-  }
-
+  // ✅ All options go to the second analysis screen first
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const Analysis_BA_SR_CA(),
+    ),
+  );
+}
   void _prev() {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);

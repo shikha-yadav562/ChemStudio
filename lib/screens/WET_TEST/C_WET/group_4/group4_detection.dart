@@ -1,4 +1,5 @@
 import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:flutter/material.dart';
 import 'group4_analysis.dart';
 import '../group_5/group5_detection.dart';
@@ -26,7 +27,7 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
   final String _tableName = 'SaltC_WetTest';
 
   late final WetTestItem _test = WetTestItem(
-    id: 13, // Unique ID for Group 4 Detection
+    id: 14, // Unique ID for Group 4 Detection
     title: 'Group IV Detection',
     procedure:
         'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water.',
@@ -69,19 +70,29 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
     );
   }
 
-  void _next() async {
-    if (_selectedOption == 'Group-IV is present') {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const Group4AnalysisScreen()),
-      );
-    } else if (_selectedOption == 'Group-IV is Absent') {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const Group5DetectionScreen()),
-      );
-    }
+  // In Group4DetectionScreen (document 8)
+// Replace the _next() method:
+
+void _next() async {
+  if (_selectedOption == 'Group-IV is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const Group4AnalysisScreen()),
+    );
+  } else if (_selectedOption == 'Group-IV is Absent') {
+    // ✅ ADD THIS: Mark Group 4 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 4,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const Group5DetectionScreen()),
+    );
   }
+}
 
   void _prev() {
     if (Navigator.canPop(context)) {

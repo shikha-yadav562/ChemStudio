@@ -30,7 +30,7 @@ class _Group5CTSrScreenState extends State<Group5CTSrScreen>
   final String _tableName = 'SaltC_WetTest';
 
   late final WetTestItem _test = WetTestItem(
-    id: 12, // Sequential ID
+    id: 24, // Sequential ID
     title: 'C.T for Sr²⁺',
     procedure: 'Above acetate solution + dil. H₂SO₄', 
     observation: 'White ppt on warming',

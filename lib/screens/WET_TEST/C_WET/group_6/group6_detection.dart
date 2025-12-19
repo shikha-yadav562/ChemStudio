@@ -1,4 +1,5 @@
 // group6_detection.dart - CORRECTED VERSION
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../group0/group0analysis.dart';
@@ -31,7 +32,7 @@ class _Group6DetectionState extends State<Group6Detection>
 
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 13, // ✅ CORRECT: Sequential ID for Group 6 Detection
+      id: 25, // ✅ CORRECT: Sequential ID for Group 6 Detection
       title: 'Group VI Detection',
       procedure: 'O.S/Filtrate + NH₄Cl + NH₄OH (till alkaline)',
       observation: 'White ppt',
@@ -77,25 +78,31 @@ class _Group6DetectionState extends State<Group6Detection>
     );
   }
 
-  /// ✅ CORRECT: Navigation logic - Last group, so absent goes to Final Result
-  void _next() {
-    if (_selectedOption == 'Group-VI is present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const Group6AnalysisScreen(),
-        ),
-      );
-    } else {
-      // ✅ Group 6 is absent AND it's the last group → go to Final Result
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCFinalResultScreen(salt: 'C'),
-        ),
-      );
-    }
+  // Replace the _next() method:
+void _next() async {
+  if (_selectedOption == 'Group-VI is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const Group6AnalysisScreen(),
+      ),
+    );
+  } else if (_selectedOption == 'Group-VI is Absent') {
+    // ✅ ADD THIS: Mark Group 6 as absent before navigating to Final Result
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 6,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCFinalResultScreen(salt: 'C'),
+      ),
+    );
   }
+}
 
   void _prev() {
     Navigator.pop(context, _selectedOption);

@@ -1,5 +1,6 @@
 // E:\flutter chemistry\wet\wet\lib\C\group1\group1detection.dart
 
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../group0/group0analysis.dart';
@@ -86,24 +87,31 @@ class _WetTestCGroupOneDetectionScreenState
     );
   }
 
-  /// NEXT navigation (NO result logic here)
-  void _next() {
-    if (_selectedOption == 'Group-I is present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCGroupOneAnalysisScreen(),
-        ),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCGroupTwoDetectionScreen(),
-        ),
-      );
-    }
+ // Replace the _next() method:
+void _next() async {
+  if (_selectedOption == 'Group-I is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupOneAnalysisScreen(),
+      ),
+    );
+  } else if (_selectedOption == 'Group-I is absent') {
+    // ✅ ADD THIS: Mark Group 1 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 1,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupTwoDetectionScreen(),
+      ),
+    );
   }
+}
 
   void _prev() {
     Navigator.pop(context, _selectedOption);

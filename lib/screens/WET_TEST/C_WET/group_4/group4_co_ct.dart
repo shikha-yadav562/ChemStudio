@@ -29,7 +29,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage>
   final String _tableName = 'SaltC_WetTest';
 
   final WetTestItem _test = WetTestItem(
-    id: 16, // Unique ID for Co²⁺ CT
+    id: 17, // Unique ID for Co²⁺ CT
     title: 'C.T For Co²⁺',
     procedure: 'Above solution + NH₄CNS + acetone, shake well',
     observation: 'Blue colour',
