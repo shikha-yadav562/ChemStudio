@@ -219,32 +219,57 @@ class _WetTestCFinalResultScreenState
 
             const Spacer(),
 
-            /// VIEW DETAIL BUTTON
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: _openDetailedResult,
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(
-                      color: Color(0xFF00897B), width: 2),
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 18),
-                ),
-                child: const Text(
-                  'VIEW DETAIL',
-                  style: TextStyle(
-                    color: Color(0xFF00897B),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
+/// VIEW DETAIL BUTTON
+SizedBox(
+  width: double.infinity,
+  child: OutlinedButton(
+    onPressed: _openDetailedResult,
+    style: OutlinedButton.styleFrom(
+      side: const BorderSide(
+          color: Color(0xFF00897B), width: 2),
+      padding:
+          const EdgeInsets.symmetric(vertical: 18),
+    ),
+    child: const Text(
+      'VIEW DETAIL',
+      style: TextStyle(
+        color: Color(0xFF00897B),
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  ),
+),
+const SizedBox(height: 12), // spacing between buttons/// BACK BUTTON
+SizedBox(
+  width: double.infinity,
+  child: OutlinedButton.icon(
+    icon: const Icon(Icons.arrow_back, color: Color(0xFF00897B)),
+    label: const Text(
+      'BACK',
+      style: TextStyle(
+        color: Color(0xFF00897B),
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    onPressed: () {
+      Navigator.pop(context);
+    },
+    style: OutlinedButton.styleFrom(
+      side: const BorderSide(color: Color(0xFF00897B), width: 2),
+      padding: const EdgeInsets.symmetric(vertical: 18),
+    ),
+  ),
+),
+            
           ],
+          
         ),
       ),
     );
   }
+  
 }
+
 
 /// ===============================================================
 /// DETAILED RESULT SCREEN (NO SCORE)
@@ -292,6 +317,26 @@ class WetTestCDetailedResultScreen extends StatelessWidget {
         ),
         title: Text('Detailed Results — Salt $salt'),
       ),
+      bottomNavigationBar: Padding(
+  padding: const EdgeInsets.all(16),
+  child: SizedBox(
+    height: 54,
+    width: double.infinity,
+    child: OutlinedButton.icon(
+      icon: const Icon(Icons.arrow_back),
+      label: const Text(
+        'BACK',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      onPressed: () {
+        Navigator.pop(context); // 👈 goes to previous screen
+      },
+    ),
+  ),
+),
+
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: ctTests.map((ct) {
