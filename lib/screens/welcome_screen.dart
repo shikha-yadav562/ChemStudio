@@ -62,45 +62,69 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  double width = constraints.maxWidth;
-
-              
-                  double cardWidth;
-                  double cardHeight;
-
-                  if (width >= 1000) {
-                    // Desktop
-                   
-                    cardWidth = 280;
-                    cardHeight = 260;
-                  } else if (width >= 600) {
-                    // Tablet
-                  
-                    cardWidth = 220;
-                    cardHeight = 220;
-                  } else {
-                    // Mobile
-               
-                    cardWidth = 150;
-                    cardHeight = 150;
-                  }
-
-                  return Center(
-                    child: Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 16,
-                      runSpacing: 16,
-                      children: [
-                        _buildSaltCard("A", "Salt A", cardWidth, cardHeight),
-                        _buildSaltCard("B", "Salt B", cardWidth, cardHeight),
-                        _buildSaltCard("C", "Salt C", cardWidth, cardHeight),
-                        _buildSaltCard("D", "Salt D", cardWidth, cardHeight),
-                      ],
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // ✅ Instruction line with gradient border
+                  Container(
+                    padding: const EdgeInsets.all(3), // border width
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [accentTeal, primaryBlue],
+                      ),
+                      borderRadius: BorderRadius.circular(30),
                     ),
-                  );
-                },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(27),
+                      ),
+                      child: const Text(
+                        'Choose any one salts',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Salt cards
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      double width = constraints.maxWidth;
+
+                      double cardWidth;
+                      double cardHeight;
+
+                      if (width >= 1000) {
+                        cardWidth = 280;
+                        cardHeight = 260;
+                      } else if (width >= 600) {
+                        cardWidth = 220;
+                        cardHeight = 220;
+                      } else {
+                        cardWidth = 150;
+                        cardHeight = 150;
+                      }
+
+                      return Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [
+                          _buildSaltCard("A", "Salt A", cardWidth, cardHeight),
+                          _buildSaltCard("B", "Salt B", cardWidth, cardHeight),
+                          _buildSaltCard("C", "Salt C", cardWidth, cardHeight),
+                          _buildSaltCard("D", "Salt D", cardWidth, cardHeight),
+                        ],
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -124,7 +148,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               targetPage = const PreliminaryTestAScreen();
               break;
             case "B":
-             targetPage = const PreliminaryTestBScreen();
+              targetPage = const PreliminaryTestBScreen();
               break;
             case "C":
               targetPage = const PreliminaryTestCScreen();
@@ -132,7 +156,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             case "D":
               targetPage = const PreliminaryTestDScreen();
               break;
-             
           }
 
           if (targetPage != null) {
