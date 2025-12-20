@@ -795,7 +795,7 @@ class _SaltCResultScreenState extends State<SaltCResultScreen>
                         },
                         icon: const Icon(Icons.science_rounded),
                         label: const Text(
-                          "Start Analysis",
+                          "Start Wet Test ",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         style: ElevatedButton.styleFrom(
