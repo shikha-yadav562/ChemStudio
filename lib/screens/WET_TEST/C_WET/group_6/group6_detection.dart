@@ -35,7 +35,7 @@ class _Group6DetectionState extends State<Group6Detection>
       id: 25, // ✅ CORRECT: Sequential ID for Group 6 Detection
       title: 'Group VI Detection',
       procedure: 'O.S/Filtrate + NH₄Cl + NH₄OH (till alkaline)',
-      observation: 'White ppt',
+      observation: 'No ppt',
       options: ['Group-VI is present', 'Group-VI is Absent'],
       correct: 'Group-VI is present',
     ),
