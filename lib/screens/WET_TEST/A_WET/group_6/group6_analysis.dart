@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // For DatabaseHelper, WetTestItem, etc.
-import 'group1ct_pb2plus.dart'; 
-import '../a_intro.dart'; // Standard import for Salt A Intro
+import 'group6_ct_MG.dart'; // Next confirmation/test page for Group VI
+import '../a_intro.dart';
 
-// --- Theme Constants (Must match existing design) ---
+// --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// FIX: Re-defining the extension method here. 
+// Extension to safely get first element or null
 extension IterableExtension<T> on Iterable<T> {
   T? firstWhereOrNull(bool Function(T element) test) {
     for (var element in this) {
@@ -17,15 +17,14 @@ extension IterableExtension<T> on Iterable<T> {
   }
 }
 
-class WetTestAGroupOneAnalysisScreen extends StatefulWidget {
-  const WetTestAGroupOneAnalysisScreen({super.key});
+class saltA_Group6Analysis extends StatefulWidget {
+  const saltA_Group6Analysis({super.key});
 
   @override
-  State<WetTestAGroupOneAnalysisScreen> createState() => 
-      _WetTestAGroupOneAnalysisScreenState();
+  State<saltA_Group6Analysis> createState() => _saltA_Group6AnalysisState();
 }
 
-class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysisScreen>
+class _saltA_Group6AnalysisState extends State<saltA_Group6Analysis>
     with SingleTickerProviderStateMixin {
   
   final int _index = 0; 
@@ -37,14 +36,15 @@ class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysi
   final _dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltC_WetTest';
 
+  // Content for Wet Test - Group VI Analysis
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 4, 
-      title: 'Analysis of Group II',
-      procedure: 'Group I ppt + H₂O (excess) and boil',
-      observation: 'Precipitate dissolve',
-      options: ['Pb²⁺ present'],
-      correct: 'Pb²⁺ present',
+      id: 11, // Sequential ID for Group VI Analysis
+      title: 'Analysis of Group VI',
+      procedure: 'Group VI white ppt + dil. HCl',
+      observation: 'Clear solution is obtained',
+      options: ['Mg²⁺ present'],
+      correct: 'no correct answer ',
     ),
   ];
 
@@ -55,7 +55,8 @@ class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysi
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide =
+        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _loadSavedAnswers();
     _animController.forward();
   }
@@ -78,7 +79,7 @@ class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysi
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const WetTestAGroupOneCTPbScreen(),
+        builder: (_) => const saltA_group6_ct_MGPage(), // Next page for Mg²⁺ confirmation
       ),
     );
   }
@@ -105,7 +106,6 @@ class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysi
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        // ADDED: Leading arrow to navigate back to Intro A
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: primaryBlue),
           onPressed: () {
@@ -121,7 +121,7 @@ class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysi
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
           child: Text(
-            'Salt A : Wet Test',
+            'Salt B : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -133,7 +133,8 @@ class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysi
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+          position:
+              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
                   .animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -172,15 +173,21 @@ class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysi
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.grey.shade300,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 opt,
                                 style: TextStyle(
-                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
-                                  color: selectedHere ? accentTeal : Colors.black87,
+                                  fontWeight: selectedHere
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.black87,
                                 ),
                               ),
                             ),
@@ -253,7 +260,7 @@ class _WetTestAGroupOneAnalysisScreenState extends State<WetTestAGroupOneAnalysi
             Text(
               test.observation,
               textAlign: TextAlign.start,
-              style: TextStyle(
+              style: const TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,

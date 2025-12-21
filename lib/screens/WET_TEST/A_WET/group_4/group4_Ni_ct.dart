@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_5/group5detection_firstanalysis.dart';
+import '../group_5/group5_detection.dart';
+// 1. ADDED IMPORT for Intro Screen
+import '../a_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Ni2ConfirmedPage extends StatefulWidget {
-  const Ni2ConfirmedPage({super.key});
+class saltA_Ni2ConfirmedPage extends StatefulWidget {
+  const saltA_Ni2ConfirmedPage({super.key});
 
   @override
-  State<Ni2ConfirmedPage> createState() => _Ni2ConfirmedPageState();
+  State<saltA_Ni2ConfirmedPage> createState() => _saltA_Ni2ConfirmedPageState();
 }
 
-class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
+class _saltA_Ni2ConfirmedPageState extends State<saltA_Ni2ConfirmedPage> {
   String? selectedOption;
 
   @override
@@ -22,12 +24,24 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroAScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt A : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -95,7 +109,7 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
               ? () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const GroupVPage()),
+                    MaterialPageRoute(builder: (_) => const saltA_Group5DetectionScreen()),
                   );
                 }
               : null,
@@ -117,7 +131,6 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
     );
   }
 
-  // ✅ SOLUTION (same style as Observation)
   Widget _solutionCard() {
     return Card(
       elevation: 4,
@@ -147,7 +160,6 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
     );
   }
 
-  // ✅ TEST (black normal) + OBSERVATION (bold blue same as Solution)
   Widget _testCard() {
     return Card(
       elevation: 4,
@@ -202,7 +214,6 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
     );
   }
 
-  // ✅ Option: teal + bold on click
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
 
@@ -236,7 +247,6 @@ class _Ni2ConfirmedPageState extends State<Ni2ConfirmedPage> {
   }
 }
 
-// ✅ Reusable gradient text widget (NO structure changed)
 class _GradientText extends StatelessWidget {
   final String text;
   const _GradientText(this.text);

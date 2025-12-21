@@ -3,30 +3,30 @@
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 import '../group3/group3detection.dart';
+import '../b_intro.dart'; // Import for Salt A Intro
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// FIX: Keeping the extension here to support _loadSavedAnswer() unless it's defined in group0analysis.dart
 extension IterableExtension<T> on Iterable<T> {
- T? firstWhereOrNull(bool Function(T element) test) {
- for (var element in this) {
-if (test(element)) return element;
- }
- return null;
-}
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (var element in this) {
+      if (test(element)) return element;
+    }
+    return null;
+  }
 }
 
-class WetTestCGroupTwoCTCuScreen extends StatefulWidget {
-  const WetTestCGroupTwoCTCuScreen({super.key});
+class WetTestBGroupTwoCTCuScreen extends StatefulWidget {
+  const WetTestBGroupTwoCTCuScreen({super.key});
 
   @override
-  State<WetTestCGroupTwoCTCuScreen> createState() => 
-      _WetTestCGroupTwoCTCuScreenState();
+  State<WetTestBGroupTwoCTCuScreen> createState() => 
+      _WetTestBGroupTwoCTCuScreenState();
 }
 
-class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
+class _WetTestBGroupTwoCTCuScreenState extends State<WetTestBGroupTwoCTCuScreen>
     with SingleTickerProviderStateMixin {
   
   String? _selectedOption; 
@@ -40,7 +40,6 @@ class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
   static const String SOLUTION_PREPARATION = 
     'Dissolve the black ppt of group II in aquaregia (conc. HCl + conc. HNO₃ in 3:1 proportion), dilute with water. Use this solution for C.T of Cu²⁺';
 
-  // Content for the Cu2+ Confirmation Test
   late final WetTestItem _test = WetTestItem(
       id: 7, 
       title: 'C.T for Cu²⁺',
@@ -64,32 +63,29 @@ class _WetTestCGroupTwoCTCuScreenState extends State<WetTestCGroupTwoCTCuScreen>
   }
 
   Future<void> _loadSavedAnswer() async {
-  final data = await _dbHelper.getAnswers(_tableName);
- setState(() {
-   // Using the Extension Override to explicitly choose the local IterableExtension
-   final savedAnswer = IterableExtension(data).firstWhereOrNull(
-     (row) => row['question_id'] == _test.id)?['answer'];
-   _selectedOption = savedAnswer;
-  });
- }
+    final data = await _dbHelper.getAnswers(_tableName);
+    setState(() {
+      final savedAnswer = IterableExtension(data).firstWhereOrNull(
+        (row) => row['question_id'] == _test.id)?['answer'];
+      _selectedOption = savedAnswer;
+    });
+  }
+
   Future<void> _saveAnswer(int id, String answer) async {
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
-void _next() async {
-  // FIX 2: Navigate to the imported Group 3 Detection screen.
-  Navigator.push(
-   context,
-   MaterialPageRoute(
-    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
-   ),
-  );
- }
+  void _next() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
+      ),
+    );
+  }
+
   void _prev() {
-    // Navigate back to the Group II Analysis screen
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+    Navigator.pop(context);
   }
 
   @override
@@ -98,26 +94,22 @@ void _next() async {
     super.dispose();
   }
 
-  // Helper method to build the preparation/solution box
   Widget _buildSolutionBox(String content) {
-    // FIX: Use a standard Card with no custom color or side border to match _buildTestCard
     return Card(
-      elevation: 4, // Same shadow as Test/Observation card
+      elevation: 4, 
       margin: const EdgeInsets.only(bottom: 16),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12), // Same border radius
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Uses the same gradient header as 'Test' and 'Observation'
             _buildGradientHeader('Solution'), 
             const SizedBox(height: 8),
             Text(
               content,
-              // Uses the same bold, primary blue color styling as the Observation text
               style: const TextStyle(
                 fontSize: 14,
                 color: primaryBlue,
@@ -143,9 +135,7 @@ void _next() async {
     );
   }
 
-  // Uses the WetTestItem's procedure field for the Test step
   Widget _buildTestCard(String testProcedure, String observation) {
-    // This Card is the one being copied
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -163,7 +153,7 @@ void _next() async {
             Text(
               observation,
               textAlign: TextAlign.start,
-              style: TextStyle(
+              style: const TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -183,12 +173,22 @@ void _next() async {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt B : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -217,17 +217,16 @@ void _next() async {
                 Expanded(
                   child: ListView(
                     children: [
-                      // Solution/Preparation Box (Now visually consistent with the card below)
                       _buildSolutionBox(SOLUTION_PREPARATION),
-                      
-                      // Test and Observation Card.
                       _buildTestCard(_test.procedure, _test.observation), 
+
+                      // Visual aid for the iodine reaction
+                      // 
 
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
                       
-                      // Options (Only one for confirmation)
                       ..._test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
@@ -271,7 +270,6 @@ void _next() async {
                     ],
                   ),
                 ),
-                // Navigation Buttons (Prev/Next)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

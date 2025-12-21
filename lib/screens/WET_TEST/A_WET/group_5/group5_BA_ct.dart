@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_6/group6detection_analysis.dart';
+import '../group_6/group6_detection.dart';
+// 1. ADDED IMPORT for Intro Screen
+import '../a_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New3Page extends StatefulWidget {
-  const New3Page({super.key});
+class saltAgroup5_BA_ct extends StatefulWidget {
+  const saltAgroup5_BA_ct({super.key});
 
   @override
-  State<New3Page> createState() => _New3PageState();
+  State<saltAgroup5_BA_ct> createState() => _saltAgroup5_BA_ctState();
 }
 
-class _New3PageState extends State<New3Page> {
+class _saltAgroup5_BA_ctState extends State<saltAgroup5_BA_ct> {
   String? selectedOption;
 
   @override
@@ -22,12 +24,24 @@ class _New3PageState extends State<New3Page> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroAScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt A : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -83,8 +97,6 @@ class _New3PageState extends State<New3Page> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ Blue + Bold
             Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests",
               style: TextStyle(
@@ -116,8 +128,6 @@ class _New3PageState extends State<New3Page> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ BLACK normal text
             Text(
               "Above acetate solution + dil. H₂SO₄",
               style: TextStyle(
@@ -127,15 +137,12 @@ class _New3PageState extends State<New3Page> {
               ),
             ),
             Divider(height: 22),
-
             GradientText(
               "Observation",
               gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ Blue + Bold
             Text(
               "White ppt",
               style: TextStyle(
@@ -172,7 +179,7 @@ class _New3PageState extends State<New3Page> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (_) => const New1_1Page()));
+                          builder: (_) => const saltA_Group6Detection()));
                 }
               : null,
           style: ElevatedButton.styleFrom(

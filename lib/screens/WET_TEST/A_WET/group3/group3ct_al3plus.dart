@@ -1,61 +1,39 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_al3plus.dart
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4_detection.dart';
 import 'package:flutter/material.dart';
-// FIX: Import the collection package for the 'firstWhereOrNull' method.
 import 'package:collection/collection.dart';
-// Assuming the import path for DatabaseHelper and WetTestItem is correct
+import '../a_intro.dart'; // Import for the intro page
 import '../group0/group0analysis.dart';
-// Import the next screen's definition (or its placeholder)
-// Note: If WetTestCGroupFourDetectionScreen is defined elsewhere, adjust this import.
 
-// --- Theme Constants (Copied for local consistency) ---
+// --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
-// --------------------------------------------------------
 
-// --- Placeholder for next screen (Group 4) ---
-class WetTestCGroupFourDetectionScreen extends StatelessWidget {
-  const WetTestCGroupFourDetectionScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Group 4 Detection")),
-      body: const Center(child: Text("Proceeding to Group 4 Detection...")),
-    );
-  }
-}
-
-
-class WetTestCGroupThreeCTAlScreen extends StatefulWidget {
-  const WetTestCGroupThreeCTAlScreen({super.key});
+class WetTestAGroupThreeCTAlScreen extends StatefulWidget {
+  const WetTestAGroupThreeCTAlScreen({super.key});
 
   @override
-  State<WetTestCGroupThreeCTAlScreen> createState() =>
-      _WetTestCGroupThreeCTAlScreenState();
+  State<WetTestAGroupThreeCTAlScreen> createState() =>
+      _WetTestAGroupThreeCTAlScreenState();
 }
 
-class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScreen>
+class _WetTestAGroupThreeCTAlScreenState extends State<WetTestAGroupThreeCTAlScreen>
     with SingleTickerProviderStateMixin {
-
   String? _selectedOption;
-
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltC_WetTest';
 
-  // Content provided by the user for the solution preparation
   static const String SOLUTION_PREPARATION = 
     'Dissolve the group 3 ppt in dil. HCl and use this solution for C.T.';
 
-  // *** Al3+ Confirmation Test Content ***
   late final WetTestItem _test = WetTestItem(
-      id: 12, // Unique ID for Al3+ Confirmation Test
+      id: 12, 
       title: 'C.T for Al³⁺',
       procedure: 'Above Solution + few drops of NaOH and warm',
       observation: 'White gelatinous ppt (Soluble in excess of NaOH)',
-      // Only one option provided as confirmation tests usually yield a single definitive result
       options: ['Al³⁺ confirmed'],
       correct: 'Al³⁺ confirmed',
   );
@@ -67,8 +45,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
         vsync: this,
         duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide =
-        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _loadSavedAnswer();
     _animController.forward();
   }
@@ -76,7 +53,6 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
   Future<void> _loadSavedAnswer() async {
     final data = await _dbHelper.getAnswers(_tableName);
     setState(() {
-        // 'data' is a List, which now correctly uses firstWhereOrNull due to the import.
         final savedAnswer = data.firstWhereOrNull(
             (row) => row['question_id'] == _test.id)?['answer'];
         _selectedOption = savedAnswer;
@@ -87,9 +63,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
-  // *** Navigation Logic ***
   void _next() {
-    // Navigate to the next appropriate screen (Group 4 Detection, matching the template).
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -99,7 +73,6 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
   }
 
   void _prev() {
-    // Go back to the Group III initial separation/detection screen.
     if (Navigator.canPop(context)) {
         Navigator.pop(context);
     }
@@ -111,12 +84,10 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
     super.dispose();
   }
 
-  // Helper methods for UI consistency (Copied from Fe3+ template)
   Widget _buildGradientHeader(String text) {
     return ShaderMask(
         shaderCallback: (bounds) =>
-            const LinearGradient(colors: [accentTeal, primaryBlue])
-                .createShader(bounds),
+            const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
         child: Text(
             text,
             style: const TextStyle(
@@ -125,20 +96,17 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
     );
   }
 
-  // Solution Box (Consistent white card style with shadow)
   Widget _buildSolutionBox(String content) {
     return Card(
       elevation: 4, 
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildGradientHeader('Solution'), 
+            _buildGradientHeader('Solution Preparation'), 
             const SizedBox(height: 8),
             Text(
               content,
@@ -154,7 +122,6 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
     );
   }
 
-  // Test and Observation Card (Consistent style)
   Widget _buildTestCard(String testProcedure, String observation) {
     return Card(
       elevation: 4,
@@ -172,7 +139,6 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
             const SizedBox(height: 8),
             Text(
               observation,
-              textAlign: TextAlign.start,
               style: const TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
@@ -184,97 +150,84 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
       ),
     );
   }
-  // End of Helper methods
 
   @override
   Widget build(BuildContext context) {
-    final test = _test;
-
     return Scaffold(
         backgroundColor: Colors.grey[50],
         appBar: AppBar(
             backgroundColor: Colors.white,
             elevation: 2,
             centerTitle: true,
+            // --- Added navigation back to Intro ---
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: primaryBlue),
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const WetTestIntroAScreen()),
+                  (route) => false,
+                );
+              },
+            ),
             title: ShaderMask(
                 shaderCallback: (bounds) =>
-                    const LinearGradient(colors: [accentTeal, primaryBlue])
-                        .createShader(bounds),
-                child: const Text( 
+                    const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+                child: Text( 
                     'Salt A : Wet Test',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                    ),
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
                 ),
             ),
         ),
         body: FadeTransition(
             opacity: _fadeSlide,
             child: SlideTransition(
-                position:
-                    Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-                        .animate(_fadeSlide),
+                position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero).animate(_fadeSlide),
                 child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                            Text(test.title,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineSmall
-                                    ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold)),
+                            Text(_test.title,
+                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                    color: primaryBlue, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 12),
                             Expanded(
                                 child: ListView(
                                     children: [
-                                        // Solution/Preparation Box
                                         _buildSolutionBox(SOLUTION_PREPARATION),
+                                        _buildTestCard(_test.procedure, _test.observation),
+                                        const SizedBox(height: 16),
                                         
-                                        // Test and Observation Card.
-                                        _buildTestCard(test.procedure, test.observation), 
-
                                         const SizedBox(height: 24),
                                         _buildGradientHeader('Select the correct inference:'),
                                         const SizedBox(height: 10),
-                                        
-                                        // Options
-                                        ...test.options.map((opt) {
+                                        ..._test.options.map((opt) {
                                             final selectedHere = _selectedOption == opt;
                                             return Padding(
                                                 padding: const EdgeInsets.symmetric(vertical: 4),
                                                 child: InkWell(
                                                     onTap: () async {
                                                         setState(() => _selectedOption = opt);
-                                                        await _saveAnswer(test.id, opt);
+                                                        await _saveAnswer(_test.id, opt);
                                                     },
                                                     borderRadius: BorderRadius.circular(8),
                                                     child: AnimatedContainer(
                                                         duration: const Duration(milliseconds: 200),
                                                         padding: const EdgeInsets.all(12),
                                                         decoration: BoxDecoration(
-                                                            color: selectedHere
-                                                                ? accentTeal.withOpacity(0.1)
-                                                                : Colors.white,
+                                                            color: selectedHere ? accentTeal.withOpacity(0.1) : Colors.white,
                                                             borderRadius: BorderRadius.circular(8),
                                                             border: Border.all(
-                                                                color: selectedHere
-                                                                    ? accentTeal
-                                                                    : Colors.grey.shade300,
+                                                                color: selectedHere ? accentTeal : Colors.grey.shade300,
                                                                 width: 1.5,
                                                             ),
                                                         ),
                                                         child: Text(
                                                             opt,
                                                             style: TextStyle(
-                                                                fontWeight: selectedHere
-                                                                    ? FontWeight.bold
-                                                                    : FontWeight.normal,
-                                                                color: selectedHere
-                                                                    ? accentTeal
-                                                                    : Colors.black87,
+                                                                fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
+                                                                color: selectedHere ? accentTeal : Colors.black87,
                                                             ),
                                                         ),
                                                     ),
@@ -284,7 +237,6 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
                                     ],
                                 ),
                             ),
-                            // Navigation Buttons
                             Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
@@ -300,8 +252,7 @@ class _WetTestCGroupThreeCTAlScreenState extends State<WetTestCGroupThreeCTAlScr
                                         style: ElevatedButton.styleFrom(
                                             backgroundColor: primaryBlue,
                                             foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 20, vertical: 12),
+                                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                         ),
                                     ),
                                 ],

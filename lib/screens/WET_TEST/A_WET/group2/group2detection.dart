@@ -1,18 +1,15 @@
-// E:\flutter chemistry\wet\wet\lib\C\group2\group2detection.dart
+// group2detection.dart
 
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; 
-import 'group2analysis.dart'; // Target for successful detection (Group II present)
-// FIX: Removed the incorrect 'hide IterableExtension' combinator.
-// This resolves both the 'WetTestCGroupThreeDetectionScreen isn't a class'
-// and the 'library doesn't export a member with the hidden name' errors.
+import 'group2analysis.dart'; 
 import '../group3/group3detection.dart'; 
+import '../a_intro.dart'; // Import for Salt Intro consistency
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// Re-defining for local usage (safest way to ensure availability)
 extension IterableExtension<T> on Iterable<T> {
   T? firstWhereOrNull(bool Function(T element) test) {
     for (var element in this) {
@@ -22,15 +19,15 @@ extension IterableExtension<T> on Iterable<T> {
   }
 }
 
-class WetTestCGroupTwoDetectionScreen extends StatefulWidget {
-    const WetTestCGroupTwoDetectionScreen({super.key});
+class WetTestAGroupTwoDetectionScreen extends StatefulWidget {
+    const WetTestAGroupTwoDetectionScreen({super.key});
 
     @override
-    State<WetTestCGroupTwoDetectionScreen> createState() =>
-        _WetTestCGroupTwoDetectionScreenState();
+    State<WetTestAGroupTwoDetectionScreen> createState() =>
+        _WetTestAGroupTwoDetectionScreenState();
 }
 
-class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetectionScreen>
+class _WetTestAGroupTwoDetectionScreenState extends State<WetTestAGroupTwoDetectionScreen>
     with SingleTickerProviderStateMixin {
     int _index = 0; 
     String? _selectedOption; 
@@ -40,13 +37,12 @@ class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetect
     final _dbHelper = DatabaseHelper.instance;
     final String _tableName = 'SaltC_WetTest';
 
-    // Content for Group II Detection
     late final List<WetTestItem> _tests = [
         WetTestItem(
             id: 4, 
             title: 'Group II Detection',
             procedure: 'O.S + Dil. HCl + H₂S gas or water',
-            observation: 'Black Precipitate', 
+            observation: 'Black ppt', 
             options: ['Group II is present', 'Group II is absent'],
             correct: 'Group II is present',
         ),
@@ -65,39 +61,33 @@ class _WetTestCGroupTwoDetectionScreenState extends State<WetTestCGroupTwoDetect
         _animController.forward();
     }
 
-Future<void> _loadSavedAnswers() async {
+    Future<void> _loadSavedAnswers() async {
         final data = await _dbHelper.getAnswers(_tableName);
         setState(() {
             final testId = _tests[_index].id;
-            
-            // --- FIX: USE EXTENSION OVERRIDE HERE ---
             final savedAnswer = IterableExtension(data).firstWhereOrNull( 
                 (row) => row['question_id'] == testId)?['answer'];
-            // ----------------------------------------
-            
             _selectedOption = savedAnswer;
         });
     }
+
     Future<void> _saveAnswer(int id, String answer) async {
         await _dbHelper.saveAnswer(_tableName, id, answer);
     }
 
-    // Navigate forward (NEXT)
     void _next() async {
         if (_selectedOption == 'Group II is present') {
-            // Group II Present -> Group II Analysis
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupTwoAnalysisScreen(), 
+                    builder: (_) => const WetTestAGroupTwoAnalysisScreen(), 
                 ),
             );
         } else {
-            // Group II Absent -> Group 3 Detection
              await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
+                    builder: (_) => const WetTestAGroupThreeDetectionScreen(), 
                 ),
             );
         }
@@ -123,11 +113,21 @@ Future<void> _loadSavedAnswers() async {
                 backgroundColor: Colors.white,
                 elevation: 2,
                 centerTitle: true,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: primaryBlue),
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
+                      (route) => false,
+                    );
+                  },
+                ),
                 title: ShaderMask(
                     shaderCallback: (bounds) =>
                         const LinearGradient(colors: [accentTeal, primaryBlue])
                             .createShader(bounds),
-                    child: const Text(
+                    child: Text(
                         'Salt A : Wet Test',
                         style: TextStyle(
                             color: Colors.white,
@@ -157,11 +157,13 @@ Future<void> _loadSavedAnswers() async {
                                 Expanded(
                                     child: ListView(
                                         children: [
-                                            _buildTestCard(test), // Card with Test and Observation
+                                            _buildTestCard(test), 
+                                            
+                                            // 
+
                                             const SizedBox(height: 24),
                                             _buildInferenceHeader(),
                                             const SizedBox(height: 10),
-                                            // Options
                                             ...test.options.map((opt) {
                                                 final selectedHere = _selectedOption == opt;
                                                 return Padding(
@@ -205,7 +207,6 @@ Future<void> _loadSavedAnswers() async {
                                         ],
                                     ),
                                 ),
-                                // Navigation Buttons (Prev/Next)
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -269,7 +270,7 @@ Future<void> _loadSavedAnswers() async {
                         Text(
                             test.observation,
                             textAlign: TextAlign.start,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: primaryBlue,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,

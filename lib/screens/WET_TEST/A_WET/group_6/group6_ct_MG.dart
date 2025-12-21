@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import '../a_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New1_2Page extends StatefulWidget {
-  const New1_2Page({super.key});
+class saltA_group6_ct_MGPage extends StatefulWidget {
+  const saltA_group6_ct_MGPage({super.key});
 
   @override
-  State<New1_2Page> createState() => _New1_2PageState();
+  State<saltA_group6_ct_MGPage> createState() => _saltA_group6_ct_MGPageState();
 }
 
-class _New1_2PageState extends State<New1_2Page> {
+class _saltA_group6_ct_MGPageState extends State<saltA_group6_ct_MGPage> {
   String? selectedOption;
 
   @override
@@ -21,12 +22,23 @@ class _New1_2PageState extends State<New1_2Page> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // FIXED: Navigates back to Intro A
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt A : Wet Test',
             style: TextStyle(
                 color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
@@ -37,7 +49,6 @@ class _New1_2PageState extends State<New1_2Page> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Heading
             const Text(
               "C.T For Mg²⁺",
               style: TextStyle(
@@ -48,7 +59,6 @@ class _New1_2PageState extends State<New1_2Page> {
             ),
             const SizedBox(height: 12),
 
-            // Test + Observation Card
             Card(
               elevation: 4,
               shape: RoundedRectangleBorder(
@@ -84,7 +94,6 @@ class _New1_2PageState extends State<New1_2Page> {
 
             const SizedBox(height: 12),
 
-            // Option
             _buildOption("Mg²⁺ confirmed"),
           ],
         ),
@@ -97,7 +106,6 @@ class _New1_2PageState extends State<New1_2Page> {
     );
   }
 
-  // ===== Gradient Header for Test/Observation =====
   Widget _gradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
@@ -114,12 +122,10 @@ class _New1_2PageState extends State<New1_2Page> {
     );
   }
 
-  // ===== Navigation Bar =====
   Widget _buildNavigationBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Previous Button
         TextButton.icon(
           onPressed: () => Navigator.pop(context),
           style: TextButton.styleFrom(
@@ -129,18 +135,12 @@ class _New1_2PageState extends State<New1_2Page> {
           icon: const Icon(Icons.arrow_back, size: 20),
           label: const Text('Previous', style: TextStyle(fontSize: 16)),
         ),
-
-        // Next Button
         ElevatedButton.icon(
-          onPressed: selectedOption != null
-              ? () {
-                  // Add navigation if needed
-                }
-              : null,
+          onPressed: selectedOption != null ? () {} : null,
           style: ElevatedButton.styleFrom(
             backgroundColor:
                 selectedOption != null ? primaryBlue : Colors.grey.shade400,
-            foregroundColor: Colors.white, // text always white
+            foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
@@ -151,7 +151,6 @@ class _New1_2PageState extends State<New1_2Page> {
     );
   }
 
-  // ===== Option Button =====
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
     return Padding(
