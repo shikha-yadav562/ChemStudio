@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../welcome_screen.dart';
 import 'package:ChemStudio/screens/DRY_TEST/C/preliminary_test_c.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/c_intro.dart';
+import 'package:ChemStudio/screens/DRY_TEST/C/possible_radicals_c.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -11,11 +12,13 @@ const Color accentTeal = Color(0xFF00A6A6);
 class DryTestCScreen extends StatefulWidget {
   final Map<int, String> preliminaryAnswers;
   final bool isReviewMode;
+  final int startIndex; // Add this line
 
   const DryTestCScreen({
     super.key,
     required this.preliminaryAnswers,
     this.isReviewMode = false,
+    this.startIndex = 0,
   });
 
   @override
@@ -36,6 +39,7 @@ class _DryTestCScreenState extends State<DryTestCScreen>
   @override
   void initState() {
     super.initState();
+    _index = widget.startIndex;
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
@@ -125,11 +129,11 @@ class _DryTestCScreenState extends State<DryTestCScreen>
         );
       } else {
         await Future.delayed(const Duration(milliseconds: 200));
-        print("✅ Dry Test Complete - Final Answers: $_answers");
+        print("🧪 Test Complete: Moving to Possible Radicals Selection");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => SaltCResultScreen(
+            builder: (_) => PossibleRadicalsCScreen(
               userAnswers: _answers,
               tests: _tests,
               preliminaryAnswers: widget.preliminaryAnswers,
