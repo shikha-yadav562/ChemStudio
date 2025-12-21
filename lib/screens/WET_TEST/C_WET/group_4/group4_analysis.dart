@@ -31,7 +31,7 @@ class _Group4AnalysisScreenState extends State<Group4AnalysisScreen>
     id: 15, 
     title: 'Analysis of Group IV',
     procedure: 'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water',
-    observation: 'Black ppt or Buff/flesh/pink ppt or white ppt',
+    observation: 'Black ppt',
     options: ['Ni²⁺ may be present', 'Co²⁺ may be present', 'Mn²⁺ may be present', 'Zn²⁺ may be present'],
     correct: 'Ni²⁺ may be present', // Default - varies based on observation
   );

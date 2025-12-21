@@ -29,7 +29,7 @@ class _saltDGroup4DetectionScreenState extends State<saltDGroup4DetectionScreen>
     title: 'Group IV Detection',
     procedure:
         'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water.',
-    observation: 'White/Black/Flesh or Buff ppt',
+    observation: 'No Ppt',
     options: ['Group-IV Present', 'Group-IV Absent'],
     correct: 'Group-IV Present',
   );

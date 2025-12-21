@@ -105,19 +105,6 @@ class _WetTestCFinalResultScreenState
         .replaceAll('4+', '⁴⁺');
   }
 
-  void _openDetailedResult() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => WetTestCDetailedResultScreen(
-          salt: widget.salt,
-          studentGroups: studentGroups,
-          ctTests: ctTests,
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -203,11 +190,8 @@ class _WetTestCFinalResultScreenState
                         ),
                         const Spacer(),
                         Icon(
-                          isCorrect
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color:
-                              isCorrect ? Colors.green : Colors.red,
+                          isCorrect ? Icons.check_circle : Icons.cancel,
+                          color: isCorrect ? Colors.green : Colors.red,
                           size: 32,
                         ),
                       ],
@@ -219,163 +203,32 @@ class _WetTestCFinalResultScreenState
 
             const Spacer(),
 
-/// VIEW DETAIL BUTTON
-SizedBox(
-  width: double.infinity,
-  child: OutlinedButton(
-    onPressed: _openDetailedResult,
-    style: OutlinedButton.styleFrom(
-      side: const BorderSide(
-          color: Color(0xFF00897B), width: 2),
-      padding:
-          const EdgeInsets.symmetric(vertical: 18),
-    ),
-    child: const Text(
-      'VIEW DETAIL',
-      style: TextStyle(
-        color: Color(0xFF00897B),
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  ),
-),
-const SizedBox(height: 12), // spacing between buttons/// BACK BUTTON
-SizedBox(
-  width: double.infinity,
-  child: OutlinedButton.icon(
-    icon: const Icon(Icons.arrow_back, color: Color(0xFF00897B)),
-    label: const Text(
-      'BACK',
-      style: TextStyle(
-        color: Color(0xFF00897B),
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    onPressed: () {
-      Navigator.pop(context);
-    },
-    style: OutlinedButton.styleFrom(
-      side: const BorderSide(color: Color(0xFF00897B), width: 2),
-      padding: const EdgeInsets.symmetric(vertical: 18),
-    ),
-  ),
-),
-            
-          ],
-          
-        ),
-      ),
-    );
-  }
-  
-}
-
-
-/// ===============================================================
-/// DETAILED RESULT SCREEN (NO SCORE)
-/// ===============================================================
-class WetTestCDetailedResultScreen extends StatelessWidget {
-  final String salt;
-  final Map<int, GroupStatus> studentGroups;
-  final List<Map<String, dynamic>> ctTests;
-
-  const WetTestCDetailedResultScreen({
-    super.key,
-    required this.salt,
-    required this.studentGroups,
-    required this.ctTests,
-  });
-
-  Future<bool> isCTCorrect({
-    required int group,
-    required String ion,
-    required int questionId,
-  }) async {
-    if (wetTestGroups[group] != GroupStatus.present) return false;
-
-    final studentAnswer = await DatabaseHelper.instance.getStudentAnswer(
-      'SaltC_WetTest',
-      questionId,
-    );
-
-    final correct = wetTestCTAnswers[ion]?.correctOption;
-
-    if (studentAnswer == null || correct == null) return false;
-
-    return studentAnswer.trim().toLowerCase() ==
-        correct.trim().toLowerCase();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF00897B),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text('Detailed Results — Salt $salt'),
-      ),
-      bottomNavigationBar: Padding(
-  padding: const EdgeInsets.all(16),
-  child: SizedBox(
-    height: 54,
-    width: double.infinity,
-    child: OutlinedButton.icon(
-      icon: const Icon(Icons.arrow_back),
-      label: const Text(
-        'BACK',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      onPressed: () {
-        Navigator.pop(context); // 👈 goes to previous screen
-      },
-    ),
-  ),
-),
-
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: ctTests.map((ct) {
-          return FutureBuilder<bool>(
-            future: isCTCorrect(
-              group: ct['group'],
-              ion: ct['ion'],
-              questionId: ct['questionId'],
-            ),
-            builder: (context, snapshot) {
-              final isCorrect = snapshot.data ?? false;
-
-              return Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  title: Text(
-                    ct['ion'],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    isCorrect
-                        ? '✓ Confirmatory test correct'
-                        : '✗ Confirmatory test incorrect',
-                    style: TextStyle(
-                        color:
-                            isCorrect ? Colors.green : Colors.red),
-                  ),
-                  trailing: Icon(
-                    isCorrect
-                        ? Icons.check_circle
-                        : Icons.cancel,
-                    color:
-                        isCorrect ? Colors.green : Colors.red,
+            /// BACK BUTTON
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.arrow_back,
+                    color: Color(0xFF00897B)),
+                label: const Text(
+                  'BACK',
+                  style: TextStyle(
+                    color: Color(0xFF00897B),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              );
-            },
-          );
-        }).toList(),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(
+                      color: Color(0xFF00897B), width: 2),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 18),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
