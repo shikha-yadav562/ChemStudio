@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_6/new1_1.dart';
+import '../group_6/group6_detection.dart';
+// 1. ADDED IMPORT for Intro Screen
+import '../b_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New3Page extends StatefulWidget {
-  const New3Page({super.key});
+class saltBgroup5_SR_ct extends StatefulWidget {
+  const saltBgroup5_SR_ct({super.key});
 
   @override
-  State<New3Page> createState() => _New3PageState();
+  State<saltBgroup5_SR_ct> createState() => _saltBgroup5_SR_ctState();
 }
 
-class _New3PageState extends State<New3Page> {
+class _saltBgroup5_SR_ctState extends State<saltBgroup5_SR_ct> {
   String? selectedOption;
 
   @override
@@ -22,17 +24,28 @@ class _New3PageState extends State<New3Page> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroBScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt B : Wet Test',
             style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 22),
           ),
         ),
       ),
@@ -42,36 +55,35 @@ class _New3PageState extends State<New3Page> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              "C.T For Ba²⁺ ",
+              "C.T For Ca²⁺",
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: primaryBlue,
                     fontWeight: FontWeight.bold,
                   ),
             ),
             const SizedBox(height: 12),
+
             _solutionCard(),
             const SizedBox(height: 12),
+
             _testCard(),
             const SizedBox(height: 12),
-            _buildOption("Ba²⁺ confirmed"),
+
+            _buildOption("Ca²⁺ confirmed"),
           ],
         ),
       ),
       bottomNavigationBar: Container(
-        color: Colors.transparent,
-        padding:
-            const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         child: _buildNavigationBar(),
       ),
     );
   }
 
-  // ---------------- SOLUTION CARD ----------------
   Widget _solutionCard() {
     return Card(
       elevation: 4,
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: const Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -83,8 +95,6 @@ class _New3PageState extends State<New3Page> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ Blue + Bold
             Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests",
               style: TextStyle(
@@ -99,12 +109,10 @@ class _New3PageState extends State<New3Page> {
     );
   }
 
-  // ---------------- TEST CARD ----------------
   Widget _testCard() {
     return Card(
       elevation: 4,
-      shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: const Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -116,26 +124,21 @@ class _New3PageState extends State<New3Page> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ BLACK normal text
             Text(
-              "Above acetate solution + dil. H₂SO₄",
+              "Above acetate solution + (NH₄)₂C₂O₄",
               style: TextStyle(
                 fontSize: 15,
-                color: Colors.black,
                 fontWeight: FontWeight.normal,
+                color: Colors.black,
               ),
             ),
             Divider(height: 22),
-
             GradientText(
               "Observation",
               gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ Blue + Bold
             Text(
               "White ppt",
               style: TextStyle(
@@ -150,7 +153,6 @@ class _New3PageState extends State<New3Page> {
     );
   }
 
-  // ---------------- NAVIGATION ----------------
   Widget _buildNavigationBar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -159,39 +161,42 @@ class _New3PageState extends State<New3Page> {
           onPressed: () => Navigator.pop(context),
           style: TextButton.styleFrom(
             foregroundColor: primaryBlue,
-            padding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           ),
           icon: const Icon(Icons.arrow_back, size: 20),
-          label: const Text('Previous', style: TextStyle(fontSize: 16)),
+          label: const Text(
+            'Previous',
+            style: TextStyle(fontSize: 16),
+          ),
         ),
-
         ElevatedButton.icon(
           onPressed: selectedOption != null
               ? () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (_) => const New1_1Page()));
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => const saltB_Group6Detection()),
+                  );
                 }
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: selectedOption != null
-                ? primaryBlue
-                : Colors.grey.shade400,
+            backgroundColor:
+                selectedOption != null ? primaryBlue : Colors.grey.shade400,
             foregroundColor: Colors.white,
-            padding:
-                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            padding: const EdgeInsets.symmetric(
+                vertical: 12, horizontal: 16),
             shape: const StadiumBorder(),
           ),
           icon: const Icon(Icons.arrow_forward, size: 20),
-          label: const Text('Next', style: TextStyle(fontSize: 16)),
+          label: const Text(
+            'Next',
+            style: TextStyle(fontSize: 16),
+          ),
         ),
       ],
     );
   }
 
-  // ---------------- OPTION ----------------
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
 
@@ -214,9 +219,10 @@ class _New3PageState extends State<New3Page> {
           child: Text(
             text,
             style: TextStyle(
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              color: selected ? accentTeal : Colors.black,
               fontSize: 15,
+              color: selected ? accentTeal : Colors.black,
+              fontWeight:
+                  selected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ),
@@ -225,21 +231,24 @@ class _New3PageState extends State<New3Page> {
   }
 }
 
-// ---------------- GRADIENT TEXT ----------------
 class GradientText extends StatelessWidget {
   final String text;
   final TextStyle style;
   final Gradient gradient;
 
-  const GradientText(this.text,
-      {required this.style, required this.gradient, super.key});
+  const GradientText(
+    this.text, {
+    required this.style,
+    required this.gradient,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          gradient.createShader(
-              Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+          gradient.createShader(Rect.fromLTWH(
+              0, 0, bounds.width, bounds.height)),
       child: Text(text, style: style.copyWith(color: Colors.white)),
     );
   }

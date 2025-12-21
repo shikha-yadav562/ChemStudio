@@ -31,7 +31,7 @@ class _Group4DetectionScreenState extends State<Group4DetectionScreen>
     title: 'Group IV Detection',
     procedure:
         'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water.',
-    observation: 'No Ppt',
+    observation: 'No ppt',
     options: ['Group-IV is present', 'Group-IV is Absent'],
     correct: 'Group-IV is present',
   );

@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'new_3.dart';
-import 'new_4.dart';
-import 'new_5.dart';
+import 'group5_BA_ct.dart';
+import 'group5_SR_ct.dart';
+import 'group5_CA_ct.dart';
+import '../b_intro.dart'; // Ensure this points to your Salt A intro screen
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class WetTestCGroupVPage2 extends StatefulWidget {
-  const WetTestCGroupVPage2({super.key});
+class saltB_analysis_sr_ba_ca extends StatefulWidget {
+  const saltB_analysis_sr_ba_ca({super.key});
 
   @override
-  State<WetTestCGroupVPage2> createState() => _WetTestCGroupVPage2State();
+  State<saltB_analysis_sr_ba_ca> createState() => _saltB_analysis_sr_ba_caState();
 }
 
-class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
+class _saltB_analysis_sr_ba_caState extends State<saltB_analysis_sr_ba_ca> {
   String? selectedOption;
 
   @override
@@ -24,12 +25,23 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // ADDED: Leading arrow to navigate back to Intro A
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child:Text(
+            'Salt B : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -89,21 +101,21 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New3Page()),
+            MaterialPageRoute(builder: (_) => const saltBgroup5_BA_ct()),
           );
         };
       } else if (selectedOption == "Ca²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New4Page()),
+            MaterialPageRoute(builder: (_) => const saltBgroup5_CA_ct()),
           );
         };
       } else if (selectedOption == "Sr²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const New5Page()),
+            MaterialPageRoute(builder: (_) => const saltBgroup5_SR_ct()),
           );
         };
       }
@@ -160,8 +172,6 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ Blue + Bold
             Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests.",
               style: TextStyle(
@@ -193,8 +203,6 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ BLACK + NORMAL
             Text(
               "Above solution + K₂CrO₄",
               style: TextStyle(
@@ -203,17 +211,13 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
                 fontWeight: FontWeight.normal,
               ),
             ),
-
             Divider(height: 22),
-
             GradientText(
               "Observation",
               gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
-
-            // ✅ Blue + Bold
             Text(
               "Yellow ppt",
               style: TextStyle(
@@ -253,11 +257,8 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
             text,
             style: TextStyle(
               fontSize: 15,
-
-              // ✅ This is FIXED now
               color: selected ? accentTeal : Colors.black,
-              fontWeight:
-                  selected ? FontWeight.bold : FontWeight.normal,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ),
@@ -284,8 +285,6 @@ class _WetTestCGroupVPage2State extends State<WetTestCGroupVPage2> {
   }
 }
 
-// ==================== GRADIENT TEXT WIDGET ====================
-
 class GradientText extends StatelessWidget {
   final String text;
   final TextStyle style;
@@ -309,4 +308,4 @@ class GradientText extends StatelessWidget {
       ),
     );
   }
-} 
+}

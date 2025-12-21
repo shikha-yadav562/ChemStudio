@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_5/group5detection_firstanalysis.dart';
+import '../group_5/group5_detection.dart';
+// 1. ADDED IMPORT
+import '../a_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Co2ConfirmedPage extends StatefulWidget {
-  const Co2ConfirmedPage({super.key});
+class saltA_Co2ConfirmedPage extends StatefulWidget {
+  const saltA_Co2ConfirmedPage({super.key});
 
   @override
-  State<Co2ConfirmedPage> createState() => _Co2ConfirmedPageState();
+  State<saltA_Co2ConfirmedPage> createState() => _saltA_Co2ConfirmedPageState();
 }
 
-class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
+class _saltA_Co2ConfirmedPageState extends State<saltA_Co2ConfirmedPage> {
   bool isSelected = false;
 
   @override
@@ -22,8 +24,20 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        title: const Text(
-          'Salt C : Wet Test',
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroAScreen(),
+              ),
+            );
+          },
+        ),
+        title: Text(
+          'Salt A : Wet Test',
           style: TextStyle(
               color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 22),
         ),
@@ -89,7 +103,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const GroupVPage(),
+                      builder: (_) => const saltA_Group5DetectionScreen(),
                     ),
                   );
                 }
@@ -125,7 +139,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
               "Use this solution for C.T.",
               style: TextStyle(
                 fontSize: 15,
-                fontWeight: FontWeight.bold, // same as observation
+                fontWeight: FontWeight.bold,
                 color: primaryBlue,
               ),
             ),
@@ -152,7 +166,7 @@ class _Co2ConfirmedPageState extends State<Co2ConfirmedPage> {
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.normal,
-                color: Colors.black, // test content black
+                color: Colors.black,
               ),
             ),
             const Divider(height: 22),

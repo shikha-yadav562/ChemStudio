@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_5/group5detection_firstanalysis.dart';
+import '../group_5/group5_detection.dart';
+// 1. ADDED IMPORT for Intro Screen
+import '../a_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class Zn2ConfirmedPage extends StatefulWidget {
-  const Zn2ConfirmedPage({super.key});
+class saltA_Zn2ConfirmedPage extends StatefulWidget {
+  const saltA_Zn2ConfirmedPage({super.key});
 
   @override
-  State<Zn2ConfirmedPage> createState() => _Zn2ConfirmedPageState();
+  State<saltA_Zn2ConfirmedPage> createState() => _saltA_Zn2ConfirmedPageState();
 }
 
-class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
+class _saltA_Zn2ConfirmedPageState extends State<saltA_Zn2ConfirmedPage> {
   String? selectedOption;
 
   @override
@@ -22,11 +24,23 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroAScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
           child: const Text(
-            'Salt C : Wet Test',
+            'Salt A : Wet Test',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
@@ -85,7 +99,7 @@ class _Zn2ConfirmedPageState extends State<Zn2ConfirmedPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const GroupVPage(),
+                      builder: (_) => const saltA_Group5DetectionScreen(),
                     ),
                   );
                 }

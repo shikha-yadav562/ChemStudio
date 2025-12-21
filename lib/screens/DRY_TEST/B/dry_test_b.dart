@@ -684,7 +684,7 @@ void initState() {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => const WetTestIntroCScreen(),
+                builder: (_) => const WetTestIntroBScreen(),
               ),
             );
           },

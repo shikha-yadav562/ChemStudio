@@ -1,30 +1,14 @@
-// E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_fe3plus.dart
+/// E:\flutter chemistry\wet\wet\lib\C\group3\group3ct_fe3plus.dart
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4_detection.dart';
 import 'package:flutter/material.dart';
+import '../a_intro.dart'; // Import for the intro page
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
-//import '../group4/group4detection.dart'; // Next screen for navigation
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// --- Placeholder for next screen (Group 4) ---
-// Note: Assuming WetTestCGroupFourDetectionScreen is defined in group4detection.dart
-// If not, you may need a placeholder or the actual import.
-class WetTestCGroupFourDetectionScreen extends StatelessWidget {
-  const WetTestCGroupFourDetectionScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Group 4 Detection")),
-      body: const Center(child: Text("Proceeding to Group 4 Detection...")),
-    );
-  }
-}
-
 // Extension to safely get the first element or null, required for consistency.
-// Since you are using it here, we will include it, or if it's already in 
-// a globally imported file, you can remove this block.
 extension IterableExtension<T> on Iterable<T> {
   T? firstWhereOrNull(bool Function(T element) test) {
     for (var element in this) {
@@ -34,16 +18,15 @@ extension IterableExtension<T> on Iterable<T> {
   }
 }
 
-
-class WetTestCGroupThreeCTFeScreen extends StatefulWidget {
-  const WetTestCGroupThreeCTFeScreen({super.key});
+class WetTestAGroupThreeCTFeScreen extends StatefulWidget {
+  const WetTestAGroupThreeCTFeScreen({super.key});
 
   @override
-  State<WetTestCGroupThreeCTFeScreen> createState() => 
-      _WetTestCGroupThreeCTFeScreenState();
+  State<WetTestAGroupThreeCTFeScreen> createState() => 
+      _WetTestAGroupThreeCTFeScreenState();
 }
 
-class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScreen>
+class _WetTestAGroupThreeCTFeScreenState extends State<WetTestAGroupThreeCTFeScreen>
     with SingleTickerProviderStateMixin {
   
   String? _selectedOption; 
@@ -100,7 +83,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const  Group4DetectionScreen(), 
+        builder: (_) => const Group4DetectionScreen(), 
       ),
     );
   }
@@ -118,7 +101,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
     super.dispose();
   }
 
-  // Helper method for the gradient header (consistent with previous files)
+  // Helper method for the gradient header
   Widget _buildGradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
@@ -132,7 +115,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
     );
   }
   
-  // Solution Box (Consistent white card style with shadow)
+  // Solution Box
   Widget _buildSolutionBox(String content) {
     return Card(
       elevation: 4, 
@@ -161,7 +144,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
     );
   }
 
-  // Test and Observation Card (Consistent style)
+  // Test and Observation Card
   Widget _buildTestCard(String testProcedure, String observation) {
     return Card(
       elevation: 4,
@@ -180,7 +163,7 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
             Text(
               observation,
               textAlign: TextAlign.start,
-              style: TextStyle(
+              style: const TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -200,11 +183,22 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // --- Added navigation back to Intro ---
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const WetTestIntroAScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
+          child: Text(
             'Salt A : Wet Test',
             style: TextStyle(
               color: Colors.white,
@@ -234,17 +228,13 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
                 Expanded(
                   child: ListView(
                     children: [
-                      // Solution/Preparation Box
                       _buildSolutionBox(SOLUTION_PREPARATION),
-                      
-                      // Test and Observation Card.
                       _buildTestCard(_test.procedure, _test.observation), 
 
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
                       
-                      // Options
                       ..._test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
@@ -288,7 +278,6 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
                     ],
                   ),
                 ),
-                // Navigation Buttons (Prev/Next)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -298,8 +287,6 @@ class _WetTestCGroupThreeCTFeScreenState extends State<WetTestCGroupThreeCTFeScr
                       label: const Text('Previous'),
                     ),
                     ElevatedButton.icon(
-                      // Since there is only one option, it should be selected immediately after the test
-                      // However, we maintain the check for consistency with other screens.
                       onPressed: _selectedOption != null ? _next : null, 
                       icon: const Icon(Icons.arrow_forward),
                       label: const Text('Next'),
