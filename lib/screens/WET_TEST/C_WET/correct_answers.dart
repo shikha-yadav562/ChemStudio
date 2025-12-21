@@ -34,7 +34,7 @@ const Map<String, Map<int, String>> correctAnswers = {
 
    // Salt C Preliminary Tests
   'SaltC_PreliminaryTest': {
-    1: 'Fe3⁺ may be present',
+    1: 'Fe³⁺ may be present',
     2: 'Crystalline',
   },
 

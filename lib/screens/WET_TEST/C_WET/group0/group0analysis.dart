@@ -1,3 +1,4 @@
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '0CT.dart';
@@ -53,7 +54,7 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
     title: 'Analysis of Group Zero',
     procedure:
         'Take Original Solution (O.S.) in a test tube, add NaOH solution, and heat gently. Hold moist turmeric paper near the mouth of the test tube.',
-    observation: 'No evolution of NH₃ gas.',
+    observation: 'No smell of Ammonia Gas',
     options: ['Group Zero is present', 'Group Zero is absent'],
     correct: 'Group Zero is absent',
   );
@@ -93,31 +94,37 @@ class _WetTestCGroupZeroScreenState extends State<WetTestCGroupZeroScreen>
     );
   }
 
-  void _next() {
-    if (_selectedOption == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select an option')),
-      );
-      return;
-    }
-
-    if (_selectedOption == 'Group Zero is present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCGroupZeroCTScreen(),
-        ),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCGroupOneDetectionScreen(),
-        ),
-      );
-    }
+void _next() async {  // ✅ Add async
+  if (_selectedOption == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please select an option')),
+    );
+    return;
   }
 
+  if (_selectedOption == 'Group Zero is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupZeroCTScreen(),
+      ),
+    );
+  } else {
+    // ✅ Mark Group 0 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber: 0,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupOneDetectionScreen(),
+      ),
+    );
+  }
+}
   @override
   void dispose() {
     _animController.dispose();

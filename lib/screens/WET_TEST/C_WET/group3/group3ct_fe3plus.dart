@@ -1,7 +1,7 @@
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/models/group_status.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/WetTestCFinalResultScreen.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart' show WetTestCPage1;
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4_detection.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart';
 import '../c_intro.dart';
@@ -31,7 +31,7 @@ class _WetTestCGroupThreeCTFeScreenState
   final String _tableName = 'SaltC_WetTest';
 
   final WetTestItem _test = WetTestItem(
-    id: 11,
+    id: 12,
     title: 'C.T For Fe³⁺',
     procedure: 'Above Solution + K₄[Fe(CN)₆]',
     observation: 'Prussian blue ppt or colour',
@@ -98,7 +98,7 @@ class _WetTestCGroupThreeCTFeScreenState
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const WetTestCPage1()),
+        MaterialPageRoute(builder: (_) => const Group4DetectionScreen()),
       );
     }
   }

@@ -1,7 +1,7 @@
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/models/group_status.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/WetTestCFinalResultScreen.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4_detection.dart';
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart';
 import '../c_intro.dart';
@@ -31,7 +31,7 @@ class _WetTestCGroupThreeCTAlScreenState
   final String _tableName = 'SaltC_WetTest';
 
   final WetTestItem _test = WetTestItem(
-    id: 12,
+    id: 13,
     title: 'C.T for Al³⁺',
     procedure: 'Above Solution + few drops of NaOH and warm',
     observation: 'White gelatinous ppt (Soluble in excess NaOH)',
@@ -98,7 +98,7 @@ class _WetTestCGroupThreeCTAlScreenState
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const WetTestCPage1()),
+        MaterialPageRoute(builder: (_) => const Group4DetectionScreen()),
       );
     }
   }

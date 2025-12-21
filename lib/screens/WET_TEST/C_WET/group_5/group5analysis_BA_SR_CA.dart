@@ -100,21 +100,21 @@ class _Analysis_BA_SR_CAState extends State<Analysis_BA_SR_CA> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const group5_BA_ct()),
+            MaterialPageRoute(builder: (_) => const Group5CTBaScreen ()),
           );
         };
       } else if (selectedOption == "Ca²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const group5_CA_ct()),
+            MaterialPageRoute(builder: (_) => const Group5CTCaScreen ()),
           );
         };
       } else if (selectedOption == "Sr²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const group5_SR_ct()),
+            MaterialPageRoute(builder: (_) => const Group5CTSrScreen ()),
           );
         };
       }
