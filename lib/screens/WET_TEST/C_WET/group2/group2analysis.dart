@@ -1,9 +1,6 @@
 // E:\flutter chemistry\wet\wet\lib\C\group2\group2analysis.dart
 
 import 'package:ChemStudio/DB/database_helper.dart';
-import 'package:ChemStudio/models/group_status.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/WetTestCFinalResultScreen.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/wet_test_answers.dart' hide GroupStatus;
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // WetTestItem, DatabaseHelper
 import 'group2ct_cu2plus.dart'; 
@@ -36,7 +33,7 @@ class _WetTestCGroupTwoAnalysisScreenState
 
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 6, // Sequential ID
+      id: 7, // Sequential ID
       title: 'Analysis of Group II',
       procedure: 'O.S + dil. HCL + H₂S gas or water',
       observation: 'Black ppt',

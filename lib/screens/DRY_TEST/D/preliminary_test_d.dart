@@ -6,15 +6,23 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestDScreen extends StatefulWidget {
-  final int startIndex; 
-  const PreliminaryTestDScreen({super.key, this.startIndex = 0}); 
+  final int startIndex;
+  final bool isReviewMode;
+  final Map<int, String>? preliminaryAnswers;
+
+  const PreliminaryTestDScreen({
+    super.key,
+    this.startIndex = 0,
+    this.isReviewMode = false,
+    this.preliminaryAnswers,
+  });
 
   @override
   State<PreliminaryTestDScreen> createState() => _PreliminaryTestDScreenState();
 }
 
 class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
-  late int _index; 
+  late int _index;
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
 
@@ -24,7 +32,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     _index = widget.startIndex;
      // Save correct answers in DB for comparison
   for (var test in _tests) {
-    _dbHelper.saveCorrectAnswer('SaltA_PreliminaryTest', test.id, test.correct);
+    _dbHelper.saveCorrectAnswer('SaltD_PreliminaryTest', test.id, test.correct);
   }
   }
 
@@ -34,7 +42,7 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
       title: "1. Preliminary Test – Colour",
       observation: "Bluish Green",
       options: ["Ni2+", "Cu2+", "Mn2+", "Co2+"],
-      correct: "Ni2+",
+      correct: "Cu2+",
     ),
     TestItem(
       id: 2,
@@ -45,28 +53,48 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
     ),
   ];
 
- Future<void> _next() async {
-  if (_index < _tests.length - 1) {
-    setState(() => _index++);
-  } else {
-    // Save all preliminary answers and correct answers before moving
-    for (var test in _tests) {
-      final selectedAnswer = _answers[test.id] ?? '';
-      await _dbHelper.saveStudentAnswer(
-        'SaltD_PreliminaryTest',
-        test.id,
-        selectedAnswer,
-      );
-      
+  Future<void> _printPreliminaryAnswers() async {
+    final answers = await _dbHelper.getAnswers('SaltD_PreliminaryTest');
+    print('📘 --- Preliminary Test Answers from Database ---');
+    for (var row in answers) {
+      print('Question ID: ${row['question_id']} | Answer: ${row['student_answer']}');
     }
+    print('----------------------------------------------');
+  }
 
+  void _next() async {
+    if (_index < _tests.length - 1) {
+      setState(() => _index++);
+    } else {
+      if (widget.isReviewMode) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DryTestDScreen(
+              preliminaryAnswers: _answers,
+              isReviewMode: true,
+            ),
+          ),
+        );
+      } else {
+        // Save all preliminary answers before moving
+        for (var test in _tests) {
+          final selectedAnswer = _answers[test.id] ?? '';
+          await _dbHelper.saveStudentAnswer(
+            'SaltD_PreliminaryTest',
+            test.id,
+            selectedAnswer,
+          );
+        }
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => DryTestDScreen(preliminaryAnswers: _answers),
-        ),
-      );
+        await _printPreliminaryAnswers();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DryTestDScreen(preliminaryAnswers: _answers),
+          ),
+        );
+      }
     }
   }
 
@@ -86,12 +114,11 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
         elevation: 2,
         centerTitle: true,
         title: ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [accentTeal, primaryBlue],
-          ).createShader(bounds),
-          child: const Text(
-            "Salt D: Preliminary Test",
-            style: TextStyle(
+          shaderCallback: (bounds) =>
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          child: Text(
+            widget.isReviewMode ? "Salt D: Review Mode" : "Salt D: Preliminary Test",
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 22,
@@ -118,9 +145,9 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                   _buildObservationCard(test),
                   const SizedBox(height: 24),
                   ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [accentTeal, primaryBlue],
-                    ).createShader(bounds),
+                    shaderCallback: (bounds) =>
+                        const LinearGradient(colors: [accentTeal, primaryBlue])
+                            .createShader(bounds),
                     child: const Text(
                       'Based on the observation, select the correct inference:',
                       style: TextStyle(
@@ -133,41 +160,94 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                   const SizedBox(height: 10),
                   ...test.options.map((opt) {
                     final selectedHere = selected == opt;
+                    final bool isCorrect = opt == test.correct;
+
+                    Color borderColor;
+                    Color backgroundColor;
+                    Color textColor;
+
+                    if (widget.isReviewMode) {
+                      if (selectedHere && isCorrect) {
+                        borderColor = Colors.green;
+                        backgroundColor = Colors.green.withOpacity(0.1);
+                        textColor = Colors.green;
+                      } else if (selectedHere && !isCorrect) {
+                        borderColor = Colors.red;
+                        backgroundColor = Colors.red.withOpacity(0.1);
+                        textColor = Colors.red;
+                      } else if (!selectedHere && isCorrect) {
+                        borderColor = Colors.green;
+                        backgroundColor = Colors.green.withOpacity(0.05);
+                        textColor = Colors.green.shade700;
+                      } else {
+                        borderColor = Colors.grey.shade300;
+                        backgroundColor = Colors.white;
+                        textColor = Colors.black87;
+                      }
+                    } else {
+                      if (selectedHere) {
+                        borderColor = accentTeal;
+                        backgroundColor = accentTeal.withOpacity(0.1);
+                        textColor = accentTeal;
+                      } else {
+                        borderColor = Colors.grey.shade300;
+                        backgroundColor = Colors.white;
+                        textColor = Colors.black87;
+                      }
+                    }
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
-                        onTap: () async {
-                          setState(() => _answers[test.id] = opt);
-                          await _dbHelper.saveStudentAnswer(
-                            'SaltD_PreliminaryTest',
-                            test.id,
-                            opt,
-                          );
-                        },
+                        onTap: widget.isReviewMode
+                            ? null
+                            : () async {
+                                setState(() => _answers[test.id] = opt);
+
+                                await _dbHelper.saveStudentAnswer(
+                                  'SaltD_PreliminaryTest',
+                                  test.id,
+                                  opt,
+                                );
+                              },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: selectedHere
-                                ? accentTeal.withOpacity(0.1)
-                                : Colors.white,
+                            color: backgroundColor,
                             border: Border.all(
-                              color: selectedHere
-                                  ? accentTeal
-                                  : Colors.grey.shade300,
-                              width: 1.5,
+                              color: borderColor,
+                              width: widget.isReviewMode && isCorrect ? 2.5 : 1.5,
                             ),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
-                            opt,
-                            style: TextStyle(
-                              fontWeight: selectedHere
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: selectedHere ? accentTeal : Colors.black87,
-                            ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  opt,
+                                  style: TextStyle(
+                                    fontWeight: (selectedHere ||
+                                            (widget.isReviewMode && isCorrect))
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: textColor,
+                                  ),
+                                ),
+                              ),
+                              if (widget.isReviewMode && selectedHere)
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 20,
+                                ),
+                              if (widget.isReviewMode && !selectedHere && isCorrect)
+                                Icon(
+                                  Icons.check_circle_outline,
+                                  color: Colors.green,
+                                  size: 20,
+                                ),
+                            ],
                           ),
                         ),
                       ),
@@ -177,32 +257,30 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
               ),
             ),
             Row(
-              mainAxisAlignment:
-                  (_index == 0) ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: (_index == 0 && !widget.isReviewMode)
+                  ? MainAxisAlignment.end
+                  : MainAxisAlignment.spaceBetween,
               children: [
-                if (_index > 0)
+                if (_index > 0 || widget.isReviewMode)
                   TextButton.icon(
-                    onPressed: _prev,
+                    onPressed: _index > 0 ? _prev : null,
                     icon: const Icon(Icons.arrow_back),
                     label: const Text("Previous"),
                   ),
                 ElevatedButton.icon(
-                  onPressed: selected != null ? _next : null,
-                  icon: Icon(
-                    _index == _tests.length - 1
-                        ? Icons.check_circle_outline
-                        : Icons.arrow_forward,
-                  ),
-                  label: Text(
-                    _index == _tests.length - 1
-                        ? "Proceed to Dry Test"
-                        : "Next",
-                  ),
+                  onPressed:
+                      widget.isReviewMode ? _next : (selected != null ? _next : null),
+                  icon: Icon(_index == _tests.length - 1
+                      ? Icons.check_circle_outline
+                      : Icons.arrow_forward),
+                  label: Text(_index == _tests.length - 1
+                      ? "Proceed to Dry Test"
+                      : "Next"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                 ),
               ],

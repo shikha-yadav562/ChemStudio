@@ -1,8 +1,10 @@
 // E:\flutter chemistry\wet\wet\lib\C\group3\group3detection.dart
 import 'package:ChemStudio/DB/database_helper.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4detection_analysis.dart.dart';
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4_detection.dart';
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group0/group0analysis.dart';
+ // DatabaseHelper, WetTestItem, etc.
 import '../c_intro.dart';
 import 'group3analysis.dart';
 
@@ -42,7 +44,7 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
   final String _tableName = 'SaltC_WetTest';
 
   late final WetTestItem _test = WetTestItem(
-    id: 9,
+    id: 10,
     title: 'Group III Detection',
     procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
     observation: 'White gelatineous ppt or reddish brown ppt',
@@ -85,24 +87,31 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
     );
   }
 
-  void _next() async {
-    if (_selectedOption == 'Group-III is present') {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCGroupThreeAnalysisScreen(), 
-        ),
-      );
-    } else if (_selectedOption == 'Group-III is Absent') {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCPage1(), 
-        ),
-      );
-    }
+
+void _next() async {
+  if (_selectedOption == 'Group-III is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupThreeAnalysisScreen(),
+      ),
+    );
+  } else if (_selectedOption == 'Group-III is Absent') {
+    // ✅ ADD THIS: Mark Group 2 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'C',
+      groupNumber:3,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const Group4DetectionScreen(),
+      ),
+    );
   }
-  
+}
   void _prev() {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);

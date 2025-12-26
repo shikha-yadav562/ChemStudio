@@ -1,5 +1,6 @@
-import 'package:ChemStudio/screens/WET_TEST/C_WET/c_intro.dart';
+import 'package:ChemStudio/screens/DRY_TEST/D/possible_radicals_d.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/correct_answers.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../../welcome_screen.dart';
@@ -9,9 +10,16 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class DryTestDScreen extends StatefulWidget {
-  final Map<int, String> preliminaryAnswers; // optional
+  final Map<int, String> preliminaryAnswers;
+  final bool isReviewMode;
+  final int startIndex;
 
-  const DryTestDScreen({super.key,required this.preliminaryAnswers});
+  const DryTestDScreen({
+    super.key,
+    required this.preliminaryAnswers,
+    this.isReviewMode = false,
+    this.startIndex = 0,
+  });
 
   @override
   State<DryTestDScreen> createState() => _DryTestDScreenState();
@@ -31,6 +39,7 @@ class _DryTestDScreenState extends State<DryTestDScreen>
   @override
   void initState() {
     super.initState();
+    _index = widget.startIndex;
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
@@ -39,30 +48,28 @@ class _DryTestDScreenState extends State<DryTestDScreen>
         CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _animController.forward();
 
-        _loadSavedAnswers(); // ✅ only load, don’t clear
+    _loadSavedAnswers();
 
     // Save correct answers for Dry Test
   for (var test in _tests) {
-    dbHelper.saveCorrectAnswer('SaltA_DryTest', test.id, test.correct);
+    dbHelper.saveCorrectAnswer('SaltD_DryTest', test.id, test.correct);
   }
 
-    // ✅ Print preliminary data when screen opens
     print("🧪 Preliminary Answers Received: ${widget.preliminaryAnswers}");
   }
 
- Future<void> _loadSavedAnswers() async {
-  final data = await dbHelper.getAnswers(_tableName);
-  if (data.isNotEmpty) {
-    setState(() {
-      for (var row in data) {
-        if (row['student_answer'] != null) {
-          _answers[row['question_id']] = row['student_answer'];
+  Future<void> _loadSavedAnswers() async {
+    final data = await dbHelper.getAnswers(_tableName);
+    if (data.isNotEmpty) {
+      setState(() {
+        for (var row in data) {
+          if (row['student_answer'] != null) {
+            _answers[row['question_id']] = row['student_answer'];
+          }
         }
-      }
-    });
+      });
+    }
   }
-}
-
 
   static List<TestItem> _generateTests() {
     return [
@@ -71,7 +78,7 @@ class _DryTestDScreenState extends State<DryTestDScreen>
         title: '1. Heating in a Dry Test Tube',
         procedure:
             'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising flame (Blue flame). Observe the change taking place.',
-        observation: 'Coloured residue observed.\nCold: Blue Hot: White',
+        observation: 'Coloured residue observed.\nCold: Blue\tHot: White',
         options: ['Co2+', 'Cu2+', 'Fe3+', 'Pb2+'],
         correct: 'Cu2+',
       ),
@@ -103,44 +110,59 @@ class _DryTestDScreenState extends State<DryTestDScreen>
   }
 
   Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
-  // Save student's selected answer
-  await dbHelper.saveStudentAnswer(_tableName, test.id, selectedAnswer);
+    await dbHelper.saveStudentAnswer(_tableName, test.id, selectedAnswer);
+  }
 
-  // Save correct answer
-  //await dbHelper.saveCorrectAnswer(tableName, test.id, test.correct);
-}
-
-  void _next() async{
+  void _next() async {
     if (_index < _tests.length - 1) {
       setState(() {
         _index++;
         _animController.forward(from: 0);
       });
     } else {
-       // ✅ Make sure DB writes are done
-      await Future.delayed(const Duration(milliseconds: 200));
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => SaltDResultScreen(
-            userAnswers: _answers,
-            tests: _tests,
-            preliminaryAnswers: widget.preliminaryAnswers,
+      if (widget.isReviewMode) {
+        print("📊 Review Mode Complete - Dry Test Answers: $_answers");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SaltDResultScreen(
+              userAnswers: _answers,
+              tests: _tests,
+              preliminaryAnswers: widget.preliminaryAnswers,
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        await Future.delayed(const Duration(milliseconds: 200));
+        print("🧪 Test Complete: Moving to Possible Radicals Selection");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PossibleRadicalsDScreen(
+              userAnswers: _answers,
+              tests: _tests,
+              preliminaryAnswers: widget.preliminaryAnswers,
+            ),
+          ),
+        );
+      }
     }
   }
 
   void _prev() {
     if (_index == 0) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const PreliminaryTestDScreen(startIndex: 1),
-        ),
-      );
+      if (widget.isReviewMode) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SaltDResultScreen(
+              userAnswers: _answers,
+              tests: _tests,
+              preliminaryAnswers: widget.preliminaryAnswers,
+            ),
+          ),
+        );
+      }
     } else {
       setState(() {
         _index--;
@@ -170,9 +192,9 @@ class _DryTestDScreenState extends State<DryTestDScreen>
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt D : Dry Tests',
-            style: TextStyle(
+          child: Text(
+            widget.isReviewMode ? 'Salt D : Review Mode' : 'Salt D : Dry Tests',
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 22,
@@ -220,39 +242,90 @@ class _DryTestDScreenState extends State<DryTestDScreen>
                       const SizedBox(height: 10),
                       ...test.options.map((opt) {
                         final selectedHere = selected == opt;
+                        final bool isCorrect = opt == test.correct;
+
+                        Color borderColor;
+                        Color backgroundColor;
+                        Color textColor;
+
+                        if (widget.isReviewMode) {
+                          if (selectedHere && isCorrect) {
+                            borderColor = Colors.green;
+                            backgroundColor = Colors.green.withOpacity(0.1);
+                            textColor = Colors.green;
+                          } else if (selectedHere && !isCorrect) {
+                            borderColor = Colors.red;
+                            backgroundColor = Colors.red.withOpacity(0.1);
+                            textColor = Colors.red;
+                          } else if (!selectedHere && isCorrect) {
+                            borderColor = Colors.green;
+                            backgroundColor = Colors.green.withOpacity(0.05);
+                            textColor = Colors.green.shade700;
+                          } else {
+                            borderColor = Colors.grey.shade300;
+                            backgroundColor = Colors.white;
+                            textColor = Colors.black87;
+                          }
+                        } else {
+                          if (selectedHere) {
+                            borderColor = accentTeal;
+                            backgroundColor = accentTeal.withOpacity(0.1);
+                            textColor = accentTeal;
+                          } else {
+                            borderColor = Colors.grey.shade300;
+                            backgroundColor = Colors.white;
+                            textColor = Colors.black87;
+                          }
+                        }
+
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
-                            onTap: () async {
-                              setState(() => _answers[test.id] = opt);
-                              await _saveAnswer(test, opt);
-                            },
+                            onTap: widget.isReviewMode
+                                ? null
+                                : () async {
+                                    setState(() => _answers[test.id] = opt);
+                                    await _saveAnswer(test, opt);
+                                  },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: selectedHere
-                                    ? accentTeal.withOpacity(0.1)
-                                    : Colors.white,
+                                color: backgroundColor,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.grey.shade300,
-                                  width: 1.5,
+                                  color: borderColor,
+                                  width: widget.isReviewMode && isCorrect ? 2.5 : 1.5,
                                 ),
                               ),
-                              child: Text(
-                                opt,
-                                style: TextStyle(
-                                  fontWeight: selectedHere
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.black87,
-                                ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      opt,
+                                      style: TextStyle(
+                                        fontWeight: (selectedHere ||
+                                                (widget.isReviewMode && isCorrect))
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                  ),
+                                  if (widget.isReviewMode && selectedHere)
+                                    Icon(
+                                      isCorrect ? Icons.check_circle : Icons.cancel,
+                                      color: isCorrect ? Colors.green : Colors.red,
+                                      size: 20,
+                                    ),
+                                  if (widget.isReviewMode && !selectedHere && isCorrect)
+                                    Icon(
+                                      Icons.check_circle_outline,
+                                      color: Colors.green,
+                                      size: 20,
+                                    ),
+                                ],
                               ),
                             ),
                           ),
@@ -270,7 +343,9 @@ class _DryTestDScreenState extends State<DryTestDScreen>
                       label: const Text('Previous'),
                     ),
                     ElevatedButton.icon(
-                      onPressed: selected != null ? _next : null,
+                      onPressed: widget.isReviewMode
+                          ? _next
+                          : (selected != null ? _next : null),
                       icon: Icon(_index == _tests.length - 1
                           ? Icons.check_circle_outline
                           : Icons.arrow_forward),
@@ -471,36 +546,37 @@ class _DryTestDScreenState extends State<DryTestDScreen>
 class SaltDResultScreen extends StatefulWidget {
   final Map<int, String> userAnswers;
   final List<TestItem> tests;
-  final Map<int, String> preliminaryAnswers; // ✅ optional
+  final Map<int, String> preliminaryAnswers;
 
   const SaltDResultScreen({
     super.key,
     required this.userAnswers,
     required this.tests,
-     required this.preliminaryAnswers,
+    required this.preliminaryAnswers,
   });
-    @override
+
+  @override
   State<SaltDResultScreen> createState() => _SaltDResultScreenState();
 }
+
 class _SaltDResultScreenState extends State<SaltDResultScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _fadeCtrl;
   Map<int, String> dryCorrect = {};
   Map<int, String> prelimCorrect = {};
 
-@override
-void initState() {
-  super.initState();
-  _fadeCtrl = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 500),
-  );
-  _fadeCtrl.forward();
+  @override
+  void initState() {
+    super.initState();
+    _fadeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _fadeCtrl.forward();
 
-  dryCorrect = correctAnswers['SaltD_DryTest'] ?? {};
-  prelimCorrect = correctAnswers['SaltD_PreliminaryTest'] ?? {};
-}
-
+    dryCorrect = correctAnswers['SaltD_DryTest'] ?? {};
+    prelimCorrect = correctAnswers['SaltD_PreliminaryTest'] ?? {};
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -532,86 +608,14 @@ void initState() {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                'Dry Test Answers:',
+                'Preliminary Test Answers:',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
 
-              // ---------- Dry Test Answers ----------
               Expanded(
                 child: ListView(
                   children: [
-                    ...widget.tests.map((test) {
-                      final ans =
-                          widget.userAnswers[test.id] ?? 'No answer selected';
-                      return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 10),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [accentTeal, primaryBlue],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Container(
-                          margin: const EdgeInsets.all(2.5),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(14),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 5,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 10,
-                            ),
-                            leading: const Icon(
-                              Icons.assignment_turned_in_rounded,
-                              color: accentTeal,
-                              size: 28,
-                            ),
-                            title: Text(
-                              test.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            subtitle: Padding(
-                              padding: const EdgeInsets.only(top: 6),
-                              child: Text(
-                                ans,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15,
-                                  color: primaryBlue,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-
-                    const SizedBox(height: 30),
-
-                    // ---------- Preliminary Test Answers ----------
-                    const Text(
-                      'Preliminary Test Answers:',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
                     if (widget.preliminaryAnswers.isEmpty)
                       const Text(
                         'No preliminary test data found.',
@@ -619,6 +623,18 @@ void initState() {
                       )
                     else
                       ...widget.preliminaryAnswers.entries.map((entry) {
+                        final correctAns = prelimCorrect[entry.key] ?? 'Not found';
+                        final isCorrect = entry.value == correctAns;
+
+                        String title;
+                        if (entry.key == 1) {
+                          title = 'Preliminary Test: Colour';
+                        } else if (entry.key == 2) {
+                          title = 'Preliminary Test: Water Soluble';
+                        } else {
+                          title = 'Preliminary Test Q${entry.key}';
+                        }
+
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 10),
                           decoration: BoxDecoration(
@@ -644,16 +660,14 @@ void initState() {
                             ),
                             child: ListTile(
                               contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 10,
-                              ),
-                              leading: const Icon(
-                                Icons.science_rounded,
-                                color: accentTeal,
+                                  horizontal: 16, vertical: 10),
+                              leading: Icon(
+                                isCorrect ? Icons.check_circle : Icons.cancel,
+                                color: isCorrect ? Colors.green : Colors.red,
                                 size: 28,
                               ),
                               title: Text(
-                                'Preliminary Test Q${entry.key}',
+                                title,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 16,
@@ -662,7 +676,7 @@ void initState() {
                               subtitle: Padding(
                                 padding: const EdgeInsets.only(top: 6),
                                 child: Text(
-                                  entry.value,
+                                  'Your Answer: ${entry.value}\nCorrect Answer: $correctAns',
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
@@ -674,97 +688,162 @@ void initState() {
                           ),
                         );
                       }),
+
+                    const SizedBox(height: 30),
+
+                    const Text(
+                      'Dry Test Answers:',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+
+                    ...widget.tests.map((test) {
+                      final ans = widget.userAnswers[test.id] ?? 'No answer selected';
+                      final correctAns = dryCorrect[test.id] ?? 'Not found';
+                      final isCorrect = ans == correctAns;
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 10),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [accentTeal, primaryBlue],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Container(
+                          margin: const EdgeInsets.all(2.5),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                            leading: Icon(
+                              isCorrect ? Icons.check_circle : Icons.cancel,
+                              color: isCorrect ? Colors.green : Colors.red,
+                              size: 28,
+                            ),
+                            title: Text(
+                              test.title,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                'Your Answer: $ans\nCorrect Answer: $correctAns',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  color: primaryBlue,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
 
-             Row(
-  children: [
-    // 🔙 PREVIOUS
-    Expanded(
-      child: SizedBox(
-        height: 50,
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => DryTestDScreen(
-                  preliminaryAnswers: widget.preliminaryAnswers,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PreliminaryTestDScreen(
+                                startIndex: 0,
+                                isReviewMode: true,
+                                preliminaryAnswers: widget.preliminaryAnswers,
+                              ),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.fact_check),
+                        label: const Text(
+                          "Recheck",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey[700],
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const WetTestIntroDScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.science_rounded),
+                        label: const Text(
+                          "Start Wet Test",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: accentTeal,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 12),
+
+                  Expanded(
+                    child: SizedBox(
+                      height: 50,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                          );
+                        },
+                        icon: const Icon(Icons.home_rounded),
+                        label: const Text(
+                          "Home",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryBlue,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            );
-          },
-          icon: const Icon(Icons.arrow_back),
-          label: const Text(
-            "Previous",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.grey[700],
-            foregroundColor: Colors.white,
-          ),
-        ),
-      ),
-    ),
-
-    const SizedBox(width: 12),
-
-    // 🧪 START ANALYSIS
-    Expanded(
-      child: SizedBox(
-        height: 50,
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const WetTestIntroCScreen(),
-              ),
-            );
-          },
-          icon: const Icon(Icons.science_rounded),
-          label: const Text(
-            "Start Analysis",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: accentTeal,
-            foregroundColor: Colors.white,
-          ),
-        ),
-      ),
-    ),
-
-    const SizedBox(width: 12),
-
-    // 🏠 HOME
-    Expanded(
-      child: SizedBox(
-        height: 50,
-        child: ElevatedButton.icon(
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const WelcomeScreen()),
-            );
-          },
-          icon: const Icon(Icons.home_rounded),
-          label: const Text(
-            "Home",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: primaryBlue,
-            foregroundColor: Colors.white,
-          ),
-        ),
-      ),
-    ),
-  ],
-)
-
             ],
           ),
         ),
@@ -772,6 +851,7 @@ void initState() {
     );
   }
 }
+
 /* ---------- MODEL + PLACEHOLDER ---------- */
 
 class TestItem {

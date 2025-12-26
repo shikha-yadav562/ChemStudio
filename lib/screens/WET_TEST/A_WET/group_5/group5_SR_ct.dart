@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_6/group6detection_analysis.dart';
+import '../group_6/group6_detection.dart';
+// 1. ADDED IMPORT for Intro Screen
+import '../a_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New4Page extends StatefulWidget {
-  const New4Page({super.key});
+class saltAgroup5_SR_ct extends StatefulWidget {
+  const saltAgroup5_SR_ct({super.key});
 
   @override
-  State<New4Page> createState() => _New4PageState();
+  State<saltAgroup5_SR_ct> createState() => _saltAgroup5_SR_ctState();
 }
 
-class _New4PageState extends State<New4Page> {
+class _saltAgroup5_SR_ctState extends State<saltAgroup5_SR_ct> {
   String? selectedOption;
 
   @override
@@ -22,12 +24,24 @@ class _New4PageState extends State<New4Page> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroAScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt A : Wet Test',
             style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -65,23 +79,6 @@ class _New4PageState extends State<New4Page> {
       ),
     );
   }
-
-  // ---------------- GRADIENT HEADER WIDGET ----------------
-  // Widget _gradientHeaderText(String text) {
-  //   return ShaderMask(
-  //     shaderCallback: (bounds) => const LinearGradient(
-  //       colors: [accentTeal, primaryBlue],
-  //     ).createShader(bounds),
-  //     child: Text(
-  //       text,
-  //       style: const TextStyle(
-  //         fontWeight: FontWeight.bold,
-  //         fontSize: 18,
-  //         color: Colors.white,
-  //       ),
-  //     ),
-  //   );
-  // }
 
   Widget _solutionCard() {
     return Card(
@@ -178,7 +175,7 @@ class _New4PageState extends State<New4Page> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const New1_1Page()),
+                        builder: (_) => const saltA_Group6Detection()),
                   );
                 }
               : null,
@@ -200,7 +197,6 @@ class _New4PageState extends State<New4Page> {
     );
   }
 
-  // ✅ FIXED OPTIONS STYLE
   Widget _buildOption(String text) {
     final bool selected = selectedOption == text;
 
@@ -235,7 +231,6 @@ class _New4PageState extends State<New4Page> {
   }
 }
 
-// ✅ GRADIENT TEXT WIDGET
 class GradientText extends StatelessWidget {
   final String text;
   final TextStyle style;

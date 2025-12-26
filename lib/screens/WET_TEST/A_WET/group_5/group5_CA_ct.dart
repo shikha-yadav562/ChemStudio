@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import '../group_6/group6detection_analysis.dart';
+import '../group_6/group6_detection.dart';
+// 1. ADDED IMPORT for Intro Screen
+import '../a_intro.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class New5Page extends StatefulWidget {
-  const New5Page({super.key});
+class saltAgroup5_CA_ct extends StatefulWidget {
+  const saltAgroup5_CA_ct({super.key});
 
   @override
-  State<New5Page> createState() => _New5PageState();
+  State<saltAgroup5_CA_ct> createState() => _saltAgroup5_CA_ctState();
 }
 
-class _New5PageState extends State<New5Page> {
+class _saltAgroup5_CA_ctState extends State<saltAgroup5_CA_ct> {
   String? selectedOption;
 
   @override
@@ -19,15 +21,27 @@ class _New5PageState extends State<New5Page> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.white,  
         elevation: 2,
         centerTitle: true,
+        // 2. CUSTOM BACK ARROW LOGIC
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroAScreen(),
+              ),
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt A : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -171,7 +185,7 @@ class _New5PageState extends State<New5Page> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const New1_1Page()),
+                        builder: (_) => const saltA_Group6Detection()),
                   );
                 }
               : null,

@@ -186,33 +186,72 @@ class WetTestIntroCScreen extends StatelessWidget {
             const SizedBox(height: 35),
 
             // ------------------ FIRST CARD ------------------
-            _infoCard(
-              icon: Icons.opacity_rounded,
-              title: "(C) PREPARATION OF ORIGINAL SOLUTION (O.S.)",
-              text:
-                  "Take a small quantity of mixture into a beaker and add two test tubes (20 mL) of water. Stir with a glass rod to dissolve the mixture."
-                  "If the mixture does not dissolve completely, then warm it gently until a clear solution is obtained."
-                  "This clear solution is used as the O.S. for further tests.",
-            ),
+          _infoCard(
+  icon: Icons.opacity_rounded,
+  title: "(C) PREPARATION OF ORIGINAL SOLUTION (O.S.)",
+  content: const Text(
+    "Take a small quantity of mixture into a beaker and add two test tubes (20 mL) of water. "
+    "Stir with a glass rod to dissolve the mixture. "
+    "If the mixture does not dissolve completely, then warm it gently until a clear solution is obtained. "
+    "This clear solution is used as the O.S. for further tests.",
+    style: TextStyle(
+      fontSize: 15,
+      height: 1.45,
+      color: Colors.black87,
+    ),
+  ),
+),
+
 
             const SizedBox(height: 25),
 
             // ------------------ SECOND CARD ------------------
             _infoCard(
-              icon: Icons.science_outlined,
-              title: "(D) DETECTION AND ANALYSIS OF GROUPS",
-              text:
-                  "Two groups must be detected for two basic radicals.\n"
-                  "Follow the sequence from Group 0 to Group VI.\n\n"
-                  "(1) If Group 0 is present:\n"
-                  "Detect one group from Group I–VI.\n\n"
-                  "(2) If Group 0 is absent:\n"
-                  "(i) Detect two groups from Group I–VI.\n"
-                  "(ii) Add group reagents till first radical is completely precipitated.\n"
-                  "(iii) Filter the solution (boil to remove H₂S if Group II or IV present).\n"
-                  "(iv) With residue, perform confirmatory test for the first radical.\n"
-                  "(v) With filtrate, continue analysis for the second radical.",
-            ),
+  icon: Icons.science_outlined,
+  title: "(D) DETECTION AND ANALYSIS OF GROUPS",
+  content: RichText(
+    text: const TextSpan(
+      style: TextStyle(
+        fontSize: 15,
+        height: 1.45,
+        color: Colors.black87,
+      ),
+      children: [
+        TextSpan(
+          text:
+              "Two groups must be detected for two basic radicals.\n"
+              "Follow the sequence from Group 0 to Group VI.\n\n",
+              style: TextStyle(fontWeight: FontWeight.bold),
+              
+        ),
+        TextSpan(
+          text: "(1) If Group 0 is present:\n",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        TextSpan(
+          text: "Detect one group from Group I–VI.\n\n",
+          style: TextStyle(color: Colors.red),
+        ),
+        TextSpan(
+          text: "(2) If Group 0 is absent:\n",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        TextSpan(text: "(i) "),
+        TextSpan(
+          text: "Detect two groups from Group I–VI.\n",
+          style: TextStyle(color: Colors.red),
+        ),
+        TextSpan(
+          text:
+              "(ii) Add group reagents till first radical is completely precipitated.\n"
+              "(iii) Filter the solution (boil to remove H₂S if Group II or IV present).\n"
+              "(iv) With residue, perform confirmatory test for the first radical.\n"
+              "(v) With filtrate, continue analysis for the second radical.",
+        ),
+      ],
+    ),
+  ),
+),
 
             const SizedBox(height: 30),
 
@@ -302,55 +341,50 @@ class WetTestIntroCScreen extends StatelessWidget {
       color: Colors.grey.shade300,
     );
   }
-
-  // ------------------ INFO CARD ------------------
-  Widget _infoCard({required IconData icon, required String title, required String text}) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 7,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: Color(0xFF00AABD), size: 30),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF005B84),
-                  ),
+// ------------------ INFO CARD ------------------
+Widget _infoCard({
+  required IconData icon,
+  required String title,
+  required Widget content,
+}) {
+  return Container(
+    padding: const EdgeInsets.all(20),
+    width: double.infinity,
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(22),
+      boxShadow: const [
+        BoxShadow(
+          color: Colors.black12,
+          blurRadius: 7,
+          offset: Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: Color(0xFF00AABD), size: 30),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF005B84),
                 ),
               ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 15,
-              height: 1.45,
-              color: Colors.black87,
             ),
-          ),
-        ],
-      ),
-    );
-  }
+          ],
+        ),
+        const SizedBox(height: 12),
+        content,
+      ],
+    ),
+  );
+}
+
 }

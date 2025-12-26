@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
 import '../group3/group3detection.dart';
-
+import '../b_intro.dart'; // Import for Salt A Intro
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
@@ -11,22 +11,23 @@ const Color accentTeal = Color(0xFF00A6A6);
 
 // Extension to safely get the first element or null, required for consistency
 extension IterableExtension<T> on Iterable<T> {
-T? firstWhereOrNull(bool Function(T element) test) {
- for (var element in this) {
- if (test(element)) return element;
- }
- return null;
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (var element in this) {
+      if (test(element)) return element;
+    }
+    return null;
+  }
 }
-}
-class WetTestCGroupTwoCTAsScreen extends StatefulWidget {
-  const WetTestCGroupTwoCTAsScreen({super.key});
+
+class WetTestBGroupTwoCTAsScreen extends StatefulWidget {
+  const WetTestBGroupTwoCTAsScreen({super.key});
 
   @override
-  State<WetTestCGroupTwoCTAsScreen> createState() => 
+  State<WetTestBGroupTwoCTAsScreen> createState() => 
       _WetTestCGroupTwoCTAsScreenState();
 }
 
-class _WetTestCGroupTwoCTAsScreenState extends State<WetTestCGroupTwoCTAsScreen>
+class _WetTestCGroupTwoCTAsScreenState extends State<WetTestBGroupTwoCTAsScreen>
     with SingleTickerProviderStateMixin {
   
   String? _selectedOption; 
@@ -35,16 +36,13 @@ class _WetTestCGroupTwoCTAsScreenState extends State<WetTestCGroupTwoCTAsScreen>
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
+  final String _tableName = 'SaltA_WetTest';
 
-  // Content provided by the user for the solution preparation
   static const String SOLUTION_PREPARATION = 
     'Dissolve the yellow ppt of Group 2 in conc. HNO₃ use this solution for C.T of As³⁺';
 
-
-  // Content for the As3+ Confirmation Test
   late final WetTestItem _test = WetTestItem(
-      id: 8, // Assuming ID 7 was Cu2+
+      id: 8, 
       title: 'C.T for As³⁺',
       procedure: 'Above Solution + ammonium molybdate solution + heat', 
       observation: 'Yellow ppt',
@@ -65,34 +63,30 @@ class _WetTestCGroupTwoCTAsScreenState extends State<WetTestCGroupTwoCTAsScreen>
     _animController.forward();
   }
 
-Future<void> _loadSavedAnswer() async {
-  final data = await _dbHelper.getAnswers(_tableName);
-  setState(() {
-   // ⭐ FIX APPLIED: Using Extension Override to specify the local extension.
-   final savedAnswer = IterableExtension(data).firstWhereOrNull(
-     (row) => row['question_id'] == _test.id)?['answer'];
-   _selectedOption = savedAnswer;
-  });
- }
+  Future<void> _loadSavedAnswer() async {
+    final data = await _dbHelper.getAnswers(_tableName);
+    setState(() {
+      final savedAnswer = IterableExtension(data).firstWhereOrNull(
+        (row) => row['question_id'] == _test.id)?['answer'];
+      _selectedOption = savedAnswer;
+    });
+  }
+
   Future<void> _saveAnswer(int id, String answer) async {
     await _dbHelper.saveAnswer(_tableName, id, answer);
   }
 
-void _next() async {
-  // FIX 2: Navigate to the imported Group 3 Detection screen.
- Navigator.push(
-   context,
-   MaterialPageRoute(
-    builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
-   ),
-  );
- }
+  void _next() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestCGroupThreeDetectionScreen(), 
+      ),
+    );
+  }
 
   void _prev() {
-    // Navigate back to the Group II Analysis screen
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+    Navigator.pop(context);
   }
 
   @override
@@ -101,7 +95,6 @@ void _next() async {
     super.dispose();
   }
 
-  // Helper method for the gradient header (consistent with previous files)
   Widget _buildGradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
@@ -115,7 +108,6 @@ void _next() async {
     );
   }
   
-  // Solution Box (Consistent white card style with shadow)
   Widget _buildSolutionBox(String content) {
     return Card(
       elevation: 4, 
@@ -144,7 +136,6 @@ void _next() async {
     );
   }
 
-  // Test and Observation Card (Consistent style)
   Widget _buildTestCard(String testProcedure, String observation) {
     return Card(
       elevation: 4,
@@ -163,7 +154,7 @@ void _next() async {
             Text(
               observation,
               textAlign: TextAlign.start,
-              style: TextStyle(
+              style: const TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -183,12 +174,22 @@ void _next() async {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: const Text(
-            'Salt C : Wet Test',
+          child: Text(
+            'Salt B: Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -217,17 +218,16 @@ void _next() async {
                 Expanded(
                   child: ListView(
                     children: [
-                      // Solution/Preparation Box
                       _buildSolutionBox(SOLUTION_PREPARATION),
-                      
-                      // Test and Observation Card.
                       _buildTestCard(_test.procedure, _test.observation), 
+                      
+                      // Instructors often find the color comparison helpful here
+                      // 
 
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
                       
-                      // Options
                       ..._test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
@@ -271,7 +271,6 @@ void _next() async {
                     ],
                   ),
                 ),
-                // Navigation Buttons (Prev/Next)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

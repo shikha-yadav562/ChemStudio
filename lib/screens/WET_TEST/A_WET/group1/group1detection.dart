@@ -1,8 +1,7 @@
-// E:\flutter chemistry\wet\wet\lib\C\group1\group1detection.dart
-
 import 'package:flutter/material.dart';
 import '../group0/group0analysis.dart'; 
 import 'group1analysis.dart'; 
+import '../a_intro.dart'; // Standard import for Salt A Intro
 // FIX: Hiding IterableExtension to resolve name collision with group1analysis.dart
 import '../group2/group2detection.dart' hide IterableExtension; 
 
@@ -10,16 +9,16 @@ import '../group2/group2detection.dart' hide IterableExtension;
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class WetTestCGroupOneDetectionScreen extends StatefulWidget {
+class WetTestAGroupOneDetectionScreen extends StatefulWidget {
     final String? restoredSelection;
-    const WetTestCGroupOneDetectionScreen({super.key, this.restoredSelection});
+    const WetTestAGroupOneDetectionScreen({super.key, this.restoredSelection});
 
     @override
-    State<WetTestCGroupOneDetectionScreen> createState() =>
-        _WetTestCGroupOneDetectionScreenState();
+    State<WetTestAGroupOneDetectionScreen> createState() =>
+        _WetTestAGroupOneDetectionScreenState();
 }
 
-class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetectionScreen>
+class _WetTestAGroupOneDetectionScreenState extends State<WetTestAGroupOneDetectionScreen>
     with SingleTickerProviderStateMixin {
     int _index = 0; 
     String? _selectedOption; 
@@ -36,7 +35,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
             procedure: 'O.S + Dil. HCl',
             observation: 'No White ppt', 
             options: ['Group I is present', 'Group I is absent'],
-            correct: 'Group I is present',
+            correct: 'Group I is absent',
         ),
     ];
 
@@ -67,7 +66,6 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
         final data = await _dbHelper.getAnswers(_tableName);
         setState(() {
             final testId = _tests[_index].id;
-            // firstWhereOrNull is available via group1analysis.dart import
             final savedAnswer = data.firstWhereOrNull(
                 (row) => row['question_id'] == testId)?['answer'];
 
@@ -81,25 +79,21 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
         await _dbHelper.saveAnswer(_tableName, id, answer);
     }
 
-    // Navigate forward (NEXT)
     void _next() async {
         final selectedBefore = _selectedOption;
 
         if (_selectedOption == 'Group I is present') {
-            // Navigate to the Group I Analysis page
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupOneAnalysisScreen(),
+                    builder: (_) => const WetTestAGroupOneAnalysisScreen(),
                 ),
             );
         } else {
-            // FIXED: If absent, navigate directly to the Group II Detection Screen.
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    // This class must correctly display the Group 2 Detection content.
-                    builder: (_) => const WetTestCGroupTwoDetectionScreen(), 
+                    builder: (_) => const WetTestAGroupTwoDetectionScreen(), 
                 ),
             );
         }
@@ -107,12 +101,10 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
         setState(() => _selectedOption = selectedBefore);
     }
     
-    // Navigate backward (PREVIOUS)
     void _prev() {
         Navigator.pop(context, _selectedOption);
     }
 
-    // Handle system back
     Future<bool> _onWillPop() async {
         Navigator.pop(context, _selectedOption);
         return false; 
@@ -136,11 +128,22 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
                     backgroundColor: Colors.white,
                     elevation: 2,
                     centerTitle: true,
+                    // ADDED: Navigation back to Intro A
+                    leading: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: primaryBlue),
+                        onPressed: () {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
+                                (route) => false,
+                            );
+                        },
+                    ),
                     title: ShaderMask(
                         shaderCallback: (bounds) =>
                             const LinearGradient(colors: [accentTeal, primaryBlue])
                                 .createShader(bounds),
-                        child: const Text(
+                        child: Text(
                             'Salt A : Wet Test',
                             style: TextStyle(
                                 color: Colors.white,
@@ -170,11 +173,10 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
                                     Expanded(
                                         child: ListView(
                                             children: [
-                                                _buildTestCard(test), // Card with Test and Observation
+                                                _buildTestCard(test), 
                                                 const SizedBox(height: 24),
                                                 _buildInferenceHeader(),
                                                 const SizedBox(height: 10),
-                                                // Options
                                                 ...test.options.map((opt) {
                                                     final selectedHere = _selectedOption == opt;
                                                     return Padding(
@@ -218,7 +220,6 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
                                             ],
                                         ),
                                     ),
-                                    // Navigation Buttons (Prev/Next)
                                     Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -283,7 +284,7 @@ class _WetTestCGroupOneDetectionScreenState extends State<WetTestCGroupOneDetect
                         Text(
                             test.observation,
                             textAlign: TextAlign.start,
-                            style: TextStyle(
+                            style: const TextStyle(
                                 color: primaryBlue,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,

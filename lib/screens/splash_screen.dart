@@ -47,19 +47,19 @@ class _SplashScreenState extends State<SplashScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // ✅ Background image
+          // Background image
           Image.asset(
             'assets/images/chem_bg.png',
             fit: BoxFit.cover,
           ),
 
-          // ✅ Soft blur overlay
+          // Soft blur overlay
           BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
             child: Container(color: Colors.black.withOpacity(0.25)),
           ),
 
-          // ✅ Center content
+          // Center content
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -94,13 +94,25 @@ class _SplashScreenState extends State<SplashScreen>
                           ),
                         ),
                       ),
+
+                    
+                      // Powered by Model College
+                      const Text(
+                        "Powered by Model College",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white70,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 50),
 
-                // Static “Get Started” button
+                // Get Started button
                 ElevatedButton(
                   onPressed: () {
                     Navigator.pushReplacement(

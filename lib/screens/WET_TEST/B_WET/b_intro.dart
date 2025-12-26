@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group0/group0analysis.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group0/group0analysis.dart';
 
-class WetTestIntroCScreen extends StatelessWidget {
-  const WetTestIntroCScreen({super.key});
+class WetTestIntroBScreen extends StatelessWidget {
+  const WetTestIntroBScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,8 +18,8 @@ class WetTestIntroCScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
-        title: const Text(
-          "Salt C : Wet Test",
+        title: Text(
+          "Salt B : Wet Test",
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w600,
@@ -149,7 +149,7 @@ SizedBox(
     onPressed: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => WetTestCGroupZeroScreen()),  // your next screen
+        MaterialPageRoute(builder: (context) => WetTestBGroupZeroScreen()),  // your next screen
       );
     },
     style: ElevatedButton.styleFrom(
