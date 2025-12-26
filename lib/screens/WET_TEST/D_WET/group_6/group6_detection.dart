@@ -32,7 +32,7 @@ class _saltD_Group6DetectionState extends State<saltD_Group6Detection>
       title: 'Group VI Detection',
       procedure:
           'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + Na₂HPO₄',
-      observation: 'No ppt',
+      observation: 'No Ppt',
       options: ['Group-VI present', 'Group-VI absent'],
       correct: 'Group-VI absent',
     ),

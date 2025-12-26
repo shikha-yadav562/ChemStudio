@@ -24,20 +24,6 @@ extension IterableExtension<E> on Iterable<E> {
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// --- Placeholder for next screens (needed for compilation) ---
-
-// Placeholder for Group 4 Detection (when Group III is Absent)
-class WetTestDGroupFourDetectionScreen extends StatelessWidget {
-    const WetTestDGroupFourDetectionScreen({super.key});
-    @override
-    Widget build(BuildContext context) {
-        return Scaffold(
-            appBar: AppBar(title: const Text("Group 4 Detection")),
-            body: const Center(child: Text("Proceeding to Group IV Detection...")),
-        );
-    }
-}
-// --- End of Placeholders ---
 
 
 class WetTestDGroupThreeDetectionScreen extends StatefulWidget {
@@ -57,14 +43,14 @@ class _WetTestDGroupThreeDetectionScreenState extends State<WetTestDGroupThreeDe
     late final Animation<double> _fadeSlide;
 
     final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+    final String _tableName = 'SaltD_WetTest';
 
     // *** Group III Detection Content ***
     late final WetTestItem _test = WetTestItem(
         id: 9, // Assuming a sequential ID
         title: 'Group III Detection',
         procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
-        observation: 'No ppt',
+        observation: 'No Ppt',
         options: ['Group-III is present', 'Group-III is Absent'],
         correct: 'Group-III is Absent', // Assumed correct option for initial data saving
     );

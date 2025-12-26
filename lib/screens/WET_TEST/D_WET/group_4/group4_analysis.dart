@@ -29,23 +29,34 @@ class _saltDgroup4_analysisState extends State<saltDgroup4_analysis>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeInOut,
+    );
     _animController.forward();
   }
 
   void _next() {
     if (selectedInference == "Ni²⁺") {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const saltDNi2ConfirmedPage()));
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const saltDNi2ConfirmedPage()),
+      );
     } else if (selectedInference == "Co²⁺") {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const saltDCo2ConfirmedPage()));
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const saltDCo2ConfirmedPage()),
+      );
     } else if (selectedInference == "Mn²⁺") {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const saltDMn2ConfirmedPage ()));
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const saltDMn2ConfirmedPage()),
+      );
     } else if (selectedInference == "Zn²⁺") {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const saltDZn2ConfirmedPage()));
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const saltDZn2ConfirmedPage()),
+      );
     }
   }
 
@@ -56,11 +67,16 @@ class _saltDgroup4_analysisState extends State<saltDgroup4_analysis>
 
   Widget _gradientHeader(String text) {
     return ShaderMask(
-      shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [accentTeal, primaryBlue],
+      ).createShader(bounds),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
       ),
     );
   }
@@ -84,8 +100,12 @@ class _saltDgroup4_analysisState extends State<saltDgroup4_analysis>
             _gradientHeader("Observation"),
             const SizedBox(height: 6),
             const Text(
-              "No ppt",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+              "Black ppt",
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: primaryBlue,
+              ),
             ),
           ],
         ),
@@ -106,7 +126,10 @@ class _saltDgroup4_analysisState extends State<saltDgroup4_analysis>
           decoration: BoxDecoration(
             color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: selected ? accentTeal : Colors.grey.shade300, width: 1.5),
+            border: Border.all(
+              color: selected ? accentTeal : Colors.grey.shade300,
+              width: 1.5,
+            ),
           ),
           child: Text(
             text,
@@ -135,25 +158,34 @@ class _saltDgroup4_analysisState extends State<saltDgroup4_analysis>
             // AppBar back always goes to intro page
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()),
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroDScreen(),
+              ),
               (route) => false,
             );
           },
         ),
         title: ShaderMask(
-          shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          shaderCallback: (bounds) => const LinearGradient(
+            colors: [accentTeal, primaryBlue],
+          ).createShader(bounds),
           child: Text(
             'Salt D : Wet Test',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-              .animate(_fadeSlide),
+          position: Tween<Offset>(
+            begin: const Offset(0.1, 0.03),
+            end: Offset.zero,
+          ).animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -197,7 +229,9 @@ class _saltDgroup4_analysisState extends State<saltDgroup4_analysis>
               icon: const Icon(Icons.arrow_forward),
               label: const Text('Next'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: selectedInference != null ? primaryBlue : Colors.grey.shade400,
+                backgroundColor: selectedInference != null
+                    ? primaryBlue
+                    : Colors.grey.shade400,
                 foregroundColor: Colors.white,
                 shape: const StadiumBorder(),
               ),

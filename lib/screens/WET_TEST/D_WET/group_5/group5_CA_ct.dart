@@ -154,7 +154,7 @@ class _saltD_ct_CApageState extends State<saltD_ct_CApage> {
             ),
             SizedBox(height: 6),
             Text(
-              "White ppt",
+              "White Ppt",
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,

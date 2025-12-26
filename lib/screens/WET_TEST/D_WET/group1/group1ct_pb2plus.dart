@@ -35,8 +35,8 @@ class _WetTestDGroupOneCTPbScreenState extends State<WetTestDGroupOneCTPbScreen>
         WetTestItem(
             id: 5, // Sequential ID
             title: 'C.T for Pb²⁺',
-            procedure: 'Group I ppt + Diluted HCl (hot), filter, add K₂CrO₄ to filtrate',
-            observation: 'Yellow Precipitate',
+            procedure: 'Solution+ KI',
+            observation: 'Yellow Ppt',
             options: ['Pb²⁺ confirmed'],
             correct: 'Pb²⁺ confirmed',
         ),

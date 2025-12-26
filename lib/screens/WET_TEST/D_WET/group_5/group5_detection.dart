@@ -42,7 +42,7 @@ class _saltD_Group5DetectionScreenState extends State<saltD_Group5DetectionScree
     id: 9, 
     title: 'Group V Detection',
     procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl(equal) + NH₄OH (till alkaline to litmus) + (NH₄)₂CO₃',
-    observation: 'No ppt',
+    observation: 'No Ppt',
     options: ['Group-V is present', 'Group-V is Absent'],
     correct: 'Group-V is Absent',
   );

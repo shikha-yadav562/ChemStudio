@@ -221,7 +221,7 @@ class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
             ),
             SizedBox(height: 6),
             Text(
-              "Yellow ppt",
+              "Yellow Ppt",
               style: TextStyle(
                 fontSize: 15,
                 color: primaryBlue,

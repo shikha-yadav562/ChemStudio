@@ -40,7 +40,7 @@ class _WetTestDGroupTwoCTAsScreenState extends State<WetTestDGroupTwoCTAsScreen>
 
   // Content provided by the user for the solution preparation
   static const String SOLUTION_PREPARATION = 
-    'Dissolve the yellow ppt of Group 2 in conc. HNO₃ use this solution for C.T of As³⁺';
+    'Dissolve the yellow Ppt of Group 2 in conc. HNO₃ use this solution for C.T of As³⁺';
 
 
   // Content for the As3+ Confirmation Test
@@ -48,7 +48,7 @@ class _WetTestDGroupTwoCTAsScreenState extends State<WetTestDGroupTwoCTAsScreen>
       id: 8, // Assuming ID 7 was Cu2+
       title: 'C.T for As³⁺',
       procedure: 'Above Solution + ammonium molybdate solution + heat', 
-      observation: 'Yellow ppt',
+      observation: 'Yellow Ppt',
       options: ['As³⁺ confirmed'],
       correct: 'As³⁺ confirmed', 
   );

@@ -37,7 +37,7 @@ class _WetTestDGroupTwoAnalysisScreenState extends State<WetTestDGroupTwoAnalysi
             id: 6, // Sequential ID
             title: 'Analysis of Group II',
             procedure: 'O.S + dil. HCL + H₂S gas or water',
-            observation: 'No Black ppt',
+            observation: 'Black ppt',
             options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
             correct: 'Cu²⁺ may be present', 
         ),

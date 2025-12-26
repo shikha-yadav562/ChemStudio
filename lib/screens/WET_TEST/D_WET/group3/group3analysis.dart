@@ -36,7 +36,7 @@ class _WetTestDGroupThreeAnalysisScreenState extends State<WetTestDGroupThreeAna
 
     // NOTE: Assuming DatabaseHelper and WetTestItem classes exist and are imported/accessible
     final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+    final String _tableName = 'SaltD_WetTest';
 
     // *** Group 3 Analysis Content ***
     late final WetTestItem _test = WetTestItem(
@@ -44,7 +44,7 @@ class _WetTestDGroupThreeAnalysisScreenState extends State<WetTestDGroupThreeAna
         title: 'Analysis of Group III',
         // Using plain ASCII for procedure string (O.S/Filtrate + NH4Cl + NH4OH)
         procedure: 'O.S/Filtrate + NH4Cl + NH4OH',
-        observation: 'reddish-brown ppt',
+        observation: 'reddish-brown Ppt',
         // Using plain ASCII for options (Fe3+, Al3+)
         options: ['Fe³⁺ may be present', 'Al³⁺ may be present'],
         correct: 'nothing present', // Assumed for initial data saving

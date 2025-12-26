@@ -74,7 +74,7 @@ class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
             _gradientHeader("Observation"),
             const SizedBox(height: 6),
             const Text(
-              "White ppt",
+              "White Ppt",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],

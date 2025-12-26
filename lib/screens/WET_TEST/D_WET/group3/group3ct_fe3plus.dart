@@ -10,19 +10,7 @@ import '../d_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// --- Placeholder for next screen (Group 4) ---
-// Note: Assuming WetTestDGroupFourDetectionScreen is defined in group4detection.dart
-// If not, you may need a placeholder or the actual import.
-class WetTestDGroupFourDetectionScreen extends StatelessWidget {
-  const WetTestDGroupFourDetectionScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Group 4 Detection")),
-      body: const Center(child: Text("Proceeding to Group 4 Detection...")),
-    );
-  }
-}
+
 
 // Extension to safely get the first element or null, required for consistency.
 // Since you are using it here, we will include it, or if it's already in 
@@ -54,7 +42,7 @@ class _WetTestDGroupThreeCTFeScreenState extends State<WetTestDGroupThreeCTFeScr
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
+  final String _tableName = 'SaltD_WetTest';
 
   // Content provided by the user for the solution preparation
   static const String SOLUTION_PREPARATION = 
@@ -66,7 +54,7 @@ class _WetTestDGroupThreeCTFeScreenState extends State<WetTestDGroupThreeCTFeScr
       id: 11, // Unique ID after Group III Analysis (ID 10)
       title: 'C.T For Fe³⁺',
       procedure: 'Above Solution+ K4[ Fe (CN)6] (Potassium ferrocyanide)', 
-      observation: 'Prussian blue ppt or colour',
+      observation: 'Prussian blue Ppt or colour',
       options: ['Fe³⁺ confirmed'],
       correct: 'Fe³⁺ confirmed', 
   );

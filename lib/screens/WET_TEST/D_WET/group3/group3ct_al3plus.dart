@@ -16,17 +16,6 @@ const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 // --------------------------------------------------------
 
-// --- Placeholder for next screen (Group 4) ---
-class WetTestDGroupFourDetectionScreen extends StatelessWidget {
-  const WetTestDGroupFourDetectionScreen({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Group 4 Detection")),
-      body: const Center(child: Text("Proceeding to Group 4 Detection...")),
-    );
-  }
-}
 
 
 class WetTestDGroupThreeCTAlScreen extends StatefulWidget {
