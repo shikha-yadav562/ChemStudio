@@ -3,10 +3,9 @@ import 'package:ChemStudio/models/group_status.dart';
 import 'package:ChemStudio/screens/WET_TEST/D_WET/WetTestDFinalResultScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
-import '../group0/group0analysis.dart';
-import 'group6_analysis.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/WetTestCFinalResultScreen.dart';
-import '../d_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group0/group0analysis.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group_6/group6_analysis.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
