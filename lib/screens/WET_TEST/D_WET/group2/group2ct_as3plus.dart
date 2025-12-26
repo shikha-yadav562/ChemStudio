@@ -1,56 +1,46 @@
 // group2ct_as3plus.dart
-
-import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
-import '../group3/group3detection.dart';
+import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/WetTestDFinalResultScreen.dart';
 import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
+import 'package:flutter/material.dart';
+import '../group0/group0analysis.dart';
+import '../group3/group3detection.dart';
 
-
-// --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// Extension to safely get the first element or null, required for consistency
-extension IterableExtension<T> on Iterable<T> {
-T? firstWhereOrNull(bool Function(T element) test) {
- for (var element in this) {
- if (test(element)) return element;
- }
- return null;
-}
-}
 class WetTestDGroupTwoCTAsScreen extends StatefulWidget {
   const WetTestDGroupTwoCTAsScreen({super.key});
 
   @override
-  State<WetTestDGroupTwoCTAsScreen> createState() => 
+  State<WetTestDGroupTwoCTAsScreen> createState() =>
       _WetTestDGroupTwoCTAsScreenState();
 }
 
-class _WetTestDGroupTwoCTAsScreenState extends State<WetTestDGroupTwoCTAsScreen>
+class _WetTestDGroupTwoCTAsScreenState
+    extends State<WetTestDGroupTwoCTAsScreen>
     with SingleTickerProviderStateMixin {
   
   String? _selectedOption; 
-  
+  bool get _isSelected => _selectedOption != null;
+
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
   final String _tableName = 'SaltD_WetTest';
 
-  // Content provided by the user for the solution preparation
   static const String SOLUTION_PREPARATION = 
-    'Dissolve the yellow Ppt of Group 2 in conc. HNO₃ use this solution for C.T of As³⁺';
+      'Dissolve the yellow ppt of Group 2 in conc. HNO₃ and use this solution for C.T of As³⁺';
 
-
-  // Content for the As3+ Confirmation Test
   late final WetTestItem _test = WetTestItem(
-      id: 8, // Assuming ID 7 was Cu2+
-      title: 'C.T for As³⁺',
-      procedure: 'Above Solution + ammonium molybdate solution + heat', 
-      observation: 'Yellow Ppt',
-      options: ['As³⁺ confirmed'],
-      correct: 'As³⁺ confirmed', 
+    id: 9,
+    title: 'C.T for As³⁺',
+    procedure: 'Above Solution + ammonium molybdate solution + heat', 
+    observation: 'Yellow ppt',
+    options: ['As³⁺ confirmed'],
+    correct: 'As³⁺ confirmed', 
   );
 
   @override
@@ -60,40 +50,65 @@ class _WetTestDGroupTwoCTAsScreenState extends State<WetTestDGroupTwoCTAsScreen>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide =
-        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _loadSavedAnswer();
     _animController.forward();
   }
 
-Future<void> _loadSavedAnswer() async {
-  final data = await _dbHelper.getAnswers(_tableName);
-  setState(() {
-   // ⭐ FIX APPLIED: Using Extension Override to specify the local extension.
-   final savedAnswer = IterableExtension(data).firstWhereOrNull(
-     (row) => row['question_id'] == _test.id)?['answer'];
-   _selectedOption = savedAnswer;
-  });
- }
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+  Future<void> _loadSavedAnswer() async {
+    final studentAnswer = await _dbHelper.getStudentAnswer(_tableName, _test.id);
+    if (studentAnswer != null) {
+      setState(() {
+        _selectedOption = studentAnswer;
+      });
+    }
   }
 
-void _next() async {
-  // FIX 2: Navigate to the imported Group 3 Detection screen.
- Navigator.push(
-   context,
-   MaterialPageRoute(
-    builder: (_) => const WetTestDGroupThreeDetectionScreen(), 
-   ),
-  );
- }
+  // ✅ FIXED: Just select, don't navigate
+  void _onOptionTapped(String option) {
+    setState(() {
+      _selectedOption = option;
+    });
+  }
+
+  // ✅ FIXED: Handle navigation only when Next is clicked
+  Future<void> _handleNext() async {
+    if (_selectedOption == null) return;
+
+    // 1️⃣ Save CT answer
+    await _dbHelper.saveStudentAnswer(_tableName, _test.id, _selectedOption!);
+
+    // 2️⃣ Mark Group II as present
+    await _dbHelper.insertGroupDecision(
+      salt: 'D',
+      groupNumber: 2,
+      status: GroupStatus.present,
+    );
+
+    // 3️⃣ Count present groups
+    final studentGroups = await _dbHelper.getStudentGroupDecisions('D');
+    final presentCount = studentGroups.values
+        .where((status) => status == GroupStatus.present)
+        .length;
+
+    // 4️⃣ Navigate accordingly
+    if (presentCount >= 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const WetTestDFinalResultScreen(salt: 'D')),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestDGroupThreeDetectionScreen(),
+        ),
+      );
+    }
+  }
 
   void _prev() {
-    // Navigate back to the Group II Analysis screen
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+    if (Navigator.canPop(context)) Navigator.pop(context);
   }
 
   @override
@@ -102,42 +117,34 @@ void _next() async {
     super.dispose();
   }
 
-  // Helper method for the gradient header (consistent with previous files)
   Widget _buildGradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue])
-              .createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
       child: Text(
         text,
         style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+          color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18
+        ),
       ),
     );
   }
-  
-  // Solution Box (Consistent white card style with shadow)
+
   Widget _buildSolutionBox(String content) {
     return Card(
-      elevation: 4, 
+      elevation: 4,
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildGradientHeader('Solution'), 
+            _buildGradientHeader('Solution'),
             const SizedBox(height: 8),
             Text(
               content,
-              style: const TextStyle(
-                fontSize: 14,
-                color: primaryBlue,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 14, color: primaryBlue, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -145,8 +152,7 @@ void _next() async {
     );
   }
 
-  // Test and Observation Card (Consistent style)
-  Widget _buildTestCard(String testProcedure, String observation) {
+  Widget _buildTestCard(String procedure, String observation) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -157,18 +163,13 @@ void _next() async {
           children: [
             _buildGradientHeader('Test'),
             const SizedBox(height: 4),
-            Text(testProcedure, style: const TextStyle(fontSize: 14)),
+            Text(procedure, style: const TextStyle(fontSize: 14)),
             const Divider(height: 24),
             _buildGradientHeader('Observation'),
             const SizedBox(height: 8),
             Text(
               observation,
-              textAlign: TextAlign.start,
-              style: TextStyle(
-                color: primaryBlue,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: TextStyle(color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ],
         ),
@@ -185,35 +186,27 @@ void _next() async {
         elevation: 2,
         centerTitle: true,
         leading: IconButton(
-    icon: const Icon(Icons.arrow_back, color: primaryBlue),
-    onPressed: () {
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const WetTestIntroDScreen()), // Replace with your actual class name in c_intro.dart
-        (route) => false, // This clears the navigation stack
-      );
-    },
-  ),
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () => Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const WetTestIntroDScreen()),
+            (route) => false,
+          ),
+        ),
         title: ShaderMask(
-          shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue])
-                  .createShader(bounds),
+          shaderCallback: (bounds) => const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
           child: const Text(
             'Salt D : Wet Test',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-            ),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
       ),
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-                  .animate(_fadeSlide),
+          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+              .animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -228,26 +221,17 @@ void _next() async {
                 Expanded(
                   child: ListView(
                     children: [
-                      // Solution/Preparation Box
                       _buildSolutionBox(SOLUTION_PREPARATION),
-                      
-                      // Test and Observation Card.
-                      _buildTestCard(_test.procedure, _test.observation), 
-
+                      _buildTestCard(_test.procedure, _test.observation),
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
-                      
-                      // Options
                       ..._test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
-                            onTap: () async {
-                              setState(() => _selectedOption = opt);
-                              await _saveAnswer(_test.id, opt);
-                            },
+                            onTap: () => _onOptionTapped(opt), // ✅ FIXED: Just select
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
@@ -258,21 +242,15 @@ void _next() async {
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.grey.shade300,
+                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 opt,
                                 style: TextStyle(
-                                  fontWeight: selectedHere
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.black87,
+                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
+                                  color: selectedHere ? primaryBlue : Colors.black87,
                                 ),
                               ),
                             ),
@@ -282,7 +260,6 @@ void _next() async {
                     ],
                   ),
                 ),
-                // Navigation Buttons (Prev/Next)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -292,14 +269,13 @@ void _next() async {
                       label: const Text('Previous'),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _selectedOption != null ? _next : null,
+                      onPressed: _isSelected ? _handleNext : null, // ✅ FIXED: Call _handleNext
                       icon: const Icon(Icons.arrow_forward),
                       label: const Text('Next'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                     ),
                   ],

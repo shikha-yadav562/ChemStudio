@@ -30,15 +30,10 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
   void initState() {
     super.initState();
     _index = widget.startIndex;
-
-    if (widget.isReviewMode && widget.preliminaryAnswers != null) {
-      _answers.addAll(widget.preliminaryAnswers!);
-    }
-
-    // Save correct answers in DB for comparison
-    for (var test in _tests) {
-      _dbHelper.saveCorrectAnswer('SaltD_PreliminaryTest', test.id, test.correct);
-    }
+     // Save correct answers in DB for comparison
+  for (var test in _tests) {
+    _dbHelper.saveCorrectAnswer('SaltD_PreliminaryTest', test.id, test.correct);
+  }
   }
 
   final List<TestItem> _tests = [
@@ -200,7 +195,6 @@ class _PreliminaryTestDScreenState extends State<PreliminaryTestDScreen> {
                         textColor = Colors.black87;
                       }
                     }
-
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(

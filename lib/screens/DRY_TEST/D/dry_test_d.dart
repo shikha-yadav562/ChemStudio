@@ -1,10 +1,10 @@
+import 'package:ChemStudio/screens/DRY_TEST/D/possible_radicals_d.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/correct_answers.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '../../welcome_screen.dart';
 import 'package:ChemStudio/screens/DRY_TEST/D/preliminary_test_d.dart';
-import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
-import 'package:ChemStudio/screens/DRY_TEST/D/possible_radicals_d.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -51,9 +51,9 @@ class _DryTestDScreenState extends State<DryTestDScreen>
     _loadSavedAnswers();
 
     // Save correct answers for Dry Test
-    for (var test in _tests) {
-      dbHelper.saveCorrectAnswer('SaltD_DryTest', test.id, test.correct);
-    }
+  for (var test in _tests) {
+    dbHelper.saveCorrectAnswer('SaltD_DryTest', test.id, test.correct);
+  }
 
     print("🧪 Preliminary Answers Received: ${widget.preliminaryAnswers}");
   }

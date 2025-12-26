@@ -1,21 +1,21 @@
+
+import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group_5/group5_BA_ct.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group_5/group5_CA_ct.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group_5/group5_SR_ct.dart';
 import 'package:flutter/material.dart';
-import 'group5_BA_ct.dart';
-import 'group5_CA_ct.dart';
-import 'group5_SR_ct.dart';
-// 1. IMPORT for Salt D Intro Screen
-import '../d_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltD_Analysis_BA_SR_CA extends StatefulWidget {
-  const saltD_Analysis_BA_SR_CA({super.key});
+class Analysis_BA_SR_CA extends StatefulWidget {
+  const Analysis_BA_SR_CA({super.key});
 
   @override
-  State<saltD_Analysis_BA_SR_CA> createState() => _saltD_Analysis_BA_SR_CAState();
+  State<Analysis_BA_SR_CA> createState() => _Analysis_BA_SR_CAState();
 }
 
-class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
+class _Analysis_BA_SR_CAState extends State<Analysis_BA_SR_CA> {
   String? selectedOption;
 
   @override
@@ -103,21 +103,21 @@ class _saltD_Analysis_BA_SR_CAState extends State<saltD_Analysis_BA_SR_CA> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltD_ct_BApage()),
+            MaterialPageRoute(builder: (_) => const Group5CTBaScreen ()),
           );
         };
       } else if (selectedOption == "Ca²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltD_ct_CApage()),
+            MaterialPageRoute(builder: (_) => const Group5CTCaScreen ()),
           );
         };
       } else if (selectedOption == "Sr²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltD_ct_SRpage()),
+            MaterialPageRoute(builder: (_) => const Group5CTSrScreen ()),
           );
         };
       }

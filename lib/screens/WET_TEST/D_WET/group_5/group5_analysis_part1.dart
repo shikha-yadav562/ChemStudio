@@ -33,7 +33,7 @@ class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
     if (selectedOption != null) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const saltD_Analysis_BA_SR_CA()),
+        MaterialPageRoute(builder: (_) => const Analysis_BA_SR_CA()),
       );
     }
   }
@@ -74,7 +74,7 @@ class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
             _gradientHeader("Observation"),
             const SizedBox(height: 6),
             const Text(
-              "White Ppt",
+              "White ppt",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
             ),
           ],
@@ -142,7 +142,7 @@ class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: Text(
+          child: const Text(
             'Salt D: Wet Test',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
@@ -193,4 +193,4 @@ class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
       ),
     );
   }
-}                                                                                                                                            
+}
