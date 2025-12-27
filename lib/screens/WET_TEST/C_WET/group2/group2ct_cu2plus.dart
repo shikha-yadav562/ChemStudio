@@ -124,6 +124,26 @@ class _WetTestCGroupTwoCTCuScreenState
       ),
     );
   }
+  Widget _buildSolutionCard() {
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildGradientHeader('Solution'),
+          const SizedBox(height: 6),
+          const Text(
+            'Dissolve the black ppt of group II in aquaregia (conc. HCL + conc. HNO3 in 3:1 proportion ), dilute with water. Use this solution for C.T of Cu2+',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   Widget _buildTestCard(String procedure, String observation) {
     return Card(
@@ -194,6 +214,8 @@ class _WetTestCGroupTwoCTCuScreenState
                 Expanded(
                   child: ListView(
                     children: [
+                       _buildSolutionCard(),  // ✅ ADD THIS
+      const SizedBox(height: 12),  // ✅ ADD THIS
                       _buildTestCard(_test.procedure, _test.observation),
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),

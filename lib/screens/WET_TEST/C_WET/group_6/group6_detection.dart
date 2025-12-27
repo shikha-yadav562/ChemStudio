@@ -34,7 +34,7 @@ class _Group6DetectionState extends State<Group6Detection>
     WetTestItem(
       id: 25, // ✅ CORRECT: Sequential ID for Group 6 Detection
       title: 'Group VI Detection',
-      procedure: 'O.S/Filtrate + NH₄Cl + NH₄OH (till alkaline)',
+      procedure: 'O.S/Filtrate + NH₄Cl + NH₄OH (till alkaline)+Na2HPO4',
       observation: 'No ppt',
       options: ['Group-VI is present', 'Group-VI is Absent'],
       correct: 'Group-VI is present',

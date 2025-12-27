@@ -123,6 +123,26 @@ class _WetTestCGroupThreeCTAlScreenState
       ),
     );
   }
+  Widget _buildSolutionCard() {
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildGradientHeader('Solution'),
+          const SizedBox(height: 6),
+          const Text(
+            'Dissolve the group 3 ppt in dil. HCL and use this solution for C.T',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+          ),
+        ],
+      ),
+    ),
+  );
+}
 
   Widget _buildTestCard() {
     return Card(
@@ -195,6 +215,8 @@ class _WetTestCGroupThreeCTAlScreenState
                 Expanded(
                   child: ListView(
                     children: [
+                       _buildSolutionCard(),  // ✅ ADD THIS
+      const SizedBox(height: 12),  // ✅ ADD THIS
                       _buildTestCard(),
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),

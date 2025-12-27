@@ -30,7 +30,7 @@ class _WetTestCGroupOneCTScreenState
   final WetTestItem _test = WetTestItem(
     id: 5,
     title: 'C.T FOR Pb²⁺',
-    procedure: 'Group I ppt + Diluted HCl (hot), filter, add K₂CrO₄ to filtrate',
+    procedure: 'Group 1 ppt + h2o + k2CrO4',
     observation: 'Yellow Precipitate',
     options: ['Pb²⁺ Confirmed'],
     correct: 'Pb²⁺ Confirmed',
