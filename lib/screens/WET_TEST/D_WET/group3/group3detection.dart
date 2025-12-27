@@ -88,7 +88,7 @@ void _next() async {
   } else if (_selectedOption == 'Group-III is Absent') {
     // ✅ ADD THIS: Mark Group 2 as absent before navigating
     await _dbHelper.insertGroupDecision(
-      salt: 'C',
+      salt: 'D',
       groupNumber:3,
       status: GroupStatus.absent,
     );

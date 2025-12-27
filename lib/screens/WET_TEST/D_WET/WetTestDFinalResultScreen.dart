@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/models/group_status.dart';
 
-
 /// ===============================================================
 /// FINAL RESULT SCREEN
 /// ===============================================================
@@ -23,6 +22,17 @@ class _WetTestDFinalResultScreenState
 
   Map<int, GroupStatus> studentGroups = {};
   List<String> selectedIons = [];
+
+  // ✅ Define which ion is CORRECT for each group
+  final Map<int, String> correctIonsPerGroup = {
+    0: 'NH4+',
+    1: 'Pb2+',
+    2: 'Cu2+',  // ✅ Only Cu²⁺ is correct for Group 2
+    3: 'Al3+',
+    4: 'Ni2+',  // ✅ Only Ni²⁺ is correct for Group 4
+    5: 'Ca2+',
+    6: 'Mg2+',
+  };
 
   final List<Map<String, dynamic>> ctTests = [
     {'ion': 'NH4+', 'group': 0, 'questionId': 2},
@@ -56,9 +66,9 @@ class _WetTestDFinalResultScreenState
     setState(() => isLoading = false);
   }
 
-  /// 🔥 CORE LOGIC:
+  /// 🔥 FIXED LOGIC:
   /// Take ions that STUDENT actually attempted (CT)
-  /// Show EXACTLY TWO (even if wrong)
+  /// Show EXACTLY TWO (even if wrong) - FOR LEARNING PURPOSE
   Future<void> _identifySelectedIons() async {
     final List<String> ions = [];
 
@@ -66,6 +76,7 @@ class _WetTestDFinalResultScreenState
       final questionId = ct['questionId'] as int;
       final ion = ct['ion'] as String;
 
+      // ✅ Check if student attempted this CT (regardless of group status)
       final studentAnswer = await DatabaseHelper.instance.getStudentAnswer(
         'SaltD_WetTest',
         questionId,
@@ -76,7 +87,13 @@ class _WetTestDFinalResultScreenState
       }
     }
 
+    // Show exactly 2 ions (or less if student didn't complete 2 CTs)
     selectedIons = ions.take(2).toList();
+  }
+
+  /// ✅ Check if the selected ion is CORRECT for its group
+  bool isCorrectIonForGroup(String ion, int group) {
+    return correctIonsPerGroup[group] == ion;
   }
 
   Future<bool> isCTCorrect({
@@ -84,8 +101,13 @@ class _WetTestDFinalResultScreenState
     required String ion,
     required int questionId,
   }) async {
+    // ✅ First check: Is this group even present?
     if (wetTestGroups[group] != GroupStatus.present) return false;
 
+    // ✅ Second check: Is this the CORRECT ion for this group?
+    if (!isCorrectIonForGroup(ion, group)) return false;
+
+    // ✅ Third check: Did student answer the CT correctly?
     final studentAnswer = await DatabaseHelper.instance.getStudentAnswer(
       'SaltD_WetTest',
       questionId,

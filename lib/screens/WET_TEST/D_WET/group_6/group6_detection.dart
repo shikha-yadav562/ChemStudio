@@ -28,7 +28,7 @@ class _Group6DetectionState extends State<Group6Detection>
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
+  final String _tableName = 'SaltD_WetTest';
 
   late final List<WetTestItem> _tests = [
     WetTestItem(
@@ -90,7 +90,7 @@ void _next() async {
   } else if (_selectedOption == 'Group-VI is Absent') {
     // ✅ ADD THIS: Mark Group 6 as absent before navigating to Final Result
     await _dbHelper.insertGroupDecision(
-      salt: 'C',
+      salt: 'D',
       groupNumber: 6,
       status: GroupStatus.absent,
     );
