@@ -79,7 +79,7 @@ Future<void> _handleNext() async {
 
   // 2️⃣ Mark Group V as present
   await _dbHelper.insertGroupDecision(
-    salt: 'C',
+    salt: 'D',
     groupNumber: 5,
     status: GroupStatus.present,
   );
