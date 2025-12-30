@@ -2,7 +2,7 @@ import 'package:ChemStudio/models/group_status.dart';
 import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
 import '0CT.dart';
-import '../group1/group1detection.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group1/group1detection.dart';
 import '../c_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
