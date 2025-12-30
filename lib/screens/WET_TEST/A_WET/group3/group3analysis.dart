@@ -1,8 +1,9 @@
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
-import '../a_intro.dart'; // Import for the intro page
 import '../group0/group0analysis.dart';
 import 'group3ct_fe3plus.dart';
 import 'group3ct_al3plus.dart';
+import '../a_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
@@ -16,22 +17,25 @@ class WetTestAGroupThreeAnalysisScreen extends StatefulWidget {
       _WetTestAGroupThreeAnalysisScreenState();
 }
 
-class _WetTestAGroupThreeAnalysisScreenState extends State<WetTestAGroupThreeAnalysisScreen>
+class _WetTestAGroupThreeAnalysisScreenState
+    extends State<WetTestAGroupThreeAnalysisScreen>
     with SingleTickerProviderStateMixin {
+
   String? _selectedOption;
+
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
-
+  final String _tableName = 'SaltA_WetTest';
+  // *** Group 3 Analysis Content ***
   late final WetTestItem _test = WetTestItem(
-    id: 10,
+    id: 11,
     title: 'Analysis of Group III',
-    procedure: 'O.S/Filtrate + NH₄Cl + NH₄OH',
-    observation: 'No ppt',
+    procedure: 'O.S/Filtrate + NH4Cl + NH4OH',
+    observation: 'reddish-brown ppt',
     options: ['Fe³⁺ may be present', 'Al³⁺ may be present'],
-    correct: 'Fe³⁺ may be present', 
+    correct: 'Fe³⁺ may be present',
   );
 
   @override
@@ -47,28 +51,46 @@ class _WetTestAGroupThreeAnalysisScreenState extends State<WetTestAGroupThreeAna
   }
 
   Future<void> _loadSavedAnswer() async {
-    final data = await _dbHelper.getAnswers(_tableName);
+    final List<Map<String, dynamic>> data = await _dbHelper.getAnswers(_tableName);
+
+    String? savedAnswer;
+
+    // Loop through each row and find the matching question_id
+    for (final row in data) {
+      if (row['question_id'] == _test.id) {
+        savedAnswer = row['student_answer'] as String?;
+        break;
+      }
+    }
+
     setState(() {
-      final savedAnswer = data.firstWhereOrNull(
-          (row) => row['question_id'] == _test.id)?['answer'];
       _selectedOption = savedAnswer;
     });
   }
 
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+  // ✅ FIXED: Only save student answer - NO correct answer!
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() => _selectedOption = selected);
+
+    // ONLY save student answer
+    await _dbHelper.saveStudentAnswer(_tableName, test.id, selected);
   }
 
+  // *** Navigation Logic ***
   void _next() async {
     if (_selectedOption == 'Fe³⁺ may be present') {
       await Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const WetTestAGroupThreeCTFeScreen()),
+        MaterialPageRoute(
+          builder: (_) => const WetTestAGroupThreeCTFeScreen(),
+        ),
       );
     } else if (_selectedOption == 'Al³⁺ may be present') {
       await Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const WetTestAGroupThreeCTAlScreen()),
+        MaterialPageRoute(
+          builder: (_) => const WetTestAGroupThreeCTAlScreen(),
+        ),
       );
     }
   }
@@ -85,14 +107,19 @@ class _WetTestAGroupThreeAnalysisScreenState extends State<WetTestAGroupThreeAna
     super.dispose();
   }
 
+  // Helper methods for UI consistency
   Widget _buildGradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
       child: Text(
         text,
         style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
       ),
     );
   }
@@ -129,27 +156,29 @@ class _WetTestAGroupThreeAnalysisScreenState extends State<WetTestAGroupThreeAna
 
   @override
   Widget build(BuildContext context) {
+    final test = _test;
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        // --- Updated Leading Navigation ---
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: primaryBlue),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (_) => const WetTestIntroAScreen()),
+              MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
               (route) => false,
             );
           },
         ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: Text(
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
+          child:Text(
             'Salt A : Wet Test',
             style: TextStyle(
               color: Colors.white,
@@ -162,50 +191,62 @@ class _WetTestAGroupThreeAnalysisScreenState extends State<WetTestAGroupThreeAna
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero).animate(_fadeSlide),
+          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+              .animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(_test.title,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: primaryBlue, fontWeight: FontWeight.bold)),
+                Text(
+                  test.title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 12),
                 Expanded(
                   child: ListView(
                     children: [
-                      _buildTestCard(_test),
-                      
+                      _buildTestCard(test),
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
-                      ..._test.options.map((opt) {
+                      // Options
+                      ...test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
                             onTap: () async {
-                              setState(() => _selectedOption = opt);
-                              await _saveAnswer(_test.id, opt);
+                              await _onOptionSelected(test, opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: selectedHere ? accentTeal.withOpacity(0.1) : Colors.white,
+                                color: selectedHere
+                                    ? accentTeal.withOpacity(0.1)
+                                    : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.grey.shade300,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 opt,
                                 style: TextStyle(
-                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
-                                  color: selectedHere ? accentTeal : Colors.black87,
+                                  fontWeight: selectedHere
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.black87,
                                 ),
                               ),
                             ),
@@ -215,6 +256,7 @@ class _WetTestAGroupThreeAnalysisScreenState extends State<WetTestAGroupThreeAna
                     ],
                   ),
                 ),
+                // Navigation Buttons (Prev/Next)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -230,7 +272,10 @@ class _WetTestAGroupThreeAnalysisScreenState extends State<WetTestAGroupThreeAna
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
                       ),
                     ),
                   ],

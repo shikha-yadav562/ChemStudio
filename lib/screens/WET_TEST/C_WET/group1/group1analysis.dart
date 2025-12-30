@@ -1,11 +1,11 @@
 // E:\flutter chemistry\wet\wet\lib\C\group1\group1analysis.dart
 
 import 'package:ChemStudio/DB/database_helper.dart';
-import 'package:ChemStudio/screens/WET_TEST/A_WET/group0/group0analysis.dart' hide DatabaseHelper;
-import 'package:ChemStudio/screens/WET_TEST/A_WET/group1/group1analysis.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/c_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/C_WET/group0/group0analysis.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/group1/group1ct_pb2plus.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import '../c_intro.dart'; 
 
 // --- Theme Constants (Must match existing design) ---
 const Color primaryBlue = Color(0xFF004C91);

@@ -83,7 +83,7 @@ class _WetTestAGroupZeroCTScreenState extends State<WetTestAGroupZeroCTScreen>
     );
 
     // 3️⃣ Check how many groups are PRESENT
-    final groups = await _dbHelper.getStudentGroupDecisions('C');
+    final groups = await _dbHelper.getStudentGroupDecisions('A');
     final presentCount = groups.values
         .where((status) => status == GroupStatus.present)
         .length;

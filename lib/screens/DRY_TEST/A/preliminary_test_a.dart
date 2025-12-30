@@ -42,12 +42,12 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
       title: "1. Preliminary Test – Colour",
       observation: "Blue",
       options: [
-        "Fe³⁺ may be present",
-        "Cu²⁺ may be present",
-        "Mn²⁺ may be present",
-        "Co²⁺ may be present",
+        "Fe3+ may be present",
+        "Cu2+ may be present",
+        "Mn2+ may be present",
+        "Co2+ may be present",
       ],
-      correct: "Cu²⁺ may be present",
+      correct: "Cu2+ may be present",
     ),
     TestItem(
       id: 2,

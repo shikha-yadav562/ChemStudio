@@ -5,7 +5,7 @@ const Map<String, Map<int, String>> correctAnswers = {
   // --------------------------
   // Salt A Preliminary Test
   'SaltA_PreliminaryTest': {
-    1: 'Cu2+',
+    1: 'Cu2+ may be present',
     2: 'Crystalline',
   },
 

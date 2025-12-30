@@ -25,13 +25,13 @@ class _WetTestAFinalResultScreenState
 
   // ✅ Define which ion is CORRECT for each group (Module A)
   final Map<int, String> correctIonsPerGroup = {
-    0: 'NH4+',
+    0: 'NH4+',  // ✅ Only NH4+ is correct for Group 0
     1: 'Pb2+',
-    2: 'Cu2+',
-    3: 'Fe3+',  // ✅ Only Fe³⁺ is correct for Group 3
+    2: 'Cu2+',  // ✅ Only Cu2+ is correct for Group 2
+    3: 'Fe3+', 
     4: 'Ni2+',
-    5: 'Ba2+',  // ✅ Only Ba²⁺ is correct for Group 5
-    6: 'Mg2+',
+    5: 'Ba2+',  
+    6: 'Mg2+', 
   };
 
   final List<Map<String, dynamic>> ctTests = [

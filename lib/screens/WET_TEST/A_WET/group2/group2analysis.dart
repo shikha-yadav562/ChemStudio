@@ -1,99 +1,114 @@
+// E:\flutter chemistry\wet\wet\lib\C\group2\group2analysis.dart
+
+import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
-import '../a_intro.dart'; // Import for Salt A Intro
+import '../group0/group0analysis.dart'; // WetTestItem, DatabaseHelper
 import 'group2ct_cu2plus.dart'; 
-import 'group2ct_as3plus.dart' hide IterableExtension;
+import 'group2ct_as3plus.dart';
+import '../a_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class WetTestAGroupTwoAnalysisScreen extends StatefulWidget {
-    const WetTestAGroupTwoAnalysisScreen({super.key});
+  const WetTestAGroupTwoAnalysisScreen({super.key});
 
-    @override
-    State<WetTestAGroupTwoAnalysisScreen> createState() => 
-        _WetTestAGroupTwoAnalysisScreenState();
+  @override
+  State<WetTestAGroupTwoAnalysisScreen> createState() =>
+      _WetTestAGroupTwoAnalysisScreenState();
 }
 
-class _WetTestAGroupTwoAnalysisScreenState extends State<WetTestAGroupTwoAnalysisScreen>
+class _WetTestAGroupTwoAnalysisScreenState
+    extends State<WetTestAGroupTwoAnalysisScreen>
     with SingleTickerProviderStateMixin {
-    
-    final int _index = 0; 
-    String? _selectedOption; 
-    
-    late final AnimationController _animController;
-    late final Animation<double> _fadeSlide;
+  final int _index = 0;
+  String? _selectedOption;
 
-    final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+  late final AnimationController _animController;
+  late final Animation<double> _fadeSlide;
 
-    late final List<WetTestItem> _tests = [
-        WetTestItem(
-            id: 6, 
-            title: 'Analysis of Group II',
-            procedure: 'O.S + dil. HCl + H₂S gas or water',
-            observation: 'Black or yellow ppt',
-            options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
-            correct: 'Cu²⁺ may be present', 
+  final _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltA_WetTest';
+  late final List<WetTestItem> _tests = [
+    WetTestItem(
+      id: 7, // Sequential ID
+      title: 'Analysis of Group II',
+      procedure: 'O.S + dil. HCL + H₂S gas or water',
+      observation: 'Black ppt',
+      options: ['Cu²⁺ may be present', 'As³⁺ may be present'],
+      correct: 'Cu²⁺ may be present',
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _loadSavedAnswers();
+    _animController.forward();
+  }
+
+  Future<void> _loadSavedAnswers() async {
+    // Load saved answers for persistence across sessions
+    final data = await _dbHelper.getAnswers(_tableName);
+
+    final testId = _tests[_index].id;
+    String? savedAnswer;
+
+    for (final row in data) {
+      if (row['question_id'] == testId) {
+        savedAnswer = row['student_answer'] as String?;
+        break;
+      }
+    }
+
+    setState(() {
+      _selectedOption = savedAnswer;
+    });
+  }
+
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() => _selectedOption = selected);
+
+    // ✅ ONLY save student answer - nothing else!
+    await _dbHelper.saveStudentAnswer(_tableName, test.id, selected);
+}
+  void _next() {
+    if (_selectedOption == null) return;
+
+    if (_selectedOption == 'Cu²⁺ may be present') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestAGroupTwoCTCuScreen(),
         ),
-    ];
-
-    @override
-    void initState() {
-        super.initState();
-        _animController = AnimationController(
-            vsync: this,
-            duration: const Duration(milliseconds: 450),
-        );
-        _fadeSlide =
-            CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-        _loadSavedAnswers();
-        _animController.forward();
+      );
+    } else if (_selectedOption == 'As³⁺ may be present') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestAGroupTwoCTAsScreen(),
+        ),
+      );
     }
-
-    Future<void> _loadSavedAnswers() async {
-        final data = await _dbHelper.getAnswers(_tableName);
-        setState(() {
-            final testId = _tests[_index].id;
-            final savedAnswer = data.firstWhereOrNull( 
-                (row) => row['question_id'] == testId)?['answer'];
-            _selectedOption = savedAnswer;
-        });
+  }
+void _prev() {
+    // Navigate back to the Group II Detection screen (WetTestCGroupOneDetectionScreen)
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
     }
+  }
 
-    Future<void> _saveAnswer(int id, String answer) async {
-        await _dbHelper.saveAnswer(_tableName, id, answer);
-    }
-
-    void _next() async {
-        if (_selectedOption == 'Cu²⁺ may be present') {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestAGroupTwoCTCuScreen(), 
-                ),
-            );
-        } else if (_selectedOption == 'As³⁺ may be present') {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestAGroupTwoCTAsScreen(), 
-                ),
-            );
-        }
-    }
-    
-    void _prev() {
-        Navigator.pop(context);
-    }
-
-    @override
-    void dispose() {
-        _animController.dispose();
-        super.dispose();
-    }
-
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
     @override
     Widget build(BuildContext context) {
         final test = _tests[_index];
@@ -104,17 +119,16 @@ class _WetTestAGroupTwoAnalysisScreenState extends State<WetTestAGroupTwoAnalysi
                 backgroundColor: Colors.white,
                 elevation: 2,
                 centerTitle: true,
-                // ADDED: Navigation back to Intro A
                 leading: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: primaryBlue),
-                    onPressed: () {
-                        Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
-                            (route) => false,
-                        );
-                    },
-                ),
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
                 title: ShaderMask(
                     shaderCallback: (bounds) =>
                         const LinearGradient(colors: [accentTeal, primaryBlue])
@@ -149,19 +163,21 @@ class _WetTestAGroupTwoAnalysisScreenState extends State<WetTestAGroupTwoAnalysi
                                 Expanded(
                                     child: ListView(
                                         children: [
-                                            _buildTestCard(test), 
+                                            _buildTestCard(test), // Card with Test and Observation
                                             const SizedBox(height: 24),
                                             _buildInferenceHeader(),
                                             const SizedBox(height: 10),
+                                            // Options
                                             ...test.options.map((opt) {
                                                 final selectedHere = _selectedOption == opt;
                                                 return Padding(
                                                     padding: const EdgeInsets.symmetric(vertical: 4),
                                                     child: InkWell(
                                                         onTap: () async {
-                                                            setState(() => _selectedOption = opt);
-                                                            await _saveAnswer(test.id, opt);
-                                                        },
+        setState(() => _selectedOption = opt);
+        // ✅ Call the proper function
+        await _onOptionSelected(test, opt);
+      },
                                                         borderRadius: BorderRadius.circular(8),
                                                         child: AnimatedContainer(
                                                             duration: const Duration(milliseconds: 200),
@@ -196,6 +212,7 @@ class _WetTestAGroupTwoAnalysisScreenState extends State<WetTestAGroupTwoAnalysi
                                         ],
                                     ),
                                 ),
+                                // Navigation Buttons (Prev/Next)
                                 Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -259,7 +276,7 @@ class _WetTestAGroupTwoAnalysisScreenState extends State<WetTestAGroupTwoAnalysi
                         Text(
                             test.observation,
                             textAlign: TextAlign.start,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: primaryBlue,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,

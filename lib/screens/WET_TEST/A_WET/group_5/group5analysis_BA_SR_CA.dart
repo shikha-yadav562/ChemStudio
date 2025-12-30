@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'group5_BA_ct.dart';
-import 'group5_SR_ct.dart';
 import 'group5_CA_ct.dart';
-import '../a_intro.dart'; // Ensure this points to your Salt A intro screen
+import 'group5_SR_ct.dart';
+import '../a_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltA_analysis_sr_ba_ca extends StatefulWidget {
-  const saltA_analysis_sr_ba_ca({super.key});
+class saltAAnalysis_BA_SR_CA extends StatefulWidget {
+  const saltAAnalysis_BA_SR_CA({super.key});
 
   @override
-  State<saltA_analysis_sr_ba_ca> createState() => _saltA_analysis_sr_ba_caState();
+  State<saltAAnalysis_BA_SR_CA> createState() => _saltAAnalysis_BA_SR_CAState();
 }
 
-class _saltA_analysis_sr_ba_caState extends State<saltA_analysis_sr_ba_ca> {
+class _saltAAnalysis_BA_SR_CAState extends State<saltAAnalysis_BA_SR_CA> {
   String? selectedOption;
 
   @override
@@ -25,17 +25,16 @@ class _saltA_analysis_sr_ba_caState extends State<saltA_analysis_sr_ba_ca> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        // ADDED: Leading arrow to navigate back to Intro A
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: primaryBlue),
-          onPressed: () {
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
-              (route) => false,
-            );
-          },
-        ),
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
@@ -101,21 +100,21 @@ class _saltA_analysis_sr_ba_caState extends State<saltA_analysis_sr_ba_ca> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltAgroup5_BA_ct()),
+            MaterialPageRoute(builder: (_) => const saltAGroup5CTBaScreen ()),
           );
         };
       } else if (selectedOption == "Ca²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltAgroup5_CA_ct()),
+            MaterialPageRoute(builder: (_) => const saltAGroup5CTCaScreen ()),
           );
         };
       } else if (selectedOption == "Sr²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltAgroup5_SR_ct()),
+            MaterialPageRoute(builder: (_) => const saltAGroup5CTSrScreen ()),
           );
         };
       }
@@ -172,6 +171,8 @@ class _saltA_analysis_sr_ba_caState extends State<saltA_analysis_sr_ba_ca> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
+
+            // ✅ Blue + Bold
             Text(
               "Dissolve the white ppt in hot acetic acid and use this (acetate) solution for further tests.",
               style: TextStyle(
@@ -203,6 +204,8 @@ class _saltA_analysis_sr_ba_caState extends State<saltA_analysis_sr_ba_ca> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
+
+            // ✅ BLACK + NORMAL
             Text(
               "Above solution + K₂CrO₄",
               style: TextStyle(
@@ -211,13 +214,17 @@ class _saltA_analysis_sr_ba_caState extends State<saltA_analysis_sr_ba_ca> {
                 fontWeight: FontWeight.normal,
               ),
             ),
+
             Divider(height: 22),
+
             GradientText(
               "Observation",
               gradient: LinearGradient(colors: [accentTeal, primaryBlue]),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 6),
+
+            // ✅ Blue + Bold
             Text(
               "Yellow ppt",
               style: TextStyle(
@@ -257,8 +264,11 @@ class _saltA_analysis_sr_ba_caState extends State<saltA_analysis_sr_ba_ca> {
             text,
             style: TextStyle(
               fontSize: 15,
+
+              // ✅ This is FIXED now
               color: selected ? accentTeal : Colors.black,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              fontWeight:
+                  selected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ),
@@ -285,6 +295,8 @@ class _saltA_analysis_sr_ba_caState extends State<saltA_analysis_sr_ba_ca> {
   }
 }
 
+// ==================== GRADIENT TEXT WIDGET ====================
+
 class GradientText extends StatelessWidget {
   final String text;
   final TextStyle style;
@@ -308,4 +320,4 @@ class GradientText extends StatelessWidget {
       ),
     );
   }
-}
+} 

@@ -1,22 +1,26 @@
+// group6_detection.dart - CORRECTED VERSION
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:flutter/material.dart';
-import '../group_6/group6_analysis.dart';
-import '../a_intro.dart';
+import 'package:ChemStudio/DB/database_helper.dart';
 import '../group0/group0analysis.dart';
+import 'group6_analysis.dart';
+import 'package:ChemStudio/screens/WET_TEST/A_WET/WetTestAFinalResultScreen.dart';
+import '../a_intro.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltA_Group6Detection extends StatefulWidget {
-  final String? restoredSelection;
-  const saltA_Group6Detection({super.key, this.restoredSelection});
+class saltAGroup6Detection extends StatefulWidget {
+  const saltAGroup6Detection({super.key});
 
   @override
-  State<saltA_Group6Detection> createState() => _saltA_Group6DetectionState();
+  State<saltAGroup6Detection> createState() => _saltAGroup6DetectionState();
 }
 
-class _saltA_Group6DetectionState extends State<saltA_Group6Detection>
+class _saltAGroup6DetectionState extends State<saltAGroup6Detection>
     with SingleTickerProviderStateMixin {
+
   int _index = 0;
   String? _selectedOption;
 
@@ -24,17 +28,16 @@ class _saltA_Group6DetectionState extends State<saltA_Group6Detection>
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltD_WetTest';
+  final String _tableName = 'SaltA_WetTest';
 
   late final List<WetTestItem> _tests = [
     WetTestItem(
-      id: 10,
+      id: 25, // ✅ CORRECT: Sequential ID for Group 6 Detection
       title: 'Group VI Detection',
-      procedure:
-          'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + Na₂HPO₄',
+      procedure: 'O.S/Filtrate + NH₄Cl + NH₄OH (till alkaline)+Na2HPO4',
       observation: 'No ppt',
-      options: ['Group-VI present', 'Group-VI absent'],
-      correct: 'Group-VI absent',
+      options: ['Group-VI is present', 'Group-VI is Absent'],
+      correct: 'Group-VI is Absent',
     ),
   ];
 
@@ -46,55 +49,63 @@ class _saltA_Group6DetectionState extends State<saltA_Group6Detection>
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
+
     _fadeSlide =
         CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
 
-    _loadSavedAnswers();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (widget.restoredSelection != null) {
-        setState(() {
-          _selectedOption = widget.restoredSelection;
-        });
-      }
-    });
-
+    _loadSavedAnswer();
     _animController.forward();
   }
 
-  Future<void> _loadSavedAnswers() async {
-    final data = await _dbHelper.getAnswers(_tableName);
-    setState(() {
-      final testId = _tests[_index].id;
-      final savedAnswer =
-          data.firstWhereOrNull((row) => row['question_id'] == testId)?['answer'];
-      if (widget.restoredSelection == null) {
-        _selectedOption = savedAnswer;
-      }
-    });
-  }
-
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
-  }
-
-  void _next() async {
-    if (_selectedOption == 'Group-VI present') {
-      await Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const saltA_Group6Analysis()),
-      );
+  Future<void> _loadSavedAnswer() async {
+    final saved =
+        await _dbHelper.getStudentAnswer(_tableName, _tests[_index].id);
+    if (saved != null) {
+      setState(() {
+        _selectedOption = saved;
+      });
     }
-    // ❌ ABSENT → DO NOTHING (BUTTON IS DISABLED ANYWAY)
   }
+
+  /// Save ONLY detection answer
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() => _selectedOption = selected);
+
+    await _dbHelper.saveStudentAnswer(
+      _tableName,
+      test.id,
+      selected,
+    );
+  }
+
+  // Replace the _next() method:
+void _next() async {
+  if (_selectedOption == 'Group-VI is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const saltAGroup6AnalysisScreen(),
+      ),
+    );
+  } else if (_selectedOption == 'Group-VI is Absent') {
+    // ✅ ADD THIS: Mark Group 6 as absent before navigating to Final Result
+    await _dbHelper.insertGroupDecision(
+      salt: 'A',
+      groupNumber: 6,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestAFinalResultScreen(salt: 'A'),
+      ),
+    );
+  }
+}
 
   void _prev() {
     Navigator.pop(context, _selectedOption);
-  }
-
-  Future<bool> _onWillPop() async {
-    Navigator.pop(context, _selectedOption);
-    return false;
   }
 
   @override
@@ -107,140 +118,124 @@ class _saltA_Group6DetectionState extends State<saltA_Group6Detection>
   Widget build(BuildContext context) {
     final test = _tests[_index];
 
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: Scaffold(
-        backgroundColor: Colors.grey[50],
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 2,
-          centerTitle: true,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: primaryBlue),
-            onPressed: () {
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const WetTestIntroAScreen()),
-                (route) => false,
-              );
-            },
-          ),
-          title: ShaderMask(
-            shaderCallback: (bounds) =>
-                const LinearGradient(colors: [accentTeal, primaryBlue])
-                    .createShader(bounds),
-            child: Text(
-              'Salt A: Wet Test',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22),
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 2,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroAScreen()),
+              (route) => false,
+            );
+          },
+        ),
+        title: ShaderMask(
+          shaderCallback: (bounds) =>
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
+          child:  Text(
+            'Salt A : Wet Test',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
             ),
           ),
         ),
-        body: FadeTransition(
-          opacity: _fadeSlide,
-          child: SlideTransition(
-            position:
-                Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-                    .animate(_fadeSlide),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    test.title,
+      ),
+      body: FadeTransition(
+        opacity: _fadeSlide,
+        child: SlideTransition(
+          position:
+              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+                  .animate(_fadeSlide),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(test.title,
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
-                        ?.copyWith(
-                            color: primaryBlue,
-                            fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        _buildTestCard(test),
-                        const SizedBox(height: 24),
-                        _buildInferenceHeader(),
-                        const SizedBox(height: 10),
-                        ...test.options.map((opt) {
-                          final selectedHere = _selectedOption == opt;
-                          return Padding(
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 4),
-                            child: InkWell(
-                              onTap: () async {
-                                setState(() => _selectedOption = opt);
-                                await _saveAnswer(test.id, opt);
-                              },
-                              borderRadius: BorderRadius.circular(8),
-                              child: AnimatedContainer(
-                                duration:
-                                    const Duration(milliseconds: 200),
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
+                        ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      _buildTestCard(test),
+                      const SizedBox(height: 24),
+                      _buildInferenceHeader(),
+                      const SizedBox(height: 10),
+                      ...test.options.map((opt) {
+                        final selectedHere = _selectedOption == opt;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: InkWell(
+                            onTap: () async {
+                              await _onOptionSelected(test, opt);
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: selectedHere
+                                    ? accentTeal.withOpacity(0.1)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
                                   color: selectedHere
-                                      ? accentTeal.withOpacity(0.1)
-                                      : Colors.white,
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: selectedHere
-                                        ? accentTeal
-                                        : Colors.grey.shade300,
-                                    width: 1.5,
-                                  ),
+                                      ? accentTeal
+                                      : Colors.grey.shade300,
+                                  width: 1.5,
                                 ),
-                                child: Text(
-                                  opt,
-                                  style: TextStyle(
-                                    fontWeight: selectedHere
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: selectedHere
-                                        ? accentTeal
-                                        : Colors.black87,
-                                  ),
+                              ),
+                              child: Text(
+                                opt,
+                                style: TextStyle(
+                                  fontWeight: selectedHere
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.black87,
                                 ),
                               ),
                             ),
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextButton.icon(
-                        onPressed: _prev,
-                        icon: const Icon(Icons.arrow_back),
-                        label: const Text('Previous'),
-                      ),
-                      ElevatedButton.icon(
-                        // 🔒 FREEZE BUTTON WHEN ABSENT
-                        onPressed: (_selectedOption == 'Group-VI present')
-                            ? _next
-                            : null,
-                        icon: const Icon(Icons.arrow_forward),
-                        label: const Text('Next'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              (_selectedOption == 'Group-VI present')
-                                  ? primaryBlue
-                                  : Colors.grey.shade400,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 12),
-                        ),
-                      ),
+                          ),
+                        );
+                      }).toList(),
                     ],
                   ),
-                ],
-              ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _prev,
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Previous'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _selectedOption != null ? _next : null, // ✅ BOTH options work
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text('Next'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
@@ -256,9 +251,10 @@ class _saltA_Group6DetectionState extends State<saltA_Group6Detection>
       child: const Text(
         'Select the correct inference:',
         style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold),
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -268,23 +264,24 @@ class _saltA_Group6DetectionState extends State<saltA_Group6Detection>
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _gradientHeader('Test'),
             const SizedBox(height: 4),
-            Text(test.procedure,
-                style: const TextStyle(fontSize: 14)),
+            Text(test.procedure, style: const TextStyle(fontSize: 14)),
             const Divider(height: 24),
             _gradientHeader('Observation'),
             const SizedBox(height: 8),
             Text(
               test.observation,
-              style: const TextStyle(
-                  color: primaryBlue,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16),
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ],
         ),
@@ -300,9 +297,7 @@ class _saltA_Group6DetectionState extends State<saltA_Group6Detection>
       child: Text(
         text,
         style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontSize: 18),
+            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }
