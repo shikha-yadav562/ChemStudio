@@ -1,18 +1,25 @@
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/screens/WET_TEST/C_WET/correct_answers.dart';
 import 'package:flutter/material.dart';
-import 'package:ChemStudio/screens/WET_TEST/A_WET/a_intro.dart';
 import '../../welcome_screen.dart';
-import 'package:ChemStudio/screens/DRY_TEST/A/preliminary_test_a.dart'; // ✅ Import Preliminary Test screen
-
-
+import 'package:ChemStudio/screens/DRY_TEST/A/preliminary_test_a.dart';
+import 'package:ChemStudio/screens/WET_TEST/A_WET/A_intro.dart';
+import 'package:ChemStudio/screens/DRY_TEST/A/possible_radicals_A.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class DryTestAScreen extends StatefulWidget {
   final Map<int, String> preliminaryAnswers;
-  const DryTestAScreen({super.key, required this.preliminaryAnswers});
+  final bool isReviewMode;
+  final int startIndex; // Add this line
+
+  const DryTestAScreen({
+    super.key,
+    required this.preliminaryAnswers,
+    this.isReviewMode = false,
+    this.startIndex = 0,
+  });
 
   @override
   State<DryTestAScreen> createState() => _DryTestAScreenState();
@@ -28,44 +35,34 @@ class _DryTestAScreenState extends State<DryTestAScreen>
 
   final dbHelper = DatabaseHelper.instance;
   final String tableName = 'SaltA_DryTest';
-
   @override
   void initState() {
     super.initState();
+    _index = widget.startIndex;
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeInOut,
-    );
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
     _animController.forward();
 
-    _loadSavedAnswers(); // ✅ only load, don’t clear
-
-    // Save correct answers for Dry Test
-  for (var test in _tests) {
-    dbHelper.saveCorrectAnswer('SaltA_DryTest', test.id, test.correct);
-  }
-
-    // ✅ Print preliminary data when screen opens
+    _loadSavedAnswers();
     print("🧪 Preliminary Answers Received: ${widget.preliminaryAnswers}");
   }
 
   Future<void> _loadSavedAnswers() async {
-  final data = await dbHelper.getAnswers(tableName);
-  if (data.isNotEmpty) {
-    setState(() {
-      for (var row in data) {
-        if (row['student_answer'] != null) {
-          _answers[row['question_id']] = row['student_answer'];
+    final data = await dbHelper.getAnswers(tableName);
+    if (data.isNotEmpty) {
+      setState(() {
+        for (var row in data) {
+          if (row['student_answer'] != null) {
+            _answers[row['question_id']] = row['student_answer'];
+          }
         }
-      }
-    });
+      });
+      print("🧪 Dry Test Answers Loaded: $_answers");
+    }
   }
-}
-
 
   static List<TestItem> _generateTests() {
     return [
@@ -74,45 +71,41 @@ class _DryTestAScreenState extends State<DryTestAScreen>
         title: '1. Heating in a Dry Test Tube',
         procedure:
             'Take a small quantity of the mixture in a clean and dry test-tube and heat it strongly in an oxidising (blue) flame. Observe the change taking place.',
-        observation: 'Coloured residue observed.\nCold: Blue Hot: White',
-        options: ['Co2+', 'Fe3+', 'Cu2+', 'Pb2+'],
-        correct: 'Cu2+', // ✅ Added
+        observation: 'Coloured residue observed.\nCold: Brown\tHot: Black',
+        options: ['Co2+', 'Cu2+', 'Fe3+', 'Pb2+'],
+        correct: 'Cu2+',
       ),
       TestItem(
         id: 2,
         title: '2. NaOH Test',
         procedure:
             'Mix the salt with NaOH solution and heat gently. Hold moist turmeric paper near the mouth of the tube.',
-        observation: 'Moist turmeric paper turns brown/red',
+        observation: 'Moist turmeric paper turns brown/red on exposure to gas',
         options: ['NH4+ Present', 'NH4+ Absent'],
-        correct: 'NH4+ Present', // ✅ Added
+        correct: 'NH4+ Present',
       ),
       TestItem(
         id: 3,
         title: '3. Flame Test',
         procedure:
             'Prepare a paste of the salt with conc. HCl. Dip a platinum wire or glass rod in it and place it in an oxidising flame. Observe the colour.',
-        observation: 'Bluish Green flame observed.',
+        observation: 'Bluish Green flame observed..',
         options: [
           'Ca2+ may be present',
           'Ba2+ may be present',
           'Sr2+ may be present',
           'Pb2+ may be present',
-          'Cu2+ may be present',
+          'Cu2+ may be present'
         ],
-        correct: 'Cu2+ may be present', // ✅ Added
+        correct: 'Cu2+ may be present',
       ),
     ];
   }
-Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
-  // Save student's selected answer
-  await dbHelper.saveStudentAnswer(tableName, test.id, selectedAnswer);
 
-  // Save correct answer
-  //await dbHelper.saveCorrectAnswer(tableName, test.id, test.correct);
-}
-
-
+  Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
+    await dbHelper.saveStudentAnswer(tableName, test.id, selectedAnswer);
+    print("💾 Saved Dry Test Answer - Q${test.id}: $selectedAnswer");
+  }
 
   void _next() async {
     if (_index < _tests.length - 1) {
@@ -121,37 +114,54 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
         _animController.forward(from: 0);
       });
     } else {
-      // ✅ Make sure DB writes are done
-      await Future.delayed(const Duration(milliseconds: 200));
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => SaltAResultScreen(
-            userAnswers: _answers,
-            tests: _tests,
-            preliminaryAnswers: widget.preliminaryAnswers,
+      if (widget.isReviewMode) {
+        print("📊 Review Mode Complete - Dry Test Answers: $_answers");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SaltAResultScreen(
+              userAnswers: _answers,
+              tests: _tests,
+              preliminaryAnswers: widget.preliminaryAnswers,
+            ),
           ),
-        ),
-      );
+        );
+      } else {
+        await Future.delayed(const Duration(milliseconds: 200));
+        print("🧪 Test Complete: Moving to Possible Radicals Selection");
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => PossibleRadicalsaScreen(
+              userAnswers: _answers,
+              tests: _tests,
+              preliminaryAnswers: widget.preliminaryAnswers,
+            ),
+          ),
+        );
+      }
     }
   }
 
   void _prev() {
-    if (_index > 0) {
+    if (_index == 0) {
+      if (widget.isReviewMode) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SaltAResultScreen(
+              userAnswers: _answers,
+              tests: _tests,
+              preliminaryAnswers: widget.preliminaryAnswers,
+            ),
+          ),
+        );
+      } 
+    } else {
       setState(() {
         _index--;
         _animController.forward(from: 0);
       });
-    } else {
-      // ✅ FIX: Navigate back to the PreliminaryTestAScreen at index 1 (Nature Test)
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          // Pass initialIndex: 1 to load the second page (Nature Test)
-          builder: (_) => const PreliminaryTestAScreen(initialIndex: 1),
-        ),
-      );
     }
   }
 
@@ -173,12 +183,11 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
         elevation: 2,
         centerTitle: true,
         title: ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [accentTeal, primaryBlue],
-          ).createShader(bounds),
-          child: const Text(
-            'Salt A : Dry Tests',
-            style: TextStyle(
+          shaderCallback: (bounds) =>
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          child: Text(
+            widget.isReviewMode ? 'Salt A : Review Mode' : 'Salt A : Dry Tests',
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 22,
@@ -189,10 +198,8 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0.1, 0.03),
-            end: Offset.zero,
-          ).animate(_fadeSlide),
+          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+              .animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -201,9 +208,9 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
                 Text(
                   test.title,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    color: primaryBlue,
-                    fontWeight: FontWeight.bold,
-                  ),
+                        color: primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
                 ),
                 const SizedBox(height: 12),
                 Expanded(
@@ -212,9 +219,9 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
                       _buildTestCard(test),
                       const SizedBox(height: 24),
                       ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [accentTeal, primaryBlue],
-                        ).createShader(bounds),
+                        shaderCallback: (bounds) =>
+                            const LinearGradient(colors: [accentTeal, primaryBlue])
+                                .createShader(bounds),
                         child: const Text(
                           'Based on the observation, select the correct inference:',
                           style: TextStyle(
@@ -227,41 +234,92 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
                       const SizedBox(height: 10),
                       ...test.options.map((opt) {
                         final selectedHere = selected == opt;
+                        final bool isCorrect = opt == test.correct;
+
+                        Color borderColor;
+                        Color backgroundColor;
+                        Color textColor;
+
+                        if (widget.isReviewMode) {
+                          if (selectedHere && isCorrect) {
+                            borderColor = Colors.green;
+                            backgroundColor = Colors.green.withOpacity(0.1);
+                            textColor = Colors.green;
+                          } else if (selectedHere && !isCorrect) {
+                            borderColor = Colors.red;
+                            backgroundColor = Colors.red.withOpacity(0.1);
+                            textColor = Colors.red;
+                          } else if (!selectedHere && isCorrect) {
+                            borderColor = Colors.green;
+                            backgroundColor = Colors.green.withOpacity(0.05);
+                            textColor = Colors.green.shade700;
+                          } else {
+                            borderColor = Colors.grey.shade300;
+                            backgroundColor = Colors.white;
+                            textColor = Colors.black87;
+                          }
+                        } else {
+                          if (selectedHere) {
+                            borderColor = accentTeal;
+                            backgroundColor = accentTeal.withOpacity(0.1);
+                            textColor = accentTeal;
+                          } else {
+                            borderColor = Colors.grey.shade300;
+                            backgroundColor = Colors.white;
+                            textColor = Colors.black87;
+                          }
+                        }
+
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                _answers[test.id] = opt;
-                              });
-                              _saveAnswer(test, opt);
-                            },
+                            onTap: widget.isReviewMode
+                                ? null
+                                : () {
+                                    setState(() {
+                                      _answers[test.id] = opt;
+                                    });
+                                    _saveAnswer(test, opt);
+                                  },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: selectedHere
-                                    ? accentTeal.withOpacity(0.1)
-                                    : Colors.white,
+                                color: backgroundColor,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.grey.shade300,
-                                  width: 1.5,
+                                  color: borderColor,
+                                  width: widget.isReviewMode && isCorrect ? 2.5 : 1.5,
                                 ),
                               ),
-                              child: Text(
-                                opt,
-                                style: TextStyle(
-                                  fontWeight: selectedHere
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: selectedHere
-                                      ? accentTeal
-                                      : Colors.black87,
-                                ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      opt,
+                                      style: TextStyle(
+                                        fontWeight: (selectedHere ||
+                                                (widget.isReviewMode && isCorrect))
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                  ),
+                                  if (widget.isReviewMode && selectedHere)
+                                    Icon(
+                                      isCorrect ? Icons.check_circle : Icons.cancel,
+                                      color: isCorrect ? Colors.green : Colors.red,
+                                      size: 20,
+                                    ),
+                                  if (widget.isReviewMode && !selectedHere && isCorrect)
+                                    Icon(
+                                      Icons.check_circle_outline,
+                                      color: Colors.green,
+                                      size: 20,
+                                    ),
+                                ],
                               ),
                             ),
                           ),
@@ -279,22 +337,17 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
                       label: const Text('Previous'),
                     ),
                     ElevatedButton.icon(
-                      onPressed: selected != null ? _next : null,
-                      icon: Icon(
-                        _index == _tests.length - 1
-                            ? Icons.check_circle_outline
-                            : Icons.arrow_forward,
-                      ),
-                      label: Text(
-                        _index == _tests.length - 1 ? 'Finish' : 'Next',
-                      ),
+                      onPressed: widget.isReviewMode
+                          ? _next
+                          : (selected != null ? _next : null),
+                      icon: Icon(_index == _tests.length - 1
+                          ? Icons.check_circle_outline
+                          : Icons.arrow_forward),
+                      label: Text(_index == _tests.length - 1 ? 'Finish' : 'Next'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 12,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                       ),
                     ),
                   ],
@@ -323,7 +376,7 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
             _gradientHeader('Observation'),
             const SizedBox(height: 8),
             if (test.id == 1) _heatingObservation(),
-            if (test.id == 2) _naohObservation(),
+            if (test.id == 2) _naohObservation(test.observation),
             if (test.id == 3) _flameObservation(),
           ],
         ),
@@ -331,21 +384,18 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
     );
   }
 
-  Widget _gradientHeader(String text) {
-    return ShaderMask(
-      shaderCallback: (bounds) => const LinearGradient(
-        colors: [accentTeal, primaryBlue],
-      ).createShader(bounds),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
-          fontSize: 18,
+  Widget _gradientHeader(String text) => ShaderMask(
+        shaderCallback: (bounds) =>
+            const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+        child: Text(
+          text,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
-      ),
-    );
-  }
+      );
 
   Widget _heatingObservation() {
     return Column(
@@ -359,35 +409,27 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
           ),
         ),
         const SizedBox(height: 12),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            // 🔥 HOT IMAGE + LABEL
             Expanded(
               child: Column(
                 children: [
                   Image.asset(
                     'assets/images/pic_a.png',
                     height: 160,
-                    fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) =>
                         const PlaceholderImage(label: 'Pic A (Hot : White)'),
                   ),
                   const SizedBox(height: 6),
-
-                  // 🔥 HOT TEXT with background
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Color(0xFFFFE8D8),
+                      color: const Color(0xFFFFE6D8),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      '🔥 HOT : WHITE',
+                      '🔥 Hot : White',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -398,33 +440,25 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
                 ],
               ),
             ),
-
             const SizedBox(width: 16),
-
-            // ❄️ COLD IMAGE + LABEL
             Expanded(
               child: Column(
                 children: [
                   Image.asset(
                     'assets/images/pic_b.png',
                     height: 160,
-                    fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) =>
                         const PlaceholderImage(label: 'Pic B (Cold : Blue)'),
                   ),
                   const SizedBox(height: 6),
-
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                     decoration: BoxDecoration(
                       color: Color(0xFFE3EEFF),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Text(
-                      '❄️ COLD : BLUE',
+                      '❄️ Cold : Blue',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -441,18 +475,14 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
     );
   }
 
-  Widget _naohObservation() {
+  Widget _naohObservation(String observationText) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Ensures image is always visible and properly scaled
         Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 500, // Prevents extra shrinking on big screens
-              minWidth: 250,
-              maxHeight: 250,
-            ),
+            constraints: const BoxConstraints(maxWidth: 450, maxHeight: 250),
             child: Image.asset(
               'assets/images/turmeric_red.png',
               fit: BoxFit.contain,
@@ -461,16 +491,13 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
             ),
           ),
         ),
-
-        const SizedBox(height: 15),
-
-        // Clean and readable text
-        const Text(
-          'Moist turmeric paper remains as it is on exposure to gas.',
+        const SizedBox(height: 12),
+        Text(
+          observationText,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             color: primaryBlue,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
             fontSize: 16,
           ),
         ),
@@ -478,30 +505,24 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
     );
   }
 
-  // MODIFIED WIDGET: _flameObservation()
   Widget _flameObservation() {
     return Center(
       child: Column(
         children: [
           Image.asset(
             'assets/images/flame_bluishgreen.png',
-            height: 160, // Match sizing convention of other observations
+            height: 160,
             errorBuilder: (_, __, ___) =>
                 const PlaceholderImage(label: 'flame_bluishgreen.png'),
           ),
-
-          // 2. Remove all old flame-related text/widgets.
-          const SizedBox(
-            height: 12,
-          ), // Match padding convention of other observations
-          // 3. Display this exact text below the image
+          const SizedBox(height: 12),
           Text(
-            'Bluish Green flame', // EXACT text requested
+            'Bluish Green flame',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w600,
-              color: primaryBlue, // Match text style convention
+              color: primaryBlue,
             ),
           ),
         ],
@@ -510,8 +531,7 @@ Future<void> _saveAnswer(TestItem test, String selectedAnswer) async {
   }
 }
 
-// ------------------------------------------------------------
-// ✅ Corrected Result Screen: SaltAResultScreen
+// ---------- Result Screen ----------
 class SaltAResultScreen extends StatefulWidget {
   final Map<int, String> userAnswers;
   final List<TestItem> tests;
@@ -535,18 +555,18 @@ class _SaltAResultScreenState extends State<SaltAResultScreen>
   Map<int, String> dryCorrect = {};
   Map<int, String> prelimCorrect = {};
 
-@override
-void initState() {
-  super.initState();
-  _fadeCtrl = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 500),
-  );
-  _fadeCtrl.forward();
+  @override
+  void initState() {
+    super.initState();
+    _fadeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _fadeCtrl.forward();
 
-  dryCorrect = correctAnswers['SaltA_DryTest'] ?? {};
-  prelimCorrect = correctAnswers['SaltA_PreliminaryTest'] ?? {};
-}
+    dryCorrect = correctAnswers['SaltA_DryTest'] ?? {};
+    prelimCorrect = correctAnswers['SaltA_PreliminaryTest'] ?? {};
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -578,15 +598,95 @@ void initState() {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const Text(
-                'Dry Test Answers:',
+                'Preliminary Test Answers:',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
 
-              // ---------- Dry Test Answers ----------
               Expanded(
                 child: ListView(
                   children: [
+                    if (widget.preliminaryAnswers.isEmpty)
+                      const Text(
+                        'No preliminary test data found.',
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                      )
+                    else
+                      ...widget.preliminaryAnswers.entries.map((entry) {
+                        final correctAns = prelimCorrect[entry.key] ?? 'Not found';
+                        final isCorrect = entry.value == correctAns;
+
+                        String title;
+                        if (entry.key == 1) {
+                          title = 'Preliminary Test: Colour';
+                        } else if (entry.key == 2) {
+                          title = 'Preliminary Test: Water Soluble';
+                        } else {
+                          title = 'Preliminary Test Q${entry.key}';
+                        }
+
+                        return Container(
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [accentTeal, primaryBlue],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Container(
+                            margin: const EdgeInsets.all(2.5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 10),
+                              leading: Icon(
+                                isCorrect ? Icons.check_circle : Icons.cancel,
+                                color: isCorrect ? Colors.green : Colors.red,
+                                size: 28,
+                              ),
+                              title: Text(
+                                title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              subtitle: Padding(
+                                padding: const EdgeInsets.only(top: 6),
+                                child: Text(
+                                  'Your Answer: ${entry.value}\nCorrect Answer: $correctAns',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    color: primaryBlue,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
+
+                    const SizedBox(height: 30),
+
+                    const Text(
+                      'Dry Test Answers:',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 16),
+
                     ...widget.tests.map((test) {
                       final ans = widget.userAnswers[test.id] ?? 'No answer selected';
                       final correctAns = dryCorrect[test.id] ?? 'Not found';
@@ -616,7 +716,8 @@ void initState() {
                             ],
                           ),
                           child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
                             leading: Icon(
                               isCorrect ? Icons.check_circle : Icons.cancel,
                               color: isCorrect ? Colors.green : Colors.red,
@@ -643,92 +744,15 @@ void initState() {
                           ),
                         ),
                       );
-                    }).toList(),
-
-                    const SizedBox(height: 30),
-
-                    // ---------- Preliminary Test Answers ----------
-                    const Text(
-                      'Preliminary Test Answers:',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-
-                    if (widget.preliminaryAnswers.isEmpty)
-                      const Text(
-                        'No preliminary test data found.',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      )
-                    else
-                      ...widget.preliminaryAnswers.entries.map((entry) {
-                        final correctAns = prelimCorrect[entry.key] ?? 'Not found';
-                        final isCorrect = entry.value == correctAns;
-
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [accentTeal, primaryBlue],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Container(
-                            margin: const EdgeInsets.all(2.5),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(14),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
-                            ),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                              leading: Icon(
-                                isCorrect ? Icons.check_circle : Icons.cancel,
-                                color: isCorrect ? Colors.green : Colors.red,
-                                size: 28,
-                              ),
-                              title: Text(
-                                'Preliminary Test Q${entry.key}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Text(
-                                  'Your Answer: ${entry.value}\nCorrect Answer: $correctAns',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: primaryBlue,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                    }),
                   ],
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // ---------- Buttons ----------
               Row(
                 children: [
-                  // 🔙 PREVIOUS
                   Expanded(
                     child: SizedBox(
                       height: 50,
@@ -737,15 +761,17 @@ void initState() {
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => DryTestAScreen(
+                              builder: (_) => PreliminaryTestAScreen(
+                                startIndex: 0,
+                                isReviewMode: true,
                                 preliminaryAnswers: widget.preliminaryAnswers,
                               ),
                             ),
                           );
                         },
-                        icon: const Icon(Icons.arrow_back),
+                        icon: const Icon(Icons.fact_check),
                         label: const Text(
-                          "Previous",
+                          "Recheck",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -758,7 +784,6 @@ void initState() {
 
                   const SizedBox(width: 12),
 
-                  // 🧪 START ANALYSIS
                   Expanded(
                     child: SizedBox(
                       height: 50,
@@ -773,7 +798,7 @@ void initState() {
                         },
                         icon: const Icon(Icons.science_rounded),
                         label: const Text(
-                          "Start Analysis",
+                          "Start Wet Test ",
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         style: ElevatedButton.styleFrom(
@@ -786,7 +811,6 @@ void initState() {
 
                   const SizedBox(width: 12),
 
-                  // 🏠 HOME
                   Expanded(
                     child: SizedBox(
                       height: 50,
@@ -819,8 +843,6 @@ void initState() {
   }
 }
 
-
-// ---------- Model ----------
 class TestItem {
   final int id;
   final String title;
@@ -853,12 +875,9 @@ class PlaceholderImage extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade400),
       ),
       child: Center(
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.grey.shade600),
-        ),
-      ),
+          child: Text(label,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey.shade600))),
     );
   }
 }
