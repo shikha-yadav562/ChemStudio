@@ -1,14 +1,21 @@
-import 'package:flutter/material.dart';
 import 'package:ChemStudio/DB/database_helper.dart';
-import 'dry_test_a.dart';
+import 'package:flutter/material.dart';
+import 'package:ChemStudio/screens/DRY_TEST/A/dry_test_a.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class PreliminaryTestAScreen extends StatefulWidget {
-  final int initialIndex;
+  final int startIndex;
+  final bool isReviewMode;
+  final Map<int, String>? preliminaryAnswers;
 
-  const PreliminaryTestAScreen({super.key, this.initialIndex = 0});
+  const PreliminaryTestAScreen({
+    super.key,
+    this.startIndex = 0,
+    this.isReviewMode = false,
+    this.preliminaryAnswers,
+  });
 
   @override
   State<PreliminaryTestAScreen> createState() => _PreliminaryTestAScreenState();
@@ -19,25 +26,28 @@ class _PreliminaryTestAScreenState extends State<PreliminaryTestAScreen> {
   final Map<int, String> _answers = {};
   final _dbHelper = DatabaseHelper.instance;
 
- @override
-void initState() {
-  super.initState();
-  _index = widget.initialIndex;
+  @override
+  void initState() {
+    super.initState();
+    _index = widget.startIndex;
 
-  // Save correct answers in DB for comparison
-  for (var test in _tests) {
-    _dbHelper.saveCorrectAnswer('SaltA_PreliminaryTest', test.id, test.correct);
+    if (widget.isReviewMode && widget.preliminaryAnswers != null) {
+      _answers.addAll(widget.preliminaryAnswers!);
+    }
   }
-}
-
 
   final List<TestItem> _tests = [
     TestItem(
       id: 1,
       title: "1. Preliminary Test – Colour",
       observation: "Blue",
-      options: ["Fe3+", "Cu2+", "Mn2+", "Co2+"],
-      correct: "Cu2+",
+      options: [
+        "Fe3+ may be present",
+        "Cu2+ may be present",
+        "Mn2+ may be present",
+        "Co2+ may be present",
+      ],
+      correct: "Cu2+ may be present",
     ),
     TestItem(
       id: 2,
@@ -50,24 +60,36 @@ void initState() {
 
   Future<void> _printPreliminaryAnswers() async {
     final answers = await _dbHelper.getAnswers('SaltA_PreliminaryTest');
-    print('📘 --- Preliminary Test Answers ---');
+    print('📘 --- Preliminary Test Answers from Database ---');
     for (var row in answers) {
-      print('Question ID: ${row['question_id']} | Answer: ${row['answer']}');
+      print('Question ID: ${row['question_id']} | Answer: ${row['student_answer']}');
     }
-    print('--------------------------------');
+    print('----------------------------------------------');
   }
 
   void _next() async {
     if (_index < _tests.length - 1) {
       setState(() => _index++);
     } else {
-      await _printPreliminaryAnswers();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => DryTestAScreen(preliminaryAnswers: _answers),
-        ),
-      );
+      if (widget.isReviewMode) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DryTestAScreen(
+              preliminaryAnswers: _answers,
+              isReviewMode: true,
+            ),
+          ),
+        );
+      } else {
+        await _printPreliminaryAnswers();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => DryTestAScreen(preliminaryAnswers: _answers),
+          ),
+        );
+      }
     }
   }
 
@@ -87,12 +109,11 @@ void initState() {
         elevation: 2,
         centerTitle: true,
         title: ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [accentTeal, primaryBlue],
-          ).createShader(bounds),
-          child: const Text(
-            "Salt A: Preliminary Test",
-            style: TextStyle(
+          shaderCallback: (bounds) =>
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          child: Text(
+            widget.isReviewMode ? "Salt A: Review Mode" : "Salt A: Preliminary Test",
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 22,
@@ -119,9 +140,9 @@ void initState() {
                   _buildObservationCard(test),
                   const SizedBox(height: 24),
                   ShaderMask(
-                    shaderCallback: (bounds) => const LinearGradient(
-                      colors: [accentTeal, primaryBlue],
-                    ).createShader(bounds),
+                    shaderCallback: (bounds) =>
+                        const LinearGradient(colors: [accentTeal, primaryBlue])
+                            .createShader(bounds),
                     child: const Text(
                       'Based on the observation, select the correct inference:',
                       style: TextStyle(
@@ -134,46 +155,95 @@ void initState() {
                   const SizedBox(height: 10),
                   ...test.options.map((opt) {
                     final selectedHere = selected == opt;
+                    final bool isCorrect = opt == test.correct;
+
+                    Color borderColor;
+                    Color backgroundColor;
+                    Color textColor;
+
+                    if (widget.isReviewMode) {
+                      if (selectedHere && isCorrect) {
+                        borderColor = Colors.green;
+                        backgroundColor = Colors.green.withOpacity(0.1);
+                        textColor = Colors.green;
+                      } else if (selectedHere && !isCorrect) {
+                        borderColor = Colors.red;
+                        backgroundColor = Colors.red.withOpacity(0.1);
+                        textColor = Colors.red;
+                      } else if (!selectedHere && isCorrect) {
+                        borderColor = Colors.green;
+                        backgroundColor = Colors.green.withOpacity(0.05);
+                        textColor = Colors.green.shade700;
+                      } else {
+                        borderColor = Colors.grey.shade300;
+                        backgroundColor = Colors.white;
+                        textColor = Colors.black87;
+                      }
+                    } else {
+                      if (selectedHere) {
+                        borderColor = accentTeal;
+                        backgroundColor = accentTeal.withOpacity(0.1);
+                        textColor = accentTeal;
+                      } else {
+                        borderColor = Colors.grey.shade300;
+                        backgroundColor = Colors.white;
+                        textColor = Colors.black87;
+                      }
+                    }
+
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: InkWell(
-                      onTap: () async {
-  setState(() => _answers[test.id] = opt);
+                        onTap: widget.isReviewMode
+                            ? null
+                            : () async {
+                                setState(() => _answers[test.id] = opt);
 
-  // Save student answer
-  await _dbHelper.saveStudentAnswer(
-    'SaltA_PreliminaryTest',
-    test.id,
-    opt,
-  );
-
-
-},
-
+                                await _dbHelper.saveStudentAnswer(
+                                  'SaltA_PreliminaryTest',
+                                  test.id,
+                                  opt,
+                                );
+                              },
                         borderRadius: BorderRadius.circular(10),
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: selectedHere
-                                ? accentTeal.withOpacity(0.1)
-                                : Colors.white,
+                            color: backgroundColor,
                             border: Border.all(
-                              color: selectedHere
-                                  ? accentTeal
-                                  : Colors.grey.shade300,
-                              width: 1.5,
+                              color: borderColor,
+                              width: widget.isReviewMode && isCorrect ? 2.5 : 1.5,
                             ),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Text(
-                            opt,
-                            style: TextStyle(
-                              fontWeight: selectedHere
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: selectedHere ? accentTeal : Colors.black87,
-                            ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  opt,
+                                  style: TextStyle(
+                                    fontWeight: (selectedHere ||
+                                            (widget.isReviewMode && isCorrect))
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: textColor,
+                                  ),
+                                ),
+                              ),
+                              if (widget.isReviewMode && selectedHere)
+                                Icon(
+                                  isCorrect ? Icons.check_circle : Icons.cancel,
+                                  color: isCorrect ? Colors.green : Colors.red,
+                                  size: 20,
+                                ),
+                              if (widget.isReviewMode && !selectedHere && isCorrect)
+                                Icon(
+                                  Icons.check_circle_outline,
+                                  color: Colors.green,
+                                  size: 20,
+                                ),
+                            ],
                           ),
                         ),
                       ),
@@ -183,33 +253,30 @@ void initState() {
               ),
             ),
             Row(
-              mainAxisAlignment: (_index == 0)
+              mainAxisAlignment: (_index == 0 && !widget.isReviewMode)
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.spaceBetween,
               children: [
-                if (_index > 0)
+                if (_index > 0 || widget.isReviewMode)
                   TextButton.icon(
-                    onPressed: _prev,
+                    onPressed: _index > 0 ? _prev : null,
                     icon: const Icon(Icons.arrow_back),
                     label: const Text("Previous"),
                   ),
                 ElevatedButton.icon(
-                  onPressed: selected != null ? _next : null,
-                  icon: Icon(
-                    _index == _tests.length - 1
-                        ? Icons.check_circle_outline
-                        : Icons.arrow_forward,
-                  ),
-                  label: Text(
-                    _index == _tests.length - 1
-                        ? "Proceed to Dry Test"
-                        : "Next",
-                  ),
+                  onPressed:
+                      widget.isReviewMode ? _next : (selected != null ? _next : null),
+                  icon: Icon(_index == _tests.length - 1
+                      ? Icons.check_circle_outline
+                      : Icons.arrow_forward),
+                  label: Text(_index == _tests.length - 1
+                      ? "Proceed to Dry Test"
+                      : "Next"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryBlue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 12),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
                 ),
               ],
@@ -281,10 +348,10 @@ void initState() {
         ),
         boxShadow: [
           BoxShadow(
-            color: Color.fromARGB(255, 45, 38, 124).withOpacity(0.4),
+             color: Color.fromARGB(255, 45, 38, 124).withOpacity(0.4),
             blurRadius: 8,
             spreadRadius: 2,
-          )
+          ),
         ],
       ),
       child: const Center(

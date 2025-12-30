@@ -5,14 +5,14 @@ import '../a_intro.dart';
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltA_Group5AnalysisPart1 extends StatefulWidget {
-  const saltA_Group5AnalysisPart1({super.key});
+class saltAGroup5AnalysisPart1 extends StatefulWidget {
+  const saltAGroup5AnalysisPart1({super.key});
 
   @override
-  State<saltA_Group5AnalysisPart1> createState() => _saltA_Group5AnalysisPart1State();
+  State<saltAGroup5AnalysisPart1> createState() => _saltAGroup5AnalysisPart1State();
 }
 
-class _saltA_Group5AnalysisPart1State extends State<saltA_Group5AnalysisPart1>
+class _saltAGroup5AnalysisPart1State extends State<saltAGroup5AnalysisPart1>
     with SingleTickerProviderStateMixin {
   String? selectedOption;
   late final AnimationController _animController;
@@ -33,7 +33,7 @@ class _saltA_Group5AnalysisPart1State extends State<saltA_Group5AnalysisPart1>
     if (selectedOption != null) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const saltA_analysis_sr_ba_ca ()),
+        MaterialPageRoute(builder: (_) => const saltAAnalysis_BA_SR_CA()),
       );
     }
   }
@@ -193,4 +193,4 @@ class _saltA_Group5AnalysisPart1State extends State<saltA_Group5AnalysisPart1>
       ),
     );
   }
-}                                                                                                                                            
+}
