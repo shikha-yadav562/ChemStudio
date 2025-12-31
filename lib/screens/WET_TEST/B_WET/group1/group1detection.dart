@@ -1,120 +1,132 @@
-import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; 
-import 'group1analysis.dart'; 
-import '../b_intro.dart'; // Standard import for Salt A Intro
-// FIX: Hiding IterableExtension to resolve name collision with group1analysis.dart
-import '../group2/group2detection.dart' hide IterableExtension; 
+// E:\flutter chemistry\wet\wet\lib\C\group1\group1detection.dart
 
-// --- Theme Constants (Must match analysis.dart) ---
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:flutter/material.dart';
+import 'package:ChemStudio/DB/database_helper.dart';
+import '../group0/group0analysis.dart';
+import '../group2/group2detection.dart';
+import 'group1analysis.dart';
+import '../b_intro.dart';
+
+// --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
 class WetTestBGroupOneDetectionScreen extends StatefulWidget {
-    final String? restoredSelection;
-    const WetTestBGroupOneDetectionScreen({super.key, this.restoredSelection});
+  final String? restoredSelection;
+  const WetTestBGroupOneDetectionScreen({super.key, this.restoredSelection});
 
-    @override
-    State<WetTestBGroupOneDetectionScreen> createState() =>
-        _WetTestBGroupOneDetectionScreenState();
+  @override
+  State<WetTestBGroupOneDetectionScreen> createState() =>
+      _WetTestBGroupOneDetectionScreenState();
 }
 
-class _WetTestBGroupOneDetectionScreenState extends State<WetTestBGroupOneDetectionScreen>
+class _WetTestBGroupOneDetectionScreenState
+    extends State<WetTestBGroupOneDetectionScreen>
     with SingleTickerProviderStateMixin {
-    int _index = 0; 
-    String? _selectedOption; 
-    late final AnimationController _animController;
-    late final Animation<double> _fadeSlide;
 
-    final _dbHelper = DatabaseHelper.instance;
-    final String _tableName = 'SaltC_WetTest';
+  int _index = 0;
+  String? _selectedOption;
 
-    late final List<WetTestItem> _tests = [
-        WetTestItem(
-            id: 3,
-            title: 'Group I Detection',
-            procedure: 'O.S + Dil. HCl',
-            observation: 'White ppt', 
-            options: ['Group I is present', 'Group I is absent'],
-            correct: 'Group I is present',
-        ),
-    ];
+  late final AnimationController _animController;
+  late final Animation<double> _fadeSlide;
 
-    @override
-    void initState() {
-        super.initState();
-        _animController = AnimationController(
-            vsync: this,
-            duration: const Duration(milliseconds: 450),
-        );
-        _fadeSlide =
-            CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+  final _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltB_WetTest';
 
-        _loadSavedAnswers();
+  late final List<WetTestItem> _tests = [
+    WetTestItem(
+      id: 3,
+      title: 'Group I Detection',
+      procedure: 'O.S + Dil. HCl',
+      observation: 'White ppt',
+      options: ['Group-I is present', 'Group-I is absent'],
+      correct: 'Group-I is present',
+    ),
+  ];
 
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (widget.restoredSelection != null) {
-                setState(() {
-                    _selectedOption = widget.restoredSelection;
-                });
-            }
-        });
+  @override
+  void initState() {
+    super.initState();
 
-        _animController.forward();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 450),
+    );
+
+    _fadeSlide =
+        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+
+    _loadSavedAnswer();
+
+    if (widget.restoredSelection != null) {
+      _selectedOption = widget.restoredSelection;
     }
 
-    Future<void> _loadSavedAnswers() async {
-        final data = await _dbHelper.getAnswers(_tableName);
-        setState(() {
-            final testId = _tests[_index].id;
-            final savedAnswer = data.firstWhereOrNull(
-                (row) => row['question_id'] == testId)?['answer'];
+    _animController.forward();
+  }
 
-            if (widget.restoredSelection == null) {
-                _selectedOption = savedAnswer;
-            }
-        });
+  Future<void> _loadSavedAnswer() async {
+    final saved =
+        await _dbHelper.getStudentAnswer(_tableName, _tests[_index].id);
+    if (saved != null && widget.restoredSelection == null) {
+      setState(() {
+        _selectedOption = saved;
+      });
     }
+  }
 
-    Future<void> _saveAnswer(int id, String answer) async {
-        await _dbHelper.saveAnswer(_tableName, id, answer);
-    }
+  /// ONLY save student answer – NO group decision here
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() => _selectedOption = selected);
 
-    void _next() async {
-        final selectedBefore = _selectedOption;
+    await _dbHelper.saveStudentAnswer(
+      _tableName,
+      test.id,
+      selected,
+    );
+  }
 
-        if (_selectedOption == 'Group I is present') {
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestBGroupOneAnalysisScreen(),
-                ),
-            );
-        } else {
-            await Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => const WetTestCGroupTwoDetectionScreen(), 
-                ),
-            );
-        }
-
-        setState(() => _selectedOption = selectedBefore);
-    }
+ // Replace the _next() method:
+void _next() async {
+  if (_selectedOption == 'Group-I is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestBGroupOneAnalysisScreen(),
+      ),
+    );
+  } else if (_selectedOption == 'Group-I is absent') {
+    // ✅ ADD THIS: Mark Group 1 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'B',
+      groupNumber: 1,
+      status: GroupStatus.absent,
+    );
     
-    void _prev() {
-        Navigator.pop(context, _selectedOption);
-    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestBGroupTwoDetectionScreen(),
+      ),
+    );
+  }
+}
 
-    Future<bool> _onWillPop() async {
-        Navigator.pop(context, _selectedOption);
-        return false; 
-    }
+  void _prev() {
+    Navigator.pop(context, _selectedOption);
+  }
 
-    @override
-    void dispose() {
-        _animController.dispose();
-        super.dispose();
-    }
+  Future<bool> _onWillPop() async {
+    Navigator.pop(context, _selectedOption);
+    return false;
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
 
     @override
     Widget build(BuildContext context) {
@@ -128,22 +140,21 @@ class _WetTestBGroupOneDetectionScreenState extends State<WetTestBGroupOneDetect
                     backgroundColor: Colors.white,
                     elevation: 2,
                     centerTitle: true,
-                    // ADDED: Navigation back to Intro A
                     leading: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: primaryBlue),
-                        onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
-                                (route) => false,
-                            );
-                        },
-                    ),
+    icon: const Icon(Icons.arrow_back, color: primaryBlue),
+    onPressed: () {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()), // Replace with your actual class name in c_intro.dart
+        (route) => false, // This clears the navigation stack
+      );
+    },
+  ),
                     title: ShaderMask(
                         shaderCallback: (bounds) =>
                             const LinearGradient(colors: [accentTeal, primaryBlue])
                                 .createShader(bounds),
-                        child: Text(
+                        child: const Text(
                             'Salt B : Wet Test',
                             style: TextStyle(
                                 color: Colors.white,
@@ -173,19 +184,20 @@ class _WetTestBGroupOneDetectionScreenState extends State<WetTestBGroupOneDetect
                                     Expanded(
                                         child: ListView(
                                             children: [
-                                                _buildTestCard(test), 
+                                                _buildTestCard(test), // Card with Test and Observation
                                                 const SizedBox(height: 24),
                                                 _buildInferenceHeader(),
                                                 const SizedBox(height: 10),
+                                                // Options
                                                 ...test.options.map((opt) {
                                                     final selectedHere = _selectedOption == opt;
                                                     return Padding(
                                                         padding: const EdgeInsets.symmetric(vertical: 4),
                                                         child: InkWell(
-                                                            onTap: () async {
-                                                                setState(() => _selectedOption = opt);
-                                                                await _saveAnswer(test.id, opt);
-                                                            },
+                                                           onTap: () async {
+  await _onOptionSelected(test, opt);
+},
+
                                                             borderRadius: BorderRadius.circular(8),
                                                             child: AnimatedContainer(
                                                                 duration: const Duration(milliseconds: 200),
@@ -220,6 +232,7 @@ class _WetTestBGroupOneDetectionScreenState extends State<WetTestBGroupOneDetect
                                             ],
                                         ),
                                     ),
+                                    // Navigation Buttons (Prev/Next)
                                     Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: [
@@ -284,7 +297,7 @@ class _WetTestBGroupOneDetectionScreenState extends State<WetTestBGroupOneDetect
                         Text(
                             test.observation,
                             textAlign: TextAlign.start,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 color: primaryBlue,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,

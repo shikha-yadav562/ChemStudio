@@ -1,7 +1,10 @@
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group1/group1detection.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/WetTestBFinalResultScreen.dart';
 import 'package:flutter/material.dart';
 import 'group0analysis.dart'; 
-import '../group1/group1detection.dart'; 
-import '../b_intro.dart'; // Standard import for Salt A Intro
+import '../b_intro.dart';
+import 'package:ChemStudio/DB/database_helper.dart'; 
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
@@ -15,23 +18,26 @@ class WetTestBGroupZeroCTScreen extends StatefulWidget {
 
 class _WetTestBGroupZeroCTScreenState extends State<WetTestBGroupZeroCTScreen>
     with SingleTickerProviderStateMixin {
-  
+
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
-  bool _isSelected = false; 
 
-  late final WetTestItem _test = WetTestItem(
-      id: 2,
-      title: 'C.T FOR NH₄⁺', 
-      procedure: 'O.S + Nessler’s reagent in excess', 
-      observation: 'Brown ppt/colouration of basic mercury (II) amidoiodine', 
-      options: ['NH₄⁺ Confirmed'],
-      correct: 'NH₄⁺ Confirmed',
-    );
+  String? _selectedOption;
+  bool get _isSelected => _selectedOption != null;
 
-  final String _answer = 'NH₄⁺ Confirmed';
-  final _dbHelper = DatabaseHelper.instance; 
-  final String _tableName = 'SaltC_WetTest'; 
+  final WetTestItem _test = WetTestItem(
+    id: 2,
+    title: 'C.T FOR NH₄⁺',
+    procedure: 'O.S + Nessler’s reagent in excess',
+    observation: 'Brown ppt/colouration of basic mercury (II) amidoiodine',
+    options: ['NH₄⁺ Confirmed'],
+    correct: 'NH₄⁺ Confirmed',
+  );
+
+
+
+  final _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltB_WetTest';
 
   @override
   void initState() {
@@ -41,15 +47,66 @@ class _WetTestBGroupZeroCTScreenState extends State<WetTestBGroupZeroCTScreen>
       duration: const Duration(milliseconds: 450),
     );
     _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+
+    _loadSavedAnswer();
     _animController.forward();
   }
 
-  void _selectOption() {
-    setState(() {
-      _isSelected = true;
-    });
-    _dbHelper.saveAnswer(_tableName, _test.id, _answer);
+  Future<void> _loadSavedAnswer() async {
+    final studentAnswer = await _dbHelper.getStudentAnswer(_tableName, _test.id);
+    if (studentAnswer != null) {
+      setState(() {
+        _selectedOption = studentAnswer;
+      });
+    }
   }
+
+  // ✅ FIXED: Just select, don't navigate
+  void _onOptionTapped(String option) {
+    setState(() {
+      _selectedOption = option;
+    });
+  }
+
+  // ✅ FIXED: Handle navigation only when Next is clicked
+  Future<void> _handleNext() async {
+    if (_selectedOption == null) return;
+
+    // 1️⃣ Save CT answer
+    await _dbHelper.saveStudentAnswer(_tableName, _test.id, _selectedOption!);
+
+    // 2️⃣ Mark Group 0 as PRESENT
+    await _dbHelper.insertGroupDecision(
+      salt: 'B',
+      groupNumber: 0,
+      status: GroupStatus.present,
+    );
+
+    // 3️⃣ Check how many groups are PRESENT
+    final groups = await _dbHelper.getStudentGroupDecisions('B');
+    final presentCount = groups.values
+        .where((status) => status == GroupStatus.present)
+        .length;
+
+    // 4️⃣ Navigate based on count
+    if (presentCount >= 2) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestBFinalResultScreen(salt: 'B'),
+        ),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const WetTestBGroupOneDetectionScreen(),
+        ),
+      );
+    }
+  }
+
+  void _prev() => Navigator.pop(context);
 
   @override
   void dispose() {
@@ -65,23 +122,21 @@ class _WetTestBGroupZeroCTScreenState extends State<WetTestBGroupZeroCTScreen>
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        // FIXED: Back arrow navigating to Intro A
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: primaryBlue),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
+              MaterialPageRoute(builder: (_) => const WetTestIntroBScreen()),
               (route) => false,
             );
           },
         ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue])
-                  .createShader(bounds),
-          child: Text(
-            'Salt B : Wet Test',
+              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          child: const Text(
+            'Salt C : Wet Test',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -113,36 +168,58 @@ class _WetTestBGroupZeroCTScreenState extends State<WetTestBGroupZeroCTScreen>
                     children: [
                       _buildTestCard(_test),
                       const SizedBox(height: 24),
-                      _gradientHeader('Result:'),
+                      _buildInferenceHeader(),
                       const SizedBox(height: 10),
-                      ..._test.options.map((opt) => _buildOption(opt)),
+                      ..._test.options.map((opt) {
+                        final selectedHere = _selectedOption == opt;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: InkWell(
+                            onTap: () => _onOptionTapped(opt), // ✅ Just select
+                            borderRadius: BorderRadius.circular(8),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: selectedHere
+                                    ? accentTeal.withOpacity(0.1)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Text(
+                                opt,
+                                style: TextStyle(
+                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
+                                  color: selectedHere ? primaryBlue : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),
-                // Navigation Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton.icon(
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: _prev,
                       icon: const Icon(Icons.arrow_back),
                       label: const Text('Previous'),
-                      style: TextButton.styleFrom(foregroundColor: primaryBlue),
                     ),
                     ElevatedButton.icon(
-                      onPressed: _isSelected ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const WetTestBGroupOneDetectionScreen()),
-                        );
-                      } : null,
+                      onPressed: _isSelected ? _handleNext : null, // ✅ Call _handleNext
                       icon: const Icon(Icons.arrow_forward),
                       label: const Text('Next'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _isSelected ? primaryBlue : Colors.grey.shade400,
+                        backgroundColor: primaryBlue,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: const StadiumBorder(),
                       ),
                     ),
                   ],
@@ -150,6 +227,21 @@ class _WetTestBGroupZeroCTScreenState extends State<WetTestBGroupZeroCTScreen>
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInferenceHeader() {
+    return ShaderMask(
+      shaderCallback: (bounds) =>
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+      child: const Text(
+        'Result:',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -165,50 +257,21 @@ class _WetTestBGroupZeroCTScreenState extends State<WetTestBGroupZeroCTScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _gradientHeader('Test'),
-            const SizedBox(height: 6),
-            Text(test.procedure, style: const TextStyle(fontSize: 15, color: Colors.black)),
+            const SizedBox(height: 4),
+            Text(test.procedure, style: const TextStyle(fontSize: 14)),
             const Divider(height: 24),
             _gradientHeader('Observation'),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             Text(
               test.observation,
-              style: const TextStyle(
+              textAlign: TextAlign.start,
+              style: TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
+                fontSize: 16,
               ),
-            ), 
+            ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOption(String opt) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: InkWell(
-        onTap: _selectOption,
-        borderRadius: BorderRadius.circular(8),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: _isSelected ? accentTeal.withOpacity(0.1) : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: _isSelected ? accentTeal : Colors.grey.shade300,
-              width: 1.5,
-            ),
-          ),
-          child: Text(
-            opt,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: _isSelected ? FontWeight.bold : FontWeight.normal,
-              color: _isSelected ? accentTeal : Colors.black,
-            ),
-          ),
         ),
       ),
     );
@@ -217,12 +280,10 @@ class _WetTestBGroupZeroCTScreenState extends State<WetTestBGroupZeroCTScreen>
   Widget _gradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue])
-              .createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
       child: Text(
         text,
-        style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }

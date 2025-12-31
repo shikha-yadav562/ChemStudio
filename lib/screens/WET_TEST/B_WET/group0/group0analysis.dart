@@ -1,18 +1,22 @@
+import 'package:ChemStudio/models/group_status.dart';
 import 'package:flutter/material.dart';
+import 'package:ChemStudio/DB/database_helper.dart';
 import '0CT.dart';
-import '../group1/group1detection.dart'; 
-import '../b_intro.dart'; // Standard import for Salt A Intro
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group1/group1detection.dart';
+import '../b_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// Re-defining the TestItem model to match your structure
+// ---------------- Wet Test Item Model ----------------
 class WetTestItem {
   final int id;
   final String title;
   final String procedure;
   final String observation;
   final List<String> options;
+
+  /// ✅ REQUIRED for CT & result verification
   final String correct;
 
   WetTestItem({
@@ -25,101 +29,102 @@ class WetTestItem {
   });
 }
 
-// Placeholder for DatabaseHelper matching your code
-class DatabaseHelper {
-  static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
-  DatabaseHelper._privateConstructor();
 
-  Future<void> saveAnswer(String table, int id, String answer) async {
-    return;
-  }
-
-  Future<List<Map<String, dynamic>>> getAnswers(String table) async {
-    return [];
-  }
-}
-
+// ---------------- Group Zero Analysis Screen ----------------
 class WetTestBGroupZeroScreen extends StatefulWidget {
   const WetTestBGroupZeroScreen({super.key});
 
   @override
-  State<WetTestBGroupZeroScreen> createState() => _WetTestBGroupZeroScreenState();
+  State<WetTestBGroupZeroScreen> createState() =>
+      _WetTestBGroupZeroScreenState();
 }
 
 class _WetTestBGroupZeroScreenState extends State<WetTestBGroupZeroScreen>
     with SingleTickerProviderStateMixin {
-  int _index = 0; 
-  final Map<int, String> _answers = {};
+  String? _selectedOption;
+
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
 
-  final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest';
+  final DatabaseHelper _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltB_WetTest';
 
-  late final List<WetTestItem> _tests = [
-    WetTestItem(
-      id: 1,
-      title: 'Analysis of Group Zero',
-      procedure:
-          'Take Original Solution (O.S.) in a test tube, add NaOH solution, and heat gently. Hold moist turmeric paper near the mouth of the test tube.',
-      observation:
-          'Evolution of NH4 gas , which turns moist turmeric paper brown / red ',
-      options: ['Group Zero is present', 'Group Zero is absent'],
-      correct: 'Group Zero is present',
-    ),
-  ];
+  final WetTestItem _test = WetTestItem(
+    id: 1,
+    title: 'Analysis of Group Zero',
+    procedure:
+        'Take Original Solution (O.S.) in a test tube, add NaOH solution, and heat gently. Hold moist turmeric paper near the mouth of the test tube.',
+    observation: ' Evolution of NH4 gas , which turns moist turmeric paper brown / red ',
+    options: ['Group Zero is present', 'Group Zero is absent'],
+    correct: 'Group Zero is present',
+  );
 
   @override
   void initState() {
     super.initState();
+
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-    _loadSavedAnswers();
+
+    _fadeSlide =
+        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+
+    _loadSavedAnswer();
     _animController.forward();
   }
 
-  Future<void> _loadSavedAnswers() async {
-    final data = await _dbHelper.getAnswers(_tableName);
-    setState(() {
-      for (var row in data) {
-        _answers[row['question_id']] = row['answer'];
-      }
-    });
-  }
-
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
-  }
-
-  void _next() async {
-    final test = _tests[_index];
-    final selectedOption = _answers[test.id];
-
-    if (selectedOption == null) return; 
-
-    if (selectedOption == 'Group Zero is present') {
-        await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const WetTestBGroupZeroCTScreen()),
-        );
-    } else if (selectedOption == 'Group Zero is absent') {
-        await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const WetTestBGroupOneDetectionScreen()),
-        );
-    }
-    setState(() {});
-  }
-
-  void _prev() {
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
+  Future<void> _loadSavedAnswer() async {
+    final saved =
+        await _dbHelper.getStudentAnswer(_tableName, _test.id);
+    if (saved != null) {
+      setState(() => _selectedOption = saved);
     }
   }
 
+  Future<void> _onOptionSelected(String option) async {
+    setState(() => _selectedOption = option);
+
+    // ✅ ONLY save student answer
+    await _dbHelper.saveStudentAnswer(
+      _tableName,
+      _test.id,
+      option,
+    );
+  }
+
+void _next() async {  // ✅ Add async
+  if (_selectedOption == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please select an option')),
+    );
+    return;
+  }
+
+  if (_selectedOption == 'Group Zero is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestBGroupZeroCTScreen(),
+      ),
+    );
+  } else {
+    // ✅ Mark Group 0 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'B',
+      groupNumber: 0,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestBGroupOneDetectionScreen(),
+      ),
+    );
+  }
+}
   @override
   void dispose() {
     _animController.dispose();
@@ -128,22 +133,20 @@ class _WetTestBGroupZeroScreenState extends State<WetTestBGroupZeroScreen>
 
   @override
   Widget build(BuildContext context) {
-    final test = _tests[_index];
-    final selected = _answers[test.id];
-
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        // ADDED: Navigation back to Intro A
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: primaryBlue),
           onPressed: () {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
+              MaterialPageRoute(
+                builder: (_) => const WetTestIntroBScreen(),
+              ),
               (route) => false,
             );
           },
@@ -152,7 +155,7 @@ class _WetTestBGroupZeroScreenState extends State<WetTestBGroupZeroScreen>
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: Text(
+          child: const Text(
             'Salt B : Wet Test',
             style: TextStyle(
               color: Colors.white,
@@ -164,84 +167,86 @@ class _WetTestBGroupZeroScreenState extends State<WetTestBGroupZeroScreen>
       ),
       body: FadeTransition(
         opacity: _fadeSlide,
-        child: SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-              .animate(_fadeSlide),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(test.title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall
-                        ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      _buildTestCard(test), 
-                      const SizedBox(height: 24),
-                      _buildInferenceHeader(),
-                      const SizedBox(height: 10),
-                      ...test.options.map((opt) {
-                        final selectedHere = selected == opt;
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: InkWell(
-                            onTap: () async {
-                              setState(() => _answers[test.id] = opt);
-                              await _saveAnswer(test.id, opt);
-                            },
-                            borderRadius: BorderRadius.circular(8),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: selectedHere ? accentTeal.withOpacity(0.1) : Colors.white,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
-                                  width: 1.5,
-                                ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                _test.title,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(
+                      color: primaryBlue,
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              const SizedBox(height: 12),
+              Expanded(
+                child: ListView(
+                  children: [
+                    _buildTestCard(),
+                    const SizedBox(height: 24),
+                    _buildInferenceHeader(),
+                    const SizedBox(height: 10),
+                    ..._test.options.map((opt) {
+                      final selected = _selectedOption == opt;
+                      return Padding(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 4),
+                        child: InkWell(
+                          onTap: () => _onOptionSelected(opt),
+                          child: AnimatedContainer(
+                            duration:
+                                const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? accentTeal.withOpacity(0.1)
+                                  : Colors.white,
+                              borderRadius:
+                                  BorderRadius.circular(8),
+                              border: Border.all(
+                                color: selected
+                                    ? accentTeal
+                                    : Colors.grey.shade300,
+                                width: 1.5,
                               ),
-                              child: Text(
-                                opt,
-                                style: TextStyle(
-                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
-                                  color: selectedHere ? accentTeal : Colors.black87,
-                                ),
+                            ),
+                            child: Text(
+                              opt,
+                              style: TextStyle(
+                                fontWeight: selected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: selected
+                                    ? accentTeal
+                                    : Colors.black87,
                               ),
                             ),
                           ),
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    TextButton.icon(
-                      onPressed: _prev,
-                      icon: const Icon(Icons.arrow_back),
-                      label: const Text('Previous'),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: selected != null ? _next : null,
-                      icon: const Icon(Icons.arrow_forward),
-                      label: const Text('Next'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryBlue,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                      ),
-                    ),
+                        ),
+                      );
+                    }),
                   ],
                 ),
-              ],
-            ),
+              ),
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  onPressed: _next,
+                  icon: const Icon(Icons.arrow_forward),
+                  label: const Text('Next'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryBlue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 12),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -264,23 +269,24 @@ class _WetTestBGroupZeroScreenState extends State<WetTestBGroupZeroScreen>
     );
   }
 
-  Widget _buildTestCard(WetTestItem test) {
+  Widget _buildTestCard() {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape:
+          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _gradientHeader('Test'),
-            const SizedBox(height: 4),
-            Text(test.procedure, style: const TextStyle(fontSize: 14)),
+            const SizedBox(height: 6),
+            Text(_test.procedure),
             const Divider(height: 24),
             _gradientHeader('Observation'),
             const SizedBox(height: 8),
             Text(
-              test.observation,
+              _test.observation,
               style: const TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
@@ -301,7 +307,10 @@ class _WetTestBGroupZeroScreenState extends State<WetTestBGroupZeroScreen>
       child: Text(
         text,
         style: const TextStyle(
-            color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
       ),
     );
   }

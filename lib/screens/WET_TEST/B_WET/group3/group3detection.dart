@@ -1,32 +1,38 @@
-/// E:\flutter chemistry\wet\wet\lib\C\group3\group3detection.dart
+// E:\flutter chemistry\wet\wet\lib\C\group3\group3detection.dart
+import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/models/group_status.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_4/group4_detection.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group0/group0analysis.dart';
 import 'package:flutter/material.dart';
-import '../group0/group0analysis.dart'; // DatabaseHelper, WetTestItem, etc.
-import 'group3analysis.dart'; 
-import '../group_4/group4_detection.dart'; 
+ // DatabaseHelper, WetTestItem, etc.
+import '../b_intro.dart';
+import 'group3analysis.dart';
 
 // --- Theme Constants ---
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-// --- Extension for finding items ---
-extension IterableExtension<E> on Iterable<E> {
-  E? firstWhereOrNull(bool Function(E) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
+// --- Placeholder for next screens (needed for compilation) ---
+class WetTestBGroupFourDetectionScreen extends StatelessWidget {
+  const WetTestBGroupFourDetectionScreen({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Group 4 Detection")),
+      body: const Center(child: Text("Proceeding to Group IV Detection...")),
+    );
   }
 }
 
-class WetTestCGroupThreeDetectionScreen extends StatefulWidget {
-  const WetTestCGroupThreeDetectionScreen({super.key});
+class WetTestBGroupThreeDetectionScreen extends StatefulWidget {
+  const WetTestBGroupThreeDetectionScreen({super.key});
 
   @override
-  State<WetTestCGroupThreeDetectionScreen> createState() =>
-      _WetTestCGroupThreeDetectionScreenState();
+  State<WetTestBGroupThreeDetectionScreen> createState() =>
+      _WetTestBGroupThreeDetectionScreenState();
 }
 
-class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDetectionScreen>
+class _WetTestBGroupThreeDetectionScreenState extends State<WetTestBGroupThreeDetectionScreen>
     with SingleTickerProviderStateMixin {
     
   String? _selectedOption; 
@@ -35,16 +41,15 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
   late final Animation<double> _fadeSlide;
 
   final _dbHelper = DatabaseHelper.instance;
-  final String _tableName = 'SaltC_WetTest'; // Updated to Salt C
+  final String _tableName = 'SaltB_WetTest';
 
-  // *** Group III Detection Content ***
   late final WetTestItem _test = WetTestItem(
-      id: 9, 
-      title: 'Group III Detection',
-      procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
-      observation: 'No ppt', // 
-      options: ['Group III is present', 'Group III is Absent'],
-      correct: 'Group III is absent', 
+    id: 10,
+    title: 'Group III Detection',
+    procedure: 'O.S/Filtrate (Remove H₂S) + NH₄Cl (equal) + NH₄OH ( till alkaline to litmus )',
+    observation: 'No ppt',
+    options: ['Group-III is present', 'Group-III is Absent'],
+    correct: 'Group-III is Absent',
   );
 
   @override
@@ -54,43 +59,59 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
       vsync: this,
       duration: const Duration(milliseconds: 450),
     );
-    _fadeSlide =
-        CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
-    _loadSavedAnswer();
+    _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _loadSavedAnswers();
     _animController.forward();
   }
 
-  Future<void> _loadSavedAnswer() async {
+  // ✅ FIXED: Now properly assigns savedAnswer to _selectedOption
+  Future<void> _loadSavedAnswers() async {
     final data = await _dbHelper.getAnswers(_tableName);
     setState(() {
-      final savedAnswer = data.firstWhereOrNull(
-          (row) => row['question_id'] == _test.id)?['answer'];
-      _selectedOption = savedAnswer;
+      final testId = _test.id;
+      final match = data.where((row) => row['question_id'] == testId);
+      final savedAnswer = match.isNotEmpty ? match.first['student_answer'] : null;
+      _selectedOption = savedAnswer; // ✅ FIXED: Added this line
     });
   }
 
-  Future<void> _saveAnswer(int id, String answer) async {
-    await _dbHelper.saveAnswer(_tableName, id, answer);
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() {
+      _selectedOption = selected;
+    });
+
+    await _dbHelper.saveStudentAnswer(
+      _tableName,
+      test.id,
+      selected,
+    );
   }
 
-  void _next() async {
-    if (_selectedOption == 'Group III is present') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const WetTestCGroupThreeAnalysisScreen(), 
-        ),
-      );
-    } else if (_selectedOption == 'Group III is Absent') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const saltBGroup4DetectionScreen(), 
-        ),
-      );
-    }
+
+void _next() async {
+  if (_selectedOption == 'Group-III is present') {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const WetTestBGroupThreeAnalysisScreen(),
+      ),
+    );
+  } else if (_selectedOption == 'Group-III is Absent') {
+    // ✅ ADD THIS: Mark Group 2 as absent before navigating
+    await _dbHelper.insertGroupDecision(
+      salt: 'B',
+      groupNumber:3,
+      status: GroupStatus.absent,
+    );
+    
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const Group4DetectionScreen(),
+      ),
+    );
   }
-  
+}
   void _prev() {
     if (Navigator.canPop(context)) {
       Navigator.pop(context);
@@ -133,7 +154,8 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
             const SizedBox(height: 8),
             Text(
               test.observation,
-              style: const TextStyle(
+              textAlign: TextAlign.start,
+              style: TextStyle(
                 color: primaryBlue,
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
@@ -147,17 +169,29 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
 
   @override
   Widget build(BuildContext context) {
+    final test = _test;
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: primaryBlue),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
+              (route) => false,
+            );
+          },
+        ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child: Text(
+          child: const Text(
             'Salt B : Wet Test',
             style: TextStyle(
               color: Colors.white,
@@ -170,13 +204,15 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero).animate(_fadeSlide),
+          position:
+              Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
+                  .animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(_test.title,
+                Text(test.title,
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
@@ -185,18 +221,17 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                 Expanded(
                   child: ListView(
                     children: [
-                      _buildTestCard(_test),
+                      _buildTestCard(test),
                       const SizedBox(height: 24),
                       _buildGradientHeader('Select the correct inference:'),
                       const SizedBox(height: 10),
-                      ..._test.options.map((opt) {
+                      ...test.options.map((opt) {
                         final selectedHere = _selectedOption == opt;
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: InkWell(
                             onTap: () async {
-                              setState(() => _selectedOption = opt);
-                              await _saveAnswer(_test.id, opt);
+                              await _onOptionSelected(test, opt);
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: AnimatedContainer(
@@ -208,15 +243,21 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                                     : Colors.white,
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
-                                  color: selectedHere ? accentTeal : Colors.grey.shade300,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.grey.shade300,
                                   width: 1.5,
                                 ),
                               ),
                               child: Text(
                                 opt,
                                 style: TextStyle(
-                                  fontWeight: selectedHere ? FontWeight.bold : FontWeight.normal,
-                                  color: selectedHere ? accentTeal : Colors.black87,
+                                  fontWeight: selectedHere
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.black87,
                                 ),
                               ),
                             ),
@@ -241,7 +282,8 @@ class _WetTestCGroupThreeDetectionScreenState extends State<WetTestCGroupThreeDe
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryBlue,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
                       ),
                     ),
                   ],
