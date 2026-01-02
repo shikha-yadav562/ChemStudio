@@ -1,26 +1,41 @@
+import 'package:ChemStudio/DB/database_helper.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/b_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group0/group0analysis.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_4/group4_Mn_ct.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_4/group4_Ni_ct.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_4/group4_Co_ct.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_4/group4_Zn_ct.dart';
 import 'package:flutter/material.dart';
-import 'group4_Ni_ct.dart';
-import 'group4_Co_ct.dart';
-import 'group4_Mn_ct.dart';
-import 'group4_Zn_ct.dart';
-import '../b_intro.dart';
+
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltBgroup4_analysis extends StatefulWidget {
-  const saltBgroup4_analysis({super.key});
+class Group4AnalysisScreen extends StatefulWidget {
+  const Group4AnalysisScreen({super.key});
 
   @override
-  State<saltBgroup4_analysis> createState() => _saltBgroup4_analysisState();
+  State<Group4AnalysisScreen> createState() => _Group4AnalysisScreenState();
 }
 
-class _saltBgroup4_analysisState extends State<saltBgroup4_analysis>
+class _Group4AnalysisScreenState extends State<Group4AnalysisScreen>
     with SingleTickerProviderStateMixin {
-  String? selectedInference;
+  String? _selectedOption;
 
   late final AnimationController _animController;
   late final Animation<double> _fadeSlide;
+
+  final _dbHelper = DatabaseHelper.instance;
+  final String _tableName = 'SaltB_WetTest';
+
+  late final WetTestItem _test = WetTestItem(
+    id: 15, 
+    title: 'Analysis of Group IV',
+    procedure: 'O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water',
+    observation: 'Black ppt',
+    options: ['Ni²⁺ may be present', 'Co²⁺ may be present', 'Mn²⁺ may be present', 'Zn²⁺ may be present'],
+    correct: 'Ni²⁺ may be present', // Default - varies based on observation
+  );
 
   @override
   void initState() {
@@ -30,62 +45,108 @@ class _saltBgroup4_analysisState extends State<saltBgroup4_analysis>
       duration: const Duration(milliseconds: 450),
     );
     _fadeSlide = CurvedAnimation(parent: _animController, curve: Curves.easeInOut);
+    _loadSavedAnswer();
     _animController.forward();
   }
 
-  void _next() {
-    if (selectedInference == "Ni²⁺") {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const saltB_Ni2ConfirmedPage()));
-    } else if (selectedInference == "Co²⁺") {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const saltB_Co2ConfirmedPage()));
-    } else if (selectedInference == "Mn²⁺") {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const saltB_Mn2ConfirmedPage()));
-    } else if (selectedInference == "Zn²⁺") {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (_) => const saltB_Zn2ConfirmedPage()));
+  Future<void> _loadSavedAnswer() async {
+    final List<Map<String, dynamic>> data = await _dbHelper.getAnswers(_tableName);
+
+    String? savedAnswer;
+
+    for (final row in data) {
+      if (row['question_id'] == _test.id) {
+        savedAnswer = row['student_answer'] as String?;
+        break;
+      }
+    }
+
+    setState(() {
+      _selectedOption = savedAnswer;
+    });
+  }
+
+  Future<void> _onOptionSelected(WetTestItem test, String selected) async {
+    setState(() => _selectedOption = selected);
+
+    await _dbHelper.saveStudentAnswer(_tableName, test.id, selected);
+  }
+
+  void _next() async {
+    if (_selectedOption == 'Ni²⁺ may be present') {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const Ni2ConfirmedPage()),
+      );
+    } else if (_selectedOption == 'Co²⁺ may be present') {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const Co2ConfirmedPage()),
+      );
+    } else if (_selectedOption == 'Mn²⁺ may be present') {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const Mn2ConfirmedPage()),
+      );
+    } else if (_selectedOption == 'Zn²⁺ may be present') {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const Zn2ConfirmedPage()),
+      );
     }
   }
 
-  // Bottom Previous button behavior
   void _prev() {
-    Navigator.pop(context);
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
   }
 
-  Widget _gradientHeader(String text) {
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildGradientHeader(String text) {
     return ShaderMask(
       shaderCallback: (bounds) =>
-          const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
+          const LinearGradient(colors: [accentTeal, primaryBlue])
+              .createShader(bounds),
       child: Text(
         text,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
       ),
     );
   }
 
-  Widget _buildTestCard() {
+  Widget _buildTestCard(WetTestItem test) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _gradientHeader("Test"),
+            _buildGradientHeader('Test'),
             const SizedBox(height: 4),
-            const Text(
-              "O.S / Filtrate + NH₄Cl (equal) + NH₄OH (till alkaline to litmus) + passing H₂S gas or water.",
-              style: TextStyle(fontSize: 15, color: Colors.black),
-            ),
-            const Divider(height: 22),
-            _gradientHeader("Observation"),
-            const SizedBox(height: 6),
-            const Text(
-              "No ppt",
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: primaryBlue),
+            Text(test.procedure, style: const TextStyle(fontSize: 14)),
+            const Divider(height: 24),
+            _buildGradientHeader('Observation'),
+            const SizedBox(height: 8),
+            Text(
+              test.observation,
+              textAlign: TextAlign.start,
+              style: const TextStyle(
+                color: primaryBlue,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ],
         ),
@@ -93,36 +154,10 @@ class _saltBgroup4_analysisState extends State<saltBgroup4_analysis>
     );
   }
 
-  Widget _buildOption(String text) {
-    final bool selected = selectedInference == text;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: InkWell(
-        onTap: () => setState(() => selectedInference = text),
-        borderRadius: BorderRadius.circular(8),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: selected ? accentTeal.withOpacity(0.1) : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: selected ? accentTeal : Colors.grey.shade300, width: 1.5),
-          ),
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
-              color: selected ? accentTeal : Colors.black,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final test = _test;
+
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
@@ -132,77 +167,124 @@ class _saltBgroup4_analysisState extends State<saltBgroup4_analysis>
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: primaryBlue),
           onPressed: () {
-            // AppBar back always goes to intro page
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroBScreen(),
+              ),
               (route) => false,
             );
           },
         ),
         title: ShaderMask(
           shaderCallback: (bounds) =>
-              const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: Text(
-            'Salt B: Wet Test',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+              const LinearGradient(colors: [accentTeal, primaryBlue])
+                  .createShader(bounds),
+          child: const Text(
+            'Salt B : Wet Test',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+            ),
           ),
         ),
       ),
       body: FadeTransition(
         opacity: _fadeSlide,
         child: SlideTransition(
-          position: Tween<Offset>(begin: const Offset(0.1, 0.03), end: Offset.zero)
-              .animate(_fadeSlide),
+          position: Tween<Offset>(
+            begin: const Offset(0.1, 0.03),
+            end: Offset.zero,
+          ).animate(_fadeSlide),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  "Analysis of Group IV",
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: primaryBlue,
-                  ),
+                Text(
+                  test.title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(color: primaryBlue, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
-                _buildTestCard(),
-                const SizedBox(height: 16),
-                _gradientHeader("Select the correct inference:"),
-                const SizedBox(height: 10),
-                _buildOption("Ni²⁺"),
-                _buildOption("Co²⁺"),
-                _buildOption("Mn²⁺"),
-                _buildOption("Zn²⁺"),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      _buildTestCard(test),
+                      const SizedBox(height: 24),
+                      _buildGradientHeader('Select the correct inference:'),
+                      const SizedBox(height: 10),
+                      ...test.options.map((opt) {
+                        final selectedHere = _selectedOption == opt;
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: InkWell(
+                            onTap: () async {
+                              await _onOptionSelected(test, opt);
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: selectedHere
+                                    ? accentTeal.withOpacity(0.1)
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.grey.shade300,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Text(
+                                opt,
+                                style: TextStyle(
+                                  fontWeight: selectedHere
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: selectedHere
+                                      ? accentTeal
+                                      : Colors.black87,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: _prev,
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text('Previous'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: _selectedOption != null ? _next : null,
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text('Next'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryBlue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
-        ),
-      ),
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Bottom Previous keeps original behavior
-            TextButton.icon(
-              onPressed: _prev,
-              icon: const Icon(Icons.arrow_back),
-              label: const Text('Previous'),
-            ),
-            ElevatedButton.icon(
-              onPressed: selectedInference != null ? _next : null,
-              icon: const Icon(Icons.arrow_forward),
-              label: const Text('Next'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: selectedInference != null ? primaryBlue : Colors.grey.shade400,
-                foregroundColor: Colors.white,
-                shape: const StadiumBorder(),
-              ),
-            ),
-          ],
         ),
       ),
     );

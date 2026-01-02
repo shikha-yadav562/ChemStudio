@@ -33,7 +33,7 @@ class _Group6CTMgScreenState extends State<Group6CTMgScreen>
     id: 27, // ✅ Sequential ID (only CT for Group 6)
     title: 'C.T for Mg²⁺',
     procedure: 'Previous solution + Titan yellow solution', // ✅ Your original procedure
-    observation: 'Rose red ppt', // ✅ Your original observation
+    observation: 'No Rose red ppt', // ✅ Your original observation
     options: ['Mg²⁺ confirmed'],
     correct: 'Mg²⁺ confirmed', 
   );

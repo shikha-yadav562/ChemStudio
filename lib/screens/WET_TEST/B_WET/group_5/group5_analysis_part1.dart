@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'group5analysis_BA_SR_CA.dart';
-import '../b_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_5/group5analysis_BA_SR_CA.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/b_intro.dart';
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltA_Group5AnalysisPart1 extends StatefulWidget {
-  const saltA_Group5AnalysisPart1({super.key});
+class Group5AnalysisPart1 extends StatefulWidget {
+  const Group5AnalysisPart1({super.key});
 
   @override
-  State<saltA_Group5AnalysisPart1> createState() => _saltA_Group5AnalysisPart1State();
+  State<Group5AnalysisPart1> createState() => _Group5AnalysisPart1State();
 }
 
-class _saltA_Group5AnalysisPart1State extends State<saltA_Group5AnalysisPart1>
+class _Group5AnalysisPart1State extends State<Group5AnalysisPart1>
     with SingleTickerProviderStateMixin {
   String? selectedOption;
   late final AnimationController _animController;
@@ -33,7 +33,7 @@ class _saltA_Group5AnalysisPart1State extends State<saltA_Group5AnalysisPart1>
     if (selectedOption != null) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const saltB_analysis_sr_ba_ca ()),
+        MaterialPageRoute(builder: (_) => const Analysis_BA_SR_CA()),
       );
     }
   }
@@ -142,8 +142,8 @@ class _saltA_Group5AnalysisPart1State extends State<saltA_Group5AnalysisPart1>
         title: ShaderMask(
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue]).createShader(bounds),
-          child: Text(
-            'Salt B: Wet Test',
+          child: const Text(
+            'Salt B : Wet Test',
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
           ),
         ),
@@ -193,4 +193,4 @@ class _saltA_Group5AnalysisPart1State extends State<saltA_Group5AnalysisPart1>
       ),
     );
   }
-}                                                                                                                                            
+}

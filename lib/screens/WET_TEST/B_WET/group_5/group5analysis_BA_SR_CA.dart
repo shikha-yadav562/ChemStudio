@@ -1,20 +1,21 @@
+
+import 'package:ChemStudio/screens/WET_TEST/B_WET/b_intro.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_5/group5_BA_ct.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_5/group5_CA_ct.dart';
+import 'package:ChemStudio/screens/WET_TEST/B_WET/group_5/group5_SR_ct.dart';
 import 'package:flutter/material.dart';
-import 'group5_BA_ct.dart';
-import 'group5_SR_ct.dart';
-import 'group5_CA_ct.dart';
-import '../b_intro.dart'; // Ensure this points to your Salt A intro screen
 
 const Color primaryBlue = Color(0xFF004C91);
 const Color accentTeal = Color(0xFF00A6A6);
 
-class saltB_analysis_sr_ba_ca extends StatefulWidget {
-  const saltB_analysis_sr_ba_ca({super.key});
+class Analysis_BA_SR_CA extends StatefulWidget {
+  const Analysis_BA_SR_CA({super.key});
 
   @override
-  State<saltB_analysis_sr_ba_ca> createState() => _saltB_analysis_sr_ba_caState();
+  State<Analysis_BA_SR_CA> createState() => _Analysis_BA_SR_CAState();
 }
 
-class _saltB_analysis_sr_ba_caState extends State<saltB_analysis_sr_ba_ca> {
+class _Analysis_BA_SR_CAState extends State<Analysis_BA_SR_CA> {
   String? selectedOption;
 
   @override
@@ -25,14 +26,15 @@ class _saltB_analysis_sr_ba_caState extends State<saltB_analysis_sr_ba_ca> {
         backgroundColor: Colors.white,
         elevation: 2,
         centerTitle: true,
-        // ADDED: Leading arrow to navigate back to Intro A
+        // 2. CUSTOM BACK ARROW LOGIC (Redirects to Intro D)
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: primaryBlue),
           onPressed: () {
-            Navigator.pushAndRemoveUntil(
+            Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const WetTestIntroBScreen()),
-              (route) => false,
+              MaterialPageRoute(
+                builder: (context) => const WetTestIntroBScreen(),
+              ),
             );
           },
         ),
@@ -40,7 +42,7 @@ class _saltB_analysis_sr_ba_caState extends State<saltB_analysis_sr_ba_ca> {
           shaderCallback: (bounds) =>
               const LinearGradient(colors: [accentTeal, primaryBlue])
                   .createShader(bounds),
-          child:Text(
+          child: const Text(
             'Salt B : Wet Test',
             style: TextStyle(
               color: Colors.white,
@@ -101,21 +103,21 @@ class _saltB_analysis_sr_ba_caState extends State<saltB_analysis_sr_ba_ca> {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltBgroup5_BA_ct()),
+            MaterialPageRoute(builder: (_) => const Group5CTBaScreen ()),
           );
         };
       } else if (selectedOption == "Ca²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltBgroup5_CA_ct()),
+            MaterialPageRoute(builder: (_) => const Group5CTCaScreen ()),
           );
         };
       } else if (selectedOption == "Sr²⁺ present") {
         onNextPressed = () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const saltBgroup5_SR_ct()),
+            MaterialPageRoute(builder: (_) => const Group5CTSrScreen ()),
           );
         };
       }
@@ -219,7 +221,7 @@ class _saltB_analysis_sr_ba_caState extends State<saltB_analysis_sr_ba_ca> {
             ),
             SizedBox(height: 6),
             Text(
-              "Yellow ppt",
+              "Yellow Ppt",
               style: TextStyle(
                 fontSize: 15,
                 color: primaryBlue,
@@ -258,7 +260,8 @@ class _saltB_analysis_sr_ba_caState extends State<saltB_analysis_sr_ba_ca> {
             style: TextStyle(
               fontSize: 15,
               color: selected ? accentTeal : Colors.black,
-              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              fontWeight:
+                  selected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
         ),
@@ -284,6 +287,8 @@ class _saltB_analysis_sr_ba_caState extends State<saltB_analysis_sr_ba_ca> {
     );
   }
 }
+
+// ==================== GRADIENT TEXT WIDGET ====================
 
 class GradientText extends StatelessWidget {
   final String text;

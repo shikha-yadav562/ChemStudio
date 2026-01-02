@@ -1,6 +1,6 @@
 import 'package:ChemStudio/DB/database_helper.dart';
 import 'package:ChemStudio/models/group_status.dart';
-import 'package:ChemStudio/screens/WET_TEST/C_WET/group_4/group4_detection.dart';
+import 'package:ChemStudio/screens/WET_TEST/D_WET/group_4/group4_detection.dart';
 import 'package:ChemStudio/screens/WET_TEST/D_WET/WetTestDFinalResultScreen.dart';
 import 'package:ChemStudio/screens/WET_TEST/D_WET/d_intro.dart';
 import 'package:flutter/material.dart';
